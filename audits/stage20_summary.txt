@@ -1,0 +1,18 @@
+Stage20 status snapshot.
+
+ok: True
+command: doctor
+error_type: None
+error_message: None
+diagnosis: healthy
+likely_cause: Проблем не обнаружено.
+recommended_action: Можно начинать штатную работу.
+
+Checks:
+- environment_ok: True
+- status_ok: True
+- master_index_ok: True
+- smoke_ok: True
+
+Interpretation:
+- CLI выглядит работоспособным.

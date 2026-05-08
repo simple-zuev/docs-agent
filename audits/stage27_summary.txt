@@ -1,0 +1,18 @@
+Stage27 passed.
+
+Done:
+- Google API operating notes added
+- quota/rate-limit classification synchronized into doctor-lite and doctor
+- real pipeline rc capture for smoke_explain documented in validation flow
+
+Validated:
+- py_compile OK
+- operator_start executed
+- preflight_check executed
+- doctor-lite snapshot captured
+- doctor snapshot captured
+- smoke_explain pipeline rc captured correctly
+
+Operational effect:
+- Google Sheets / Drive quota-sensitive failures should now classify closer to network/retryable
+- docs-agent baseline is better synchronized with real Google API behavior

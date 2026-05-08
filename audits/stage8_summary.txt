@@ -1,0 +1,11 @@
+Stage8 passed.
+Validated:
+- usage exit code = 1
+- success exit code = 0
+- not found exit code = 2
+Validated commands:
+- find-doc-any
+- open-doc-from-query
+- read-doc-from-query
+- ask(read flow)
+- status

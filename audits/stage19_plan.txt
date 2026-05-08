@@ -1,0 +1,33 @@
+Stage19 plan.
+
+Target:
+- prepare next iteration for doctor/diagnose capability
+
+Why:
+- current CLI is already usable, but operator diagnostics are still split across several commands
+- a single diagnostic entrypoint will reduce troubleshooting time
+- this is the highest-value best-practice improvement after Stage18
+
+Planned scope:
+- define doctor/diagnose command contract
+- define compact human output for doctor
+- define JSON output for doctor
+- define checks included in doctor:
+  - environment / venv
+  - status
+  - master index reachability
+  - smoke wrapper result
+  - summarized diagnosis
+- define exit code behavior for doctor
+- keep existing command contract stable
+
+Non-goals:
+- no breaking changes to find/open/read/ask/status
+- no removal of existing wrappers
+- no deep refactor unless required
+
+Recommended implementation notes:
+- build doctor as an additive command
+- reuse existing payload builders where possible
+- reuse compact diagnostic explanation layer
+- keep operator output short and actionable

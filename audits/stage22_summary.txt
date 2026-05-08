@@ -1,0 +1,18 @@
+Stage22 passed.
+
+Done:
+- doctor-lite added for routine preflight
+- doctor kept as deep diagnostic with smoke probe
+- operator_start switched to doctor-lite
+- preflight_check switched to doctor-lite
+- runbook and release status updated
+
+Validated:
+- py_compile OK
+- operator_start OK
+- preflight_check OK
+- doctor command still available
+
+Operational state:
+- ready for controlled daily use
+- routine start path is now separated from heavy smoke diagnostics

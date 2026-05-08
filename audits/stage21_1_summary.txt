@@ -1,0 +1,16 @@
+Stage21.1 passed.
+
+Done:
+- preflight_check changed to soft doctor-based gate
+- network/quota doctor diagnosis is no longer treated as hard blocker for routine start
+- operator runbook updated
+- current release status updated
+
+Validated:
+- py_compile OK
+- operator_start executed
+- preflight_check executed
+
+Operational state:
+- ready for controlled daily use
+- daily start is more robust under temporary quota pressure

@@ -1,0 +1,33 @@
+Current Release Status
+
+Component:
+- agent_cli.py
+
+Release stage:
+- stage27-reconciled
+
+Operational status:
+- stable enough for controlled daily use
+- routine path confirmed healthy
+- deep path is quota-sensitive and should be interpreted with reconciliation logic
+
+Primary operator entrypoint:
+- bash scripts/operator_start.sh
+
+Primary preflight:
+- bash scripts/preflight_check.sh
+
+Routine diagnostic:
+- python agent_cli.py doctor-lite
+
+Deep diagnostic:
+- python agent_cli.py doctor
+
+Explained smoke:
+- bash scripts/regression_smoke_explain.sh
+
+Notes:
+- Google Sheets API remains the main quota-sensitive dependency
+- 429 / RATE_LIMIT_EXCEEDED style failures should be treated as network/retryable
+- final deep conclusions should use reconciliation run when needed
+- next engineering step: MASTER_INDEX cache + memoization

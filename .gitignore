@@ -1,0 +1,54 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtualenvs
+venv/
+venv312/
+.venv/
+
+# OS / editors
+.DS_Store
+.idea/
+.vscode/
+
+# Local env / secrets
+.env
+.env.*
+secrets/
+*.pem
+*.key
+*.crt
+token.json
+credentials.json
+service_account*.json
+client_secret*.json
+
+# Logs / temp
+*.log
+tmp/
+.temp/
+*.tmp
+
+# Python build artifacts
+build/
+dist/
+*.egg-info/
+
+# Local snapshots
+backups/
+
+# Optional noisy artifacts
+audits/*.bak
+
+# Project-local noisy folders/files
+cache/
+exports/
+reports/
+tmp_upload_test.txt
+auth_and_scan.py.bak-*

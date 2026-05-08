@@ -1,0 +1,238 @@
+== usage no command ==
+ok: False
+command: usage
+error_type: UsageError
+error_message: Missing command.
+
+Usage:
+  python agent_cli.py status
+  python agent_cli.py find-doc-id <DOC-XXXX>
+  python agent_cli.py find-doc-name <document name>
+  python agent_cli.py find-link <drive_id_or_url_fragment>
+  python agent_cli.py find-doc-any <query>   | f <query>
+  python agent_cli.py open-doc-from-query <query>   | o <query>
+  python agent_cli.py read-doc-from-query <query>   | r <query>
+  python agent_cli.py get-file <google_drive_file_id>
+  python agent_cli.py read-doc <google_doc_id>
+  python agent_cli.py ask [--json] <free text query>   | q [--json] <query>
+
+exit_code=1 expected=1
+== usage missing query ==
+ok: False
+command: usage
+error_type: UsageError
+error_message: Missing query argument.
+
+Usage:
+  python agent_cli.py status
+  python agent_cli.py find-doc-id <DOC-XXXX>
+  python agent_cli.py find-doc-name <document name>
+  python agent_cli.py find-link <drive_id_or_url_fragment>
+  python agent_cli.py find-doc-any <query>   | f <query>
+  python agent_cli.py open-doc-from-query <query>   | o <query>
+  python agent_cli.py read-doc-from-query <query>   | r <query>
+  python agent_cli.py get-file <google_drive_file_id>
+  python agent_cli.py read-doc <google_doc_id>
+  python agent_cli.py ask [--json] <free text query>   | q [--json] <query>
+
+exit_code=1 expected=1
+== find success ==
+ok: True
+route: find-doc-any
+query: DOC-0001
+document_id: DOC-0001
+document_name: 00_MASTER_INDEX_АСТЦВ_v3
+link: https://docs.google.com/spreadsheets/d/1hyWNNzsIHRLGJ65urOQUA0x_kOqCP61OkXcM3MMyedw
+exit_code=0 expected=0
+== find not found ==
+ok: False
+command: find-doc-any
+query: DOC-9999
+error_type: NotFound
+error_message: No matches found by Document ID, Document Name, or Link fragment.
+retryable: False
+auth_related: False
+network_related: False
+exit_code=2 expected=2
+== open success ==
+ok: True
+route: open-doc-from-query
+query: DOC-0002
+google_object_id: 1Sb24YW8UvEMq3qIP5KPc-MfHK0Sx7ABqEhM9Espvhc0
+document_id: DOC-0002
+document_name: 00_PROJECT_AI_OPERATING_PROMPT_АСТЦВ
+link: https://docs.google.com/document/d/1Sb24YW8UvEMq3qIP5KPc-MfHK0Sx7ABqEhM9Espvhc0
+exit_code=0 expected=0
+== open not found ==
+ok: False
+command: find-doc-any
+query: DOC-9999
+error_type: NotFound
+error_message: No matches found by Document ID, Document Name, or Link fragment.
+retryable: False
+auth_related: False
+network_related: False
+exit_code=2 expected=2
+== read success ==
+ok: True
+route: read-doc-from-query
+query: 00_PROJECT_AI_OPERATING_PROMPT_АСТЦВ
+document_id: DOC-0002
+document_name: 00_PROJECT_AI_OPERATING_PROMPT_АСТЦВ
+link: https://docs.google.com/document/d/1Sb24YW8UvEMq3qIP5KPc-MfHK0Sx7ABqEhM9Espvhc0
+
+content_preview:
+00_PROJECT_AI_OPERATING_PROMPT_АСТЦВ
+
+Статус документа: Базовый операционный документ
+Версия: 2.0
+Проект: АСТЦВ
+Расположение: 00_Управление_проектом
+
+1. Назначение документа
+
+Настоящий документ определяет общий порядок работы документационного оператора с проектом АСТЦВ, документацией, repository на Google Drive, архитектурными материалами, требованиями, комплаенс-документацией, пользовательскими сценариями, аналитическими справками, схемами и реестрами.
+
+Документ используется как:
+- базовая инструкция проекта;
+- рабочий порядок сопровождения документации;
+- инструкция по поддержанию repository в управляемом состоянии;
+- источник правил для подготовки и проверки документов.
+
+2. Общий режим работы
+
+Проект АСТЦВ рассматривается как регулируемая финансово-технологическая платформа для операций с криптовалютой в юрисдикции Российской Федерации.
+
+Текущий этап проекта:
+- стадия предварительной продуктовой и архитектурной проработки;
+- подготовка к формированию технической команды;
+- подготовка к архитектурной, юридической и комплаенс-проверке;
+- формирование управляемого документационного контура;
+- подготовка материалов для будущего технического руководителя, продуктовой команды, юридич
+
+[truncated]
+exit_code=0 expected=0
+== read not found ==
+ok: False
+command: find-doc-any
+query: NON_EXISTENT_DOCUMENT_NAME
+error_type: NotFound
+error_message: No matches found by Document ID, Document Name, or Link fragment.
+retryable: False
+auth_related: False
+network_related: False
+exit_code=2 expected=2
+== ask read success ==
+ok: True
+route: read-doc-from-query
+query: прочитай 00_PROJECT_AI_OPERATING_PROMPT_АСТЦВ
+document_id: DOC-0002
+document_name: 00_PROJECT_AI_OPERATING_PROMPT_АСТЦВ
+link: https://docs.google.com/document/d/1Sb24YW8UvEMq3qIP5KPc-MfHK0Sx7ABqEhM9Espvhc0
+
+content_preview:
+00_PROJECT_AI_OPERATING_PROMPT_АСТЦВ
+
+Статус документа: Базовый операционный документ
+Версия: 2.0
+Проект: АСТЦВ
+Расположение: 00_Управление_проектом
+
+1. Назначение документа
+
+Настоящий документ определяет общий порядок работы документационного оператора с проектом АСТЦВ, документацией, repository на Google Drive, архитектурными материалами, требованиями, комплаенс-документацией, пользовательскими сценариями, аналитическими справками, схемами и реестрами.
+
+Документ используется как:
+- базовая инструкция проекта;
+- рабочий порядок сопровождения документации;
+- инструкция по поддержанию repository в управляемом состоянии;
+- источник правил для подготовки и проверки документов.
+
+2. Общий режим работы
+
+Проект АСТЦВ рассматривается как регулируемая финансово-технологическая платформа для операци
+
+[truncated]
+exit_code=0 expected=0
+== ask read not found ==
+ok: False
+route: read-doc-from-query
+query: прочитай NON_EXISTENT_DOCUMENT_NAME
+error_type: NotFound
+error_message: No matches found by Document ID, Document Name, or Link fragment.
+exit_code=2 expected=2
+== status success ==
+{
+  "ok": true,
+  "command": "status",
+  "safety": {
+    "ok": true,
+    "command": "show-safety-mode",
+    "mode": "readonly",
+    "default_dry_run": true,
+    "forbid_master_index_write": true,
+    "forbid_delete": true,
+    "default_test_folder": "200_Офис",
+    "_debug": {
+      "returncode": 0,
+      "stderr": "",
+      "cmd": [
+        "/Users/zuevvladimir/AI/docs-agent/venv312/bin/python",
+        "/Users/zuevvladimir/AI/docs-agent/docs_agent.py",
+        "show-safety-mode",
+        "--json-output"
+      ],
+      "timeout_sec": 60
+    },
+    "_retry": {
+      "used": false,
+      "attempt_count": 1,
+      "attempts": [
+        {
+          "attempt": 1,
+          "ok": true,
+          "error_type": null,
+          "error_message": null
+        }
+      ]
+    }
+  },
+  "config": {
+    "ok": true,
+    "command": "show-config-status",
+    "safety_mode": "readonly",
+    "default_dry_run": true,
+    "forbid_master_index_write": true,
+    "forbid_delete": true,
+    "default_test_folder": "200_Офис",
+    "master_index_spreadsheet_id": "1hyWNNzsIHRLGJ65urOQUA0x_kOqCP61OkXcM3MMyedw",
+    "master_index_sheet_name": "MASTER_INDEX",
+    "change_log_spreadsheet_id": "1-6F5MCJR2EkP74pROsYXsPMmu1zPwp82hl0mDi9U3EQ",
+    "change_log_sheet_name": "Change Log Lite",
+    "identity_note": "registry identity != drive identity",
+    "_debug": {
+      "returncode": 0,
+      "stderr": "",
+      "cmd": [
+        "/Users/zuevvladimir/AI/docs-agent/venv312/bin/python",
+        "/Users/zuevvladimir/AI/docs-agent/docs_agent.py",
+        "show-config-status",
+        "--json-output"
+      ],
+      "timeout_sec": 60
+    },
+    "_retry": {
+      "used": false,
+      "attempt_count": 1,
+      "attempts": [
+        {
+          "attempt": 1,
+          "ok": true,
+          "error_type": null,
+          "error_message": null
+        }
+      ]
+    }
+  }
+}
+exit_code=0 expected=0

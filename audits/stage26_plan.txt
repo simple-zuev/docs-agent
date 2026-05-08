@@ -1,0 +1,19 @@
+Stage26 plan.
+
+Target:
+- introduce quota-aware operational baseline without breaking CLI contract
+
+Step 1:
+- document quota and rate-limit policy
+- improve top-level CLI classification for 429 / quota / rate-limit cases
+
+Step 2:
+- add MASTER_INDEX cache with TTL
+- reduce repeated lookup pressure
+
+Step 3:
+- move multi-strategy search to one-fetch local filtering where possible
+
+Non-goals for current step:
+- no breaking changes to find/open/read/ask/status/doctor-lite/doctor contract
+- no deep refactor of repository structure

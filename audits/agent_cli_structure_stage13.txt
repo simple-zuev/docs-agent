@@ -1,0 +1,842 @@
+
+========================================================================================================================
+import 
+index: 0
+import json
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+BASE = Path.home() / "AI" / "docs-agent"
+DOCS_AGENT = BASE / "docs_agent.py"
+PYTHON_BIN = sys.executable
+MASTER_INDEX_ID = "1hyWNNzsIHRLGJ65urOQUA0x_kOqCP61OkXcM3MMyedw"
+MASTER_INDEX_SHEET = "MASTER_INDEX"
+
+EXIT_OK = 0
+EXIT_USAGE_ERROR = 1
+EXIT_NOT_FOUND = 2
+EXIT_AUTH_ERROR = 3
+EXIT_NETWORK_ERROR = 4
+EXIT_INTERNAL_ERROR = 5
+EXIT_INTERRUPTED = 130
+
+COL_DOCUMENT_ID = 0
+COL_DOCUMENT_NAME = 1
+COL_LINK = 14
+
+DOCS_AGENT_TIMEOUT_SEC = 60
+
+
+
+
+
+
+========================================================================================================================
+def build_error_payload(
+index: 14705
+def build_error_payload(
+    *,
+    command: str,
+    query: str | None = None,
+    error_type: str,
+    error_message: str,
+    retryable: bool = False,
+    auth_related: bool = False,
+    network_related: bool = False,
+    **extra,
+) -> dict:
+    payload = {
+        "ok": False,
+        "command": command,
+        "error_type": error_type,
+        "error_message": error_message,
+        "retryable": retryable,
+        "auth_related": auth_related,
+        "network_related": network_related,
+    }
+    if query is not None:
+        payload["query"] = query
+    payload.update(extra)
+    return payload
+
+
+
+========================================================================================================================
+def run_docs_agent(
+index: 4593
+def run_docs_agent(args: list[str]) -> dict:
+    cmd = [PYTHON_BIN, str(DOCS_AGENT)] + args + ["--json-output"]
+
+    try:
+        proc = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            timeout=DOCS_AGENT_TIMEOUT_SEC,
+        )
+    except subprocess.TimeoutExpired as exc:
+        return build_error_payload(
+            command="subprocess",
+            error_type="TimeoutExpired",
+            error_message=f"docs_agent.py timed out after {DOCS_AGENT_TIMEOUT_SEC} seconds.",
+            retryable=True,
+            auth_related=False,
+            network_related=True,
+            _debug={
+                "cmd": cmd,
+                "timeout_sec": DOCS_AGENT_TIMEOUT_SEC,
+                "stdout_preview": (exc.stdout or "")[:500] if exc.stdout else "",
+                "stderr_preview": (exc.stderr or "")[:500] if exc.stderr else "",
+            },
+        )
+    except Exception as exc:
+        return build_error_payload(
+            command="subprocess",
+            error_type=exc.__class__.__name__,
+            error_message=f"Failed to start docs_agent.py: {exc}",
+            retryable=False,
+            auth_related=False,
+            network_related=False,
+            _debug={
+                "cmd": cmd,
+            },
+        )
+
+    stdout = (proc.stdout or "").strip()
+    stderr = (proc.stderr or "").strip()
+
+    if not stdout:
+        return build_error_payload(
+            command="subprocess",
+            error_type="EmptyOutput",
+            error_message="No stdout from docs_agent.py.",
+            retryable=False,
+            auth_related=False,
+            network_related=False,
+            _debug={
+                "returncode": proc.returncode,
+                "stderr": stderr,
+                "stdout_preview": stdout[:500],
+                "cmd": cmd,
+                "timeout_sec": DOCS_AGENT_TIMEOUT_SEC,
+            },
+        )
+
+    try:
+        data = json.loads(stdout)
+    except Exception as exc:
+        return build_error_payload(
+            command="subprocess",
+            error_type=exc.__class__.__name__,
+            error_message="Failed to parse JSON output from docs_agent.py.",
+            retryable=False,
+            auth_related=False,
+            network_related=False,
+            _debug={
+                "returncode": proc.returncode,
+                "stderr": stderr,
+                "stdout_preview": stdout[:1000],
+                "cmd": cmd,
+                "timeout_sec": DOCS_AGENT_TIMEOUT_SEC,
+            },
+        )
+
+    if "_debug" not in data:
+        data["_debug"] = {
+            "returncode": proc.returncode,
+            "stderr": stderr,
+            "cmd": cmd,
+            "timeout_sec": DOCS_AGENT_TIMEOUT_SEC,
+        }
+
+    return data
+
+
+
+========================================================================================================================
+def run_docs_agent_with_retry(
+index: 3554
+def run_docs_agent_with_retry(args: list[str], retries: int = 3, sleep_sec: float = 1.0) -> dict:
+    import time
+
+    attempts = []
+    last = None
+
+    for attempt in range(1, retries + 1):
+        payload = run_docs_agent(args)
+        attempts.append({
+            "attempt": attempt,
+            "ok": payload.get("ok"),
+            "error_type": payload.get("error_type"),
+            "error_message": payload.get("error_message"),
+        })
+        last = payload
+
+        if payload.get("ok"):
+            payload["_retry"] = {
+                "used": attempt > 1,
+                "attempt_count": attempt,
+                "attempts": attempts,
+            }
+            return payload
+
+        if attempt < retries and is_retryable_network_error(payload):
+            time.sleep(sleep_sec)
+            continue
+
+        break
+
+    if isinstance(last, dict):
+        last["_retry"] = {
+            "used": len(attempts) > 1,
+            "attempt_count": len(attempts),
+            "attempts": attempts,
+        }
+    return last
+
+
+========================================================================================================================
+def extract_google_id_from_link(
+index: 8901
+def extract_google_id_from_link(link: str | None) -> str | None:
+    if not link:
+        return None
+
+    patterns = [
+        r"/document/d/([a-zA-Z0-9_-]+)",
+        r"/spreadsheets/d/([a-zA-Z0-9_-]+)",
+        r"/file/d/([a-zA-Z0-9_-]+)",
+        r"/folders/([a-zA-Z0-9_-]+)",
+    ]
+    for pat in patterns:
+        m = re.search(pat, link)
+        if m:
+            return m.group(1)
+
+    if re.fullmatch(r"[a-zA-Z0-9_-]{20,}", link):
+        return link
+
+    return None
+
+
+
+========================================================================================================================
+def normalize_query_for_lookup(
+index: 9494
+def normalize_query_for_lookup(query: str) -> str:
+    q = query.strip()
+
+    prefixes = [
+        "прочитай ",
+        "read ",
+        "read-doc ",
+        "открой ",
+        "open ",
+        "show ",
+        "покажи ",
+        "найди ",
+        "find ",
+        "документ ",
+        "doc ",
+    ]
+
+    ql = q.lower()
+    changed = True
+    while changed:
+        changed = False
+        for prefix in prefixes:
+            if ql.startswith(prefix):
+                q = q[len(prefix):].strip()
+                ql = q.lower()
+                changed = True
+
+    return q
+
+
+
+========================================================================================================================
+def find_doc_any_payload(
+index: 11631
+def find_doc_any_payload(query: str) -> dict:
+    attempts = []
+
+    by_id = run_docs_agent_with_retry([
+        "find-row-by-column",
+        MASTER_INDEX_ID,
+        MASTER_INDEX_SHEET,
+        "Document ID",
+        query,
+    ])
+    attempts.append(summarize_attempt("Document ID", by_id))
+    if by_id.get("ok") and by_id.get("matches_found", 0) > 0:
+        return build_find_doc_success_payload(
+            query=query,
+            matched_by="Document ID",
+            result=by_id,
+            attempts=attempts,
+        )
+
+    by_name = run_docs_agent_with_retry([
+        "find-row-by-column",
+        MASTER_INDEX_ID,
+        MASTER_INDEX_SHEET,
+        "Document Name",
+        query,
+    ])
+    attempts.append(summarize_attempt("Document Name", by_name))
+    if by_name.get("ok") and by_name.get("matches_found", 0) > 0:
+        return build_find_doc_success_payload(
+            query=query,
+            matched_by="Document Name",
+            result=by_name,
+            attempts=attempts,
+        )
+
+    by_link = run_docs_agent_with_retry([
+        "find-row-by-link-fragment",
+        MASTER_INDEX_ID,
+        MASTER_INDEX_SHEET,
+        query,
+    ])
+    attempts.append(summarize_attempt("Link fragment", by_link))
+    if by_link.get("ok") and by_link.get("matches_found", 0) > 0:
+        return build_find_doc_success_payload(
+            query=query,
+            matched_by="Link fragment",
+            result=by_link,
+            attempts=attempts,
+        )
+
+    return build_error_payload(
+        command="find-doc-any",
+        query=query,
+        error_type="NotFound",
+        error_message="No matches found by Document ID, Document Name, or Link fragment.",
+        attempts=attempts,
+    )
+
+
+
+
+
+========================================================================================================================
+def open_doc_from_query_payload(
+index: 15967
+def open_doc_from_query_payload(query: str) -> dict:
+    found = find_doc_any_payload(query)
+    if not found.get("ok"):
+        return found
+
+    link = (found.get("summary") or {}).get("link")
+    google_id = extract_google_id_from_link(link)
+
+    return {
+        "ok": True,
+        "command": "open-doc-from-query",
+        "query": query,
+        "matched_by": found.get("matched_by"),
+        "summary": found.get("summary"),
+        "google_object_id": google_id,
+        "find_result": found,
+    }
+
+
+
+========================================================================================================================
+def read_doc_from_query_payload(
+index: 16477
+def read_doc_from_query_payload(query: str) -> dict:
+    found = find_doc_any_payload(query)
+    if not found.get("ok"):
+        return found
+
+    link = (found.get("summary") or {}).get("link")
+    google_id = extract_google_id_from_link(link)
+
+    if not google_id:
+        return build_error_payload(
+            command="read-doc-from-query",
+            query=query,
+            error_type="LinkParseError",
+            error_message="Could not extract Google document ID from link.",
+            summary=found.get("summary"),
+        )
+
+    read_result = run_docs_agent_with_retry(["read-doc", google_id])
+
+    return {
+        "ok": bool(read_result.get("ok")),
+        "command": "read-doc-from-query",
+        "query": query,
+        "matched_by": found.get("matched_by"),
+        "summary": found.get("summary"),
+        "google_object_id": google_id,
+        "find_result": found,
+        "read_result": read_result,
+    }
+
+
+
+========================================================================================================================
+def is_status_query(
+index: 18462
+def is_status_query(query_lower: str) -> bool:
+    return any(x in query_lower for x in [
+        "status",
+        "статус",
+        "mode",
+        "режим",
+        "config",
+        "конфиг",
+        "безопас",
+    ])
+
+
+
+========================================================================================================================
+def is_read_query(
+index: 18685
+def is_read_query(query_lower: str) -> bool:
+    return any(x in query_lower for x in [
+        "read",
+        "прочитай",
+        "read-doc",
+        "content",
+        "содержимое",
+        "текст документа",
+    ])
+
+
+
+========================================================================================================================
+def build_ask_result(
+index: 18906
+def build_ask_result(query: str, routed_to: str, result: dict, **extra) -> dict:
+    payload = {
+        "ok": bool(result.get("ok")),
+        "command": "ask",
+        "query": query,
+        "routed_to": routed_to,
+        "result": result,
+    }
+    payload.update(extra)
+    return payload
+
+
+
+========================================================================================================================
+def ask_status_payload(
+index: 19202
+def ask_status_payload(query: str) -> dict:
+    result = cmd_status_payload()
+    return build_ask_result(query, "status", result)
+
+
+
+========================================================================================================================
+def ask_read_payload(
+index: 19335
+def ask_read_payload(query: str, lookup_query: str) -> dict:
+    result = read_doc_from_query_payload(lookup_query)
+    return build_ask_result(query, "read-doc-from-query", result)
+
+
+
+========================================================================================================================
+def ask_google_id_payload(
+index: 19519
+def ask_google_id_payload(query: str, lookup_query: str) -> dict:
+    found = find_doc_any_payload(lookup_query)
+    if found.get("ok"):
+        return build_ask_result(query, "find-doc-any", found)
+
+    file_result = run_docs_agent_with_retry(["get-file", lookup_query])
+    return {
+        "ok": bool(file_result.get("ok")),
+        "command": "ask",
+        "query": query,
+        "routed_to": "get-file",
+        "result": file_result,
+        "fallback_from": found,
+    }
+
+
+
+========================================================================================================================
+def ask_find_payload(
+index: 20001
+def ask_find_payload(query: str, lookup_query: str) -> dict:
+    found = find_doc_any_payload(lookup_query)
+    return build_ask_result(query, "find-doc-any", found)
+
+
+
+========================================================================================================================
+def ask_payload(
+index: 20169
+def ask_payload(query: str) -> dict:
+    q = query.strip()
+    ql = q.lower()
+    lookup_query = normalize_query_for_lookup(q)
+
+    if is_status_query(ql):
+        return ask_status_payload(query)
+
+    if is_read_query(ql):
+        return ask_read_payload(query, lookup_query)
+
+    if looks_like_google_id(lookup_query):
+        return ask_google_id_payload(query, lookup_query)
+
+    return ask_find_payload(query, lookup_query)
+
+
+
+========================================================================================================================
+def print_json(
+index: 7373
+def print_json(payload: dict) -> None:
+    print(json.dumps(payload, ensure_ascii=False, indent=2))
+
+
+========================================================================================================================
+def print_compact_find(
+index: 517
+def print_compact_find(payload: dict):
+    print(f"ok: {payload.get('ok')}")
+    print("route: find-doc-any")
+    print(f"query: {payload.get('query')}")
+    summary = payload.get("summary") or {}
+    if summary:
+        print(f"document_id: {summary.get('document_id')}")
+        print(f"document_name: {summary.get('document_name')}")
+        print(f"link: {summary.get('link')}")
+
+
+========================================================================================================================
+def print_compact_open(
+index: 901
+def print_compact_open(payload: dict):
+    print(f"ok: {payload.get('ok')}")
+    print("route: open-doc-from-query")
+    print(f"query: {payload.get('query')}")
+    print(f"google_object_id: {payload.get('google_object_id')}")
+    summary = payload.get("summary") or {}
+    if summary:
+        print(f"document_id: {summary.get('document_id')}")
+        print(f"document_name: {summary.get('document_name')}")
+        print(f"link: {summary.get('link')}")
+
+
+========================================================================================================================
+def print_compact_read(
+index: 1358
+def print_compact_read(payload: dict):
+    print(f"ok: {payload.get('ok')}")
+    print("route: read-doc-from-query")
+    print(f"query: {payload.get('query')}")
+    summary = payload.get("summary") or {}
+    if summary:
+        print(f"document_id: {summary.get('document_id')}")
+        print(f"document_name: {summary.get('document_name')}")
+        print(f"link: {summary.get('link')}")
+
+    read_result = payload.get("read_result") or {}
+    content = read_result.get("content", "")
+    if content:
+        print("")
+        print("content_preview:")
+        preview = content[:1200]
+        print(preview)
+        if read_result.get("truncated") or len(content) > 1200:
+            print("")
+            print("[truncated]")
+
+
+========================================================================================================================
+def build_compact_ask_output(
+index: 20600
+def build_compact_ask_output(payload: dict) -> list[str]:
+    lines: list[str] = []
+    ok = payload.get("ok", False)
+    routed = payload.get("routed_to", "unknown")
+    query = payload.get("query", "")
+
+    lines.append(f"ok: {ok}")
+    lines.append(f"route: {routed}")
+    lines.append(f"query: {query}")
+
+    if routed == "status":
+        result = payload.get("result", {})
+        safety = result.get("safety", {})
+        config = result.get("config", {})
+        lines.append(f"mode: {safety.get('mode')}")
+        lines.append(f"default_test_folder: {safety.get('default_test_folder')}")
+        lines.append(f"master_index: {config.get('master_index_sheet_name')} / {config.get('master_index_spreadsheet_id')}")
+        return lines
+
+    if routed in {"find-doc-any", "get-file"}:
+        result = payload.get("result", {})
+
+        if result.get("command") == "find-doc-any":
+            summary = result.get("summary", {})
+            lines.append(f"document_id: {summary.get('document_id')}")
+            lines.append(f"document_name: {summary.get('document_name')}")
+            lines.append(f"link: {summary.get('link')}")
+            return lines
+
+        if result.get("command") == "get-file":
+            f = result.get("file", {})
+            lines.append(f"file_id: {f.get('id')}")
+            lines.append(f"name: {f.get('name')}")
+            lines.append(f"mime: {f.get('mimeType')}")
+            lines.append(f"link: {f.get('webViewLink')}")
+            return lines
+
+    if routed == "read-doc-from-query":
+        result = payload.get("result", {}) or {}
+
+        if not result.get("ok"):
+            lines.append(f"error_type: {result.get('error_type')}")
+            lines.append(f"error_message: {result.get('error_message')}")
+            return lines
+
+        summary = result.get("summary", {}) or {}
+        read_result = result.get("read_result", {}) or {}
+        content = read_result.get("content", "") or ""
+        content_preview = content[:800]
+
+        lines.append(f"document_id: {summary.get('document_id')}")
+        lines.append(f"document_name: {summary.get('document_name')}")
+        lines.append(f"link: {summary.get('link')}")
+        lines.append("")
+        lines.append("content_preview:")
+        lines.append(content_preview)
+        if read_result.get("truncated"):
+            lines.append("")
+            lines.append("[truncated]")
+        return lines
+
+    if not ok:
+        result = payload.get("result", {})
+        lines.append(f"error_type: {result.get('error_type') or payload.get('error_type')}")
+        lines.append(f"error_message: {result.get('error_message') or payload.get('error_message')}")
+        return lines
+
+    lines.append(json.dumps(payload, ensure_ascii=False, indent=2))
+    return lines
+
+
+
+========================================================================================================================
+def print_human_lines(
+index: 8207
+def print_human_lines(lines: list[str]) -> None:
+    for line in lines:
+        print(line)
+
+
+
+========================================================================================================================
+def parse_json_flag(
+index: 23637
+def parse_json_flag(argv: list[str]) -> tuple[bool, list[str]]:
+    json_output = False
+    args = argv[:]
+    if args and args[0] == "--json":
+        json_output = True
+        args = args[1:]
+    return json_output, args
+
+
+
+
+========================================================================================================================
+def handle_query_command(
+index: 24113
+def handle_query_command(
+    argv: list[str],
+    handler,
+    *,
+    allow_json_flag: bool = False,
+) -> int:
+    if allow_json_flag:
+        json_output, args = parse_json_flag(argv)
+    else:
+        json_output, args = False, argv[:]
+
+    if not args:
+        print_usage_error("Missing query argument.")
+        return EXIT_USAGE_ERROR
+
+    value = " ".join(args)
+    if allow_json_flag:
+        return handler(value, json_output=json_output)
+    return handler(value)
+
+
+========================================================================================================================
+def cmd_find_doc_any(
+index: 17413
+def cmd_find_doc_any(query: str, json_output: bool = False) -> int:
+    payload = find_doc_any_payload(query)
+    if json_output:
+        print_json(payload)
+    else:
+        if payload.get("ok"):
+            print_compact_find(payload)
+        else:
+            print_compact_error(payload)
+    return resolve_command_exit_code(payload)
+
+
+
+========================================================================================================================
+def cmd_open_doc_from_query(
+index: 17754
+def cmd_open_doc_from_query(query: str, json_output: bool = False) -> int:
+    payload = open_doc_from_query_payload(query)
+    if json_output:
+        print_json(payload)
+    else:
+        if payload.get("ok"):
+            print_compact_open(payload)
+        else:
+            print_compact_error(payload)
+    return resolve_command_exit_code(payload)
+
+
+========================================================================================================================
+def cmd_read_doc_from_query(
+index: 18108
+def cmd_read_doc_from_query(query: str, json_output: bool = False) -> int:
+    payload = read_doc_from_query_payload(query)
+    if json_output:
+        print_json(payload)
+    else:
+        if payload.get("ok"):
+            print_compact_read(payload)
+        else:
+            print_compact_error(payload)
+    return resolve_command_exit_code(payload)
+
+
+========================================================================================================================
+def cmd_ask(
+index: 23377
+def cmd_ask(query: str, json_output: bool = False) -> int:
+    payload = ask_payload(query)
+    if json_output:
+        print_json(payload)
+    else:
+        print_human_lines(build_compact_ask_output(payload))
+    return resolve_command_exit_code(payload)
+
+
+
+
+========================================================================================================================
+def usage(
+index: 24837
+def usage() -> None:
+    print(
+        "Usage:\n"
+        "  python agent_cli.py status [--json]\n"
+        "  python agent_cli.py find-doc-id <DOC-XXXX>\n"
+        "  python agent_cli.py find-doc-name <document name>\n"
+        "  python agent_cli.py find-link <drive_id_or_url_fragment>\n"
+        "  python agent_cli.py find-doc-any [--json] <query>        | f [--json] <query>\n"
+        "  python agent_cli.py open-doc-from-query [--json] <query> | o [--json] <query>\n"
+        "  python agent_cli.py read-doc-from-query [--json] <query> | r [--json] <query>\n"
+        "  python agent_cli.py get-file <google_drive_file_id>\n"
+        "  python agent_cli.py read-doc <google_doc_id>\n"
+        "  python agent_cli.py ask [--json] <free text query>       | q [--json] <query>\n"
+        "\n"
+        "Examples:\n"
+        "  python agent_cli.py status\n"
+        "  python agent_cli.py status --json\n"
+        "  python agent_cli.py f DOC-0001\n"
+        "  python agent_cli.py o DOC-0002\n"
+        "  python agent_cli.py r DOC-0002\n"
+        "  python agent_cli.py r \"00_PROJECT_AI_OPERATING_PROMPT_АСТЦВ\"\n"
+        "  python agent_cli.py q \"прочитай DOC-0002\"\n"
+        "  python agent_cli.py q --json \"прочитай 00_PROJECT_AI_OPERATING_PROMPT_АСТЦВ\"\n"
+    )
+
+
+
+========================================================================================================================
+def main() -> int:
+index: 26583
+def main() -> int:
+    if len(sys.argv) < 2:
+        print_usage_error("Missing command.")
+        return EXIT_USAGE_ERROR
+
+    cmd = sys.argv[1]
+    argv = sys.argv[2:]
+
+    try:
+        if cmd == "status":
+            json_output, args = parse_json_flag(argv)
+            if args:
+                print_usage_error("status does not accept positional arguments.")
+                return EXIT_USAGE_ERROR
+            return cmd_status(json_output=json_output)
+
+        if cmd == "find-doc-id":
+            if len(argv) < 1:
+                print_usage_error("Missing DOC-XXXX argument.")
+                return EXIT_USAGE_ERROR
+            cmd_find_doc_id(argv[0])
+            return EXIT_OK
+
+        if cmd == "find-doc-name":
+            return handle_query_command(argv, cmd_find_doc_name)
+
+        if cmd == "find-link":
+            return handle_query_command(argv, cmd_find_link)
+
+        if cmd in {"find-doc-any", "f"}:
+            return handle_query_command(argv, cmd_find_doc_any, allow_json_flag=True)
+
+        if cmd in {"open-doc-from-query", "o"}:
+            return handle_query_command(argv, cmd_open_doc_from_query, allow_json_flag=True)
+
+        if cmd in {"read-doc-from-query", "r"}:
+            return handle_query_command(argv, cmd_read_doc_from_query, allow_json_flag=True)
+
+        if cmd == "get-file":
+            if len(argv) < 1:
+                print_usage_error("Missing google_drive_file_id argument.")
+                return EXIT_USAGE_ERROR
+            cmd_get_file(argv[0])
+            return EXIT_OK
+
+        if cmd == "read-doc":
+            if len(argv) < 1:
+                print_usage_error("Missing google_doc_id argument.")
+                return EXIT_USAGE_ERROR
+            cmd_read_doc(argv[0])
+            return EXIT_OK
+
+        if cmd in {"ask", "q"}:
+            return handle_query_command(argv, cmd_ask, allow_json_flag=True)
+
+        print_usage_error(f"Unknown command: {cmd}")
+        return EXIT_USAGE_ERROR
+
+    except KeyboardInterrupt:
+        print_json({
+            "ok": False,
+            "command": cmd,
+            "error_type": "KeyboardInterrupt",
+            "error_message": "Interrupted by user",
+            "retryable": True,
+            "auth_related": False,
+            "network_related": False,
+        })
+        return EXIT_INTERRUPTED
+

@@ -1,0 +1,264 @@
+== open compact missing doc ==
+ok: False
+command: find-doc-any
+query: DOC-9999
+error_type: NotFound
+error_message: No matches found by Document ID, Document Name, or Link fragment.
+retryable: False
+auth_related: False
+network_related: False
+== open json missing doc ==
+{
+  "ok": false,
+  "command": "find-doc-any",
+  "error_type": "NotFound",
+  "error_message": "No matches found by Document ID, Document Name, or Link fragment.",
+  "retryable": false,
+  "auth_related": false,
+  "network_related": false,
+  "query": "DOC-9999",
+  "attempts": [
+    {
+      "strategy": "Document ID",
+      "ok": true,
+      "matches_found": 0,
+      "error_type": null,
+      "error_message": null,
+      "debug": {
+        "returncode": 0,
+        "stderr": "",
+        "cmd": [
+          "/Users/zuevvladimir/AI/docs-agent/venv312/bin/python",
+          "/Users/zuevvladimir/AI/docs-agent/docs_agent.py",
+          "find-row-by-column",
+          "1hyWNNzsIHRLGJ65urOQUA0x_kOqCP61OkXcM3MMyedw",
+          "MASTER_INDEX",
+          "Document ID",
+          "DOC-9999",
+          "--json-output"
+        ],
+        "timeout_sec": 60
+      }
+    },
+    {
+      "strategy": "Document Name",
+      "ok": true,
+      "matches_found": 0,
+      "error_type": null,
+      "error_message": null,
+      "debug": {
+        "returncode": 0,
+        "stderr": "",
+        "cmd": [
+          "/Users/zuevvladimir/AI/docs-agent/venv312/bin/python",
+          "/Users/zuevvladimir/AI/docs-agent/docs_agent.py",
+          "find-row-by-column",
+          "1hyWNNzsIHRLGJ65urOQUA0x_kOqCP61OkXcM3MMyedw",
+          "MASTER_INDEX",
+          "Document Name",
+          "DOC-9999",
+          "--json-output"
+        ],
+        "timeout_sec": 60
+      }
+    },
+    {
+      "strategy": "Link fragment",
+      "ok": true,
+      "matches_found": 0,
+      "error_type": null,
+      "error_message": null,
+      "debug": {
+        "returncode": 0,
+        "stderr": "",
+        "cmd": [
+          "/Users/zuevvladimir/AI/docs-agent/venv312/bin/python",
+          "/Users/zuevvladimir/AI/docs-agent/docs_agent.py",
+          "find-row-by-link-fragment",
+          "1hyWNNzsIHRLGJ65urOQUA0x_kOqCP61OkXcM3MMyedw",
+          "MASTER_INDEX",
+          "DOC-9999",
+          "--json-output"
+        ],
+        "timeout_sec": 60
+      }
+    }
+  ]
+}
+== read compact missing doc ==
+ok: False
+command: find-doc-any
+query: NON_EXISTENT_DOCUMENT_NAME
+error_type: NotFound
+error_message: No matches found by Document ID, Document Name, or Link fragment.
+retryable: False
+auth_related: False
+network_related: False
+== read json missing doc ==
+{
+  "ok": false,
+  "command": "find-doc-any",
+  "error_type": "NotFound",
+  "error_message": "No matches found by Document ID, Document Name, or Link fragment.",
+  "retryable": false,
+  "auth_related": false,
+  "network_related": false,
+  "query": "NON_EXISTENT_DOCUMENT_NAME",
+  "attempts": [
+    {
+      "strategy": "Document ID",
+      "ok": true,
+      "matches_found": 0,
+      "error_type": null,
+      "error_message": null,
+      "debug": {
+        "returncode": 0,
+        "stderr": "",
+        "cmd": [
+          "/Users/zuevvladimir/AI/docs-agent/venv312/bin/python",
+          "/Users/zuevvladimir/AI/docs-agent/docs_agent.py",
+          "find-row-by-column",
+          "1hyWNNzsIHRLGJ65urOQUA0x_kOqCP61OkXcM3MMyedw",
+          "MASTER_INDEX",
+          "Document ID",
+          "NON_EXISTENT_DOCUMENT_NAME",
+          "--json-output"
+        ],
+        "timeout_sec": 60
+      }
+    },
+    {
+      "strategy": "Document Name",
+      "ok": true,
+      "matches_found": 0,
+      "error_type": null,
+      "error_message": null,
+      "debug": {
+        "returncode": 0,
+        "stderr": "",
+        "cmd": [
+          "/Users/zuevvladimir/AI/docs-agent/venv312/bin/python",
+          "/Users/zuevvladimir/AI/docs-agent/docs_agent.py",
+          "find-row-by-column",
+          "1hyWNNzsIHRLGJ65urOQUA0x_kOqCP61OkXcM3MMyedw",
+          "MASTER_INDEX",
+          "Document Name",
+          "NON_EXISTENT_DOCUMENT_NAME",
+          "--json-output"
+        ],
+        "timeout_sec": 60
+      }
+    },
+    {
+      "strategy": "Link fragment",
+      "ok": true,
+      "matches_found": 0,
+      "error_type": null,
+      "error_message": null,
+      "debug": {
+        "returncode": 0,
+        "stderr": "",
+        "cmd": [
+          "/Users/zuevvladimir/AI/docs-agent/venv312/bin/python",
+          "/Users/zuevvladimir/AI/docs-agent/docs_agent.py",
+          "find-row-by-link-fragment",
+          "1hyWNNzsIHRLGJ65urOQUA0x_kOqCP61OkXcM3MMyedw",
+          "MASTER_INDEX",
+          "NON_EXISTENT_DOCUMENT_NAME",
+          "--json-output"
+        ],
+        "timeout_sec": 60
+      }
+    }
+  ]
+}
+== ask compact missing doc ==
+ok: False
+route: read-doc-from-query
+query: прочитай NON_EXISTENT_DOCUMENT_NAME
+error_type: NotFound
+error_message: No matches found by Document ID, Document Name, or Link fragment.
+== ask json missing doc ==
+{
+  "ok": false,
+  "command": "ask",
+  "query": "прочитай NON_EXISTENT_DOCUMENT_NAME",
+  "routed_to": "read-doc-from-query",
+  "result": {
+    "ok": false,
+    "command": "find-doc-any",
+    "error_type": "NotFound",
+    "error_message": "No matches found by Document ID, Document Name, or Link fragment.",
+    "retryable": false,
+    "auth_related": false,
+    "network_related": false,
+    "query": "NON_EXISTENT_DOCUMENT_NAME",
+    "attempts": [
+      {
+        "strategy": "Document ID",
+        "ok": true,
+        "matches_found": 0,
+        "error_type": null,
+        "error_message": null,
+        "debug": {
+          "returncode": 0,
+          "stderr": "",
+          "cmd": [
+            "/Users/zuevvladimir/AI/docs-agent/venv312/bin/python",
+            "/Users/zuevvladimir/AI/docs-agent/docs_agent.py",
+            "find-row-by-column",
+            "1hyWNNzsIHRLGJ65urOQUA0x_kOqCP61OkXcM3MMyedw",
+            "MASTER_INDEX",
+            "Document ID",
+            "NON_EXISTENT_DOCUMENT_NAME",
+            "--json-output"
+          ],
+          "timeout_sec": 60
+        }
+      },
+      {
+        "strategy": "Document Name",
+        "ok": true,
+        "matches_found": 0,
+        "error_type": null,
+        "error_message": null,
+        "debug": {
+          "returncode": 0,
+          "stderr": "",
+          "cmd": [
+            "/Users/zuevvladimir/AI/docs-agent/venv312/bin/python",
+            "/Users/zuevvladimir/AI/docs-agent/docs_agent.py",
+            "find-row-by-column",
+            "1hyWNNzsIHRLGJ65urOQUA0x_kOqCP61OkXcM3MMyedw",
+            "MASTER_INDEX",
+            "Document Name",
+            "NON_EXISTENT_DOCUMENT_NAME",
+            "--json-output"
+          ],
+          "timeout_sec": 60
+        }
+      },
+      {
+        "strategy": "Link fragment",
+        "ok": true,
+        "matches_found": 0,
+        "error_type": null,
+        "error_message": null,
+        "debug": {
+          "returncode": 0,
+          "stderr": "",
+          "cmd": [
+            "/Users/zuevvladimir/AI/docs-agent/venv312/bin/python",
+            "/Users/zuevvladimir/AI/docs-agent/docs_agent.py",
+            "find-row-by-link-fragment",
+            "1hyWNNzsIHRLGJ65urOQUA0x_kOqCP61OkXcM3MMyedw",
+            "MASTER_INDEX",
+            "NON_EXISTENT_DOCUMENT_NAME",
+            "--json-output"
+          ],
+          "timeout_sec": 60
+        }
+      }
+    ]
+  }
+}

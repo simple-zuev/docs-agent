@@ -1,0 +1,16 @@
+Stage26 passed.
+
+Done:
+- quota and rate-limit policy documented
+- top-level CLI classification improved for 429 / quota / rate-limit cases
+- operational plan for cache/throttling step recorded
+
+Validated:
+- py_compile OK
+- operator_start executed
+- preflight_check executed
+- doctor snapshot captured
+
+Operational effect:
+- quota-sensitive failures are now easier to classify as network/retryable
+- application policy for future cache/throttle work is documented

@@ -1,0 +1,10 @@
+Stage27 root-cause checkpoint.
+
+Observed:
+- direct regression_exit_codes.sh run can return rc=0
+- regression_smoke_explain.sh currently returns rc=1
+- zsh pipeline rc must be captured immediately via $pipestatus before any other command
+
+Interpretation target:
+- inspect smoke_explain implementation
+- identify whether rc mismatch comes from shell flow, set -e/pipefail interaction, or command sequencing inside script

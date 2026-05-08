@@ -1,0 +1,43 @@
+Final Operator Runbook
+
+Daily start:
+1. cd ~/AI/docs-agent
+2. source venv312/bin/activate
+3. bash scripts/operator_start.sh
+
+Normal preflight:
+- bash scripts/preflight_check.sh
+
+Routine diagnostic:
+- python agent_cli.py doctor-lite
+- python agent_cli.py doctor-lite --json
+
+Deep diagnostic:
+- python agent_cli.py doctor
+- python agent_cli.py doctor --json
+
+Deep smoke check:
+- bash scripts/regression_smoke_quiet.sh
+
+Explained smoke check:
+- bash scripts/regression_smoke_explain.sh
+
+Main commands:
+- python agent_cli.py doctor-lite
+- python agent_cli.py doctor
+- python agent_cli.py status
+- python agent_cli.py f "DOC-0001"
+- python agent_cli.py o "DOC-0002"
+- python agent_cli.py r "DOC-0002"
+- python agent_cli.py q "прочитай DOC-0002"
+
+Interpretation:
+- doctor-lite = рутинный старт без smoke-нагрузки
+- doctor = полная диагностика со встроенной explained smoke-проверкой
+- regression_smoke_explain.sh = объясняет, какой smoke-шаг падает первым
+
+Best practice:
+- для ежедневного входа используй doctor-lite
+- для углубленной диагностики используй doctor
+- если doctor падает по smoke, смотри diagnosis / likely_cause / recommended_action
+- summary/report формируй из одного сохраненного JSON

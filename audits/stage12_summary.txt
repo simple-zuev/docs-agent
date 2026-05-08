@@ -1,0 +1,17 @@
+Stage12 passed.
+
+Done:
+- usage/help text polished
+- explicit [--json] support shown for routed query commands
+- examples added to help output
+- no functional contract changes introduced
+
+Validated:
+- py_compile OK
+- usage output renders correctly
+- status/find/open/read/ask smoke checks OK
+- regression_smoke_quiet OK
+
+Release state:
+- ready for controlled daily use
+- help output improved for operator convenience

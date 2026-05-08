@@ -1,0 +1,23 @@
+Stage27 reconciled summary.
+
+Final interpretation:
+- Google API quota/rate-limit helper functions are added
+- Google API operating notes are documented
+- doctor-lite routine path is healthy
+- doctor/deep path remains quota-sensitive and may show transient instability across runs
+- regression_smoke_explain.sh logic itself is not the root cause
+- observed rc mismatch is consistent with transient external/quota-sensitive behavior, not a stable shell-flow defect
+
+Confirmed:
+- py_compile OK
+- operator_start OK
+- preflight_check OK
+- doctor-lite snapshot captured
+- helper functions present in agent_cli.py
+- regression_smoke_explain xtrace run succeeded
+- zsh pipeline rc handling clarified
+
+Operational state:
+- ready for controlled daily use
+- deep diagnostics should be interpreted as quota-sensitive
+- current baseline is suitable for Git sync and documentation freeze

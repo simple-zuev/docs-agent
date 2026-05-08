@@ -1,0 +1,17 @@
+Operator Checklist
+
+Before daily use:
+1. cd ~/AI/docs-agent
+2. source venv312/bin/activate
+3. python agent_cli.py status
+
+Recommended smoke checks:
+- python agent_cli.py f "DOC-0001"
+- python agent_cli.py o "DOC-0002"
+- python agent_cli.py r "DOC-0002"
+- python agent_cli.py q "прочитай DOC-0002"
+
+If something looks wrong:
+- bash scripts/regression_smoke_quiet.sh
+- python agent_cli.py status --json
+- inspect latest file in audits/

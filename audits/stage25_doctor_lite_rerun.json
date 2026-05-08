@@ -1,0 +1,177 @@
+{
+  "ok": false,
+  "command": "doctor-lite",
+  "checks": {
+    "environment": {
+      "ok": true,
+      "details": {
+        "python_bin": "/Users/zuevvladimir/AI/docs-agent/venv312/bin/python",
+        "docs_agent_path": "/Users/zuevvladimir/AI/docs-agent/docs_agent.py",
+        "base_path": "/Users/zuevvladimir/AI/docs-agent",
+        "python_exists": true,
+        "docs_agent_exists": true,
+        "base_exists": true
+      }
+    },
+    "status": {
+      "ok": true,
+      "command": "status",
+      "safety": {
+        "ok": true,
+        "command": "show-safety-mode",
+        "mode": "readonly",
+        "default_dry_run": true,
+        "forbid_master_index_write": true,
+        "forbid_delete": true,
+        "default_test_folder": "200_Офис",
+        "_debug": {
+          "returncode": 0,
+          "stderr": "",
+          "cmd": [
+            "/Users/zuevvladimir/AI/docs-agent/venv312/bin/python",
+            "/Users/zuevvladimir/AI/docs-agent/docs_agent.py",
+            "show-safety-mode",
+            "--json-output"
+          ],
+          "timeout_sec": 60
+        },
+        "_retry": {
+          "used": false,
+          "attempt_count": 1,
+          "attempts": [
+            {
+              "attempt": 1,
+              "ok": true,
+              "error_type": null,
+              "error_message": null
+            }
+          ]
+        }
+      },
+      "config": {
+        "ok": true,
+        "command": "show-config-status",
+        "safety_mode": "readonly",
+        "default_dry_run": true,
+        "forbid_master_index_write": true,
+        "forbid_delete": true,
+        "default_test_folder": "200_Офис",
+        "master_index_spreadsheet_id": "1hyWNNzsIHRLGJ65urOQUA0x_kOqCP61OkXcM3MMyedw",
+        "master_index_sheet_name": "MASTER_INDEX",
+        "change_log_spreadsheet_id": "1-6F5MCJR2EkP74pROsYXsPMmu1zPwp82hl0mDi9U3EQ",
+        "change_log_sheet_name": "Change Log Lite",
+        "identity_note": "registry identity != drive identity",
+        "_debug": {
+          "returncode": 0,
+          "stderr": "",
+          "cmd": [
+            "/Users/zuevvladimir/AI/docs-agent/venv312/bin/python",
+            "/Users/zuevvladimir/AI/docs-agent/docs_agent.py",
+            "show-config-status",
+            "--json-output"
+          ],
+          "timeout_sec": 60
+        },
+        "_retry": {
+          "used": false,
+          "attempt_count": 1,
+          "attempts": [
+            {
+              "attempt": 1,
+              "ok": true,
+              "error_type": null,
+              "error_message": null
+            }
+          ]
+        }
+      }
+    },
+    "master_index_lookup": {
+      "ok": false,
+      "command": "find-doc-any",
+      "error_type": "NotFound",
+      "error_message": "No matches found by Document ID, Document Name, or Link fragment.",
+      "retryable": false,
+      "auth_related": false,
+      "network_related": false,
+      "query": "DOC-0001",
+      "attempts": [
+        {
+          "strategy": "Document ID",
+          "ok": false,
+          "matches_found": 0,
+          "error_type": "HttpError",
+          "error_message": "<HttpError 429 when requesting https://sheets.googleapis.com/v4/spreadsheets/1hyWNNzsIHRLGJ65urOQUA0x_kOqCP61OkXcM3MMyedw/values/%27MASTER_INDEX%27%21A%3AZZ?alt=json returned \"Quota exceeded for quota metric 'Read requests' and limit 'Read requests per minute per user' of service 'sheets.googleapis.com' for consumer 'project_number:176769797886'.\". Details: \"[{'@type': 'type.googleapis.com/google.rpc.ErrorInfo', 'reason': 'RATE_LIMIT_EXCEEDED', 'domain': 'googleapis.com', 'metadata': {'service': 'sheets.googleapis.com', 'quota_metric': 'sheets.googleapis.com/read_requests', 'quota_limit': 'ReadRequestsPerMinutePerUser', 'quota_unit': '1/min/{project}/{user}', 'consumer': 'projects/176769797886', 'quota_location': 'global', 'quota_limit_value': '60'}}, {'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Request a higher quota limit.', 'url': 'https://cloud.google.com/docs/quotas/help/request_increase'}]}]\">",
+          "debug": {
+            "returncode": 1,
+            "stderr": "",
+            "cmd": [
+              "/Users/zuevvladimir/AI/docs-agent/venv312/bin/python",
+              "/Users/zuevvladimir/AI/docs-agent/docs_agent.py",
+              "find-row-by-column",
+              "1hyWNNzsIHRLGJ65urOQUA0x_kOqCP61OkXcM3MMyedw",
+              "MASTER_INDEX",
+              "Document ID",
+              "DOC-0001",
+              "--json-output"
+            ],
+            "timeout_sec": 60
+          }
+        },
+        {
+          "strategy": "Document Name",
+          "ok": false,
+          "matches_found": 0,
+          "error_type": "HttpError",
+          "error_message": "<HttpError 429 when requesting https://sheets.googleapis.com/v4/spreadsheets/1hyWNNzsIHRLGJ65urOQUA0x_kOqCP61OkXcM3MMyedw/values/%27MASTER_INDEX%27%21A%3AZZ?alt=json returned \"Quota exceeded for quota metric 'Read requests' and limit 'Read requests per minute per user' of service 'sheets.googleapis.com' for consumer 'project_number:176769797886'.\". Details: \"[{'@type': 'type.googleapis.com/google.rpc.ErrorInfo', 'reason': 'RATE_LIMIT_EXCEEDED', 'domain': 'googleapis.com', 'metadata': {'quota_location': 'global', 'quota_metric': 'sheets.googleapis.com/read_requests', 'service': 'sheets.googleapis.com', 'quota_unit': '1/min/{project}/{user}', 'consumer': 'projects/176769797886', 'quota_limit': 'ReadRequestsPerMinutePerUser', 'quota_limit_value': '60'}}, {'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Request a higher quota limit.', 'url': 'https://cloud.google.com/docs/quotas/help/request_increase'}]}]\">",
+          "debug": {
+            "returncode": 1,
+            "stderr": "",
+            "cmd": [
+              "/Users/zuevvladimir/AI/docs-agent/venv312/bin/python",
+              "/Users/zuevvladimir/AI/docs-agent/docs_agent.py",
+              "find-row-by-column",
+              "1hyWNNzsIHRLGJ65urOQUA0x_kOqCP61OkXcM3MMyedw",
+              "MASTER_INDEX",
+              "Document Name",
+              "DOC-0001",
+              "--json-output"
+            ],
+            "timeout_sec": 60
+          }
+        },
+        {
+          "strategy": "Link fragment",
+          "ok": false,
+          "matches_found": 0,
+          "error_type": "HttpError",
+          "error_message": "<HttpError 429 when requesting https://sheets.googleapis.com/v4/spreadsheets/1hyWNNzsIHRLGJ65urOQUA0x_kOqCP61OkXcM3MMyedw/values/%27MASTER_INDEX%27%21A%3AZZ?alt=json returned \"Quota exceeded for quota metric 'Read requests' and limit 'Read requests per minute per user' of service 'sheets.googleapis.com' for consumer 'project_number:176769797886'.\". Details: \"[{'@type': 'type.googleapis.com/google.rpc.ErrorInfo', 'reason': 'RATE_LIMIT_EXCEEDED', 'domain': 'googleapis.com', 'metadata': {'quota_location': 'global', 'service': 'sheets.googleapis.com', 'consumer': 'projects/176769797886', 'quota_metric': 'sheets.googleapis.com/read_requests', 'quota_limit': 'ReadRequestsPerMinutePerUser', 'quota_limit_value': '60', 'quota_unit': '1/min/{project}/{user}'}}, {'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Request a higher quota limit.', 'url': 'https://cloud.google.com/docs/quotas/help/request_increase'}]}]\">",
+          "debug": {
+            "returncode": 1,
+            "stderr": "",
+            "cmd": [
+              "/Users/zuevvladimir/AI/docs-agent/venv312/bin/python",
+              "/Users/zuevvladimir/AI/docs-agent/docs_agent.py",
+              "find-row-by-link-fragment",
+              "1hyWNNzsIHRLGJ65urOQUA0x_kOqCP61OkXcM3MMyedw",
+              "MASTER_INDEX",
+              "DOC-0001",
+              "--json-output"
+            ],
+            "timeout_sec": 60
+          }
+        }
+      ]
+    }
+  },
+  "summary": "Обнаружены проблемы в следующих зонах: master_index_lookup.",
+  "next_step": "Запусти doctor --json для расширенной диагностики.",
+  "diagnosis": "not_found",
+  "likely_cause": "Похоже, обязательный объект не найден.",
+  "recommended_action": "Проверь MASTER_INDEX и доступность ожидаемых объектов.",
+  "error_type": "NotFound",
+  "error_message": "No matches found by Document ID, Document Name, or Link fragment.",
+  "retryable": false,
+  "auth_related": false,
+  "network_related": false
+}

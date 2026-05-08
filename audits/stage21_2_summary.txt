@@ -1,0 +1,15 @@
+Stage21.2 passed.
+
+Done:
+- fixed soft preflight under set -e
+- doctor exit code is now captured explicitly before decision logic
+- runbook updated with shell behavior note
+- current release status updated
+
+Validated:
+- operator_start executed
+- preflight_check executed with soft decision path
+
+Operational state:
+- ready for controlled daily use
+- soft preflight now works as designed

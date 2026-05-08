@@ -1,0 +1,6 @@
+Possible vNext items:
+- add compact human output for status command
+- reduce noisy output in regression scripts
+- add dedicated regression for auth/network/internal exit code mapping
+- add command aliases/help examples
+- add optional verbose/debug switch for CLI

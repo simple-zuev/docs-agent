@@ -1,0 +1,216 @@
+{
+  "ok": false,
+  "command": "doctor",
+  "checks": {
+    "environment": {
+      "ok": true,
+      "details": {
+        "python_bin": "/Users/zuevvladimir/AI/docs-agent/venv312/bin/python",
+        "docs_agent_path": "/Users/zuevvladimir/AI/docs-agent/docs_agent.py",
+        "base_path": "/Users/zuevvladimir/AI/docs-agent",
+        "python_exists": true,
+        "docs_agent_exists": true,
+        "base_exists": true
+      }
+    },
+    "status": {
+      "ok": true,
+      "command": "status",
+      "safety": {
+        "ok": true,
+        "command": "show-safety-mode",
+        "mode": "readonly",
+        "default_dry_run": true,
+        "forbid_master_index_write": true,
+        "forbid_delete": true,
+        "default_test_folder": "200_Офис",
+        "_debug": {
+          "returncode": 0,
+          "stderr": "",
+          "cmd": [
+            "/Users/zuevvladimir/AI/docs-agent/venv312/bin/python",
+            "/Users/zuevvladimir/AI/docs-agent/docs_agent.py",
+            "show-safety-mode",
+            "--json-output"
+          ],
+          "timeout_sec": 60
+        },
+        "_retry": {
+          "used": false,
+          "attempt_count": 1,
+          "attempts": [
+            {
+              "attempt": 1,
+              "ok": true,
+              "error_type": null,
+              "error_message": null
+            }
+          ]
+        }
+      },
+      "config": {
+        "ok": true,
+        "command": "show-config-status",
+        "safety_mode": "readonly",
+        "default_dry_run": true,
+        "forbid_master_index_write": true,
+        "forbid_delete": true,
+        "default_test_folder": "200_Офис",
+        "master_index_spreadsheet_id": "1hyWNNzsIHRLGJ65urOQUA0x_kOqCP61OkXcM3MMyedw",
+        "master_index_sheet_name": "MASTER_INDEX",
+        "change_log_spreadsheet_id": "1-6F5MCJR2EkP74pROsYXsPMmu1zPwp82hl0mDi9U3EQ",
+        "change_log_sheet_name": "Change Log Lite",
+        "identity_note": "registry identity != drive identity",
+        "_debug": {
+          "returncode": 0,
+          "stderr": "",
+          "cmd": [
+            "/Users/zuevvladimir/AI/docs-agent/venv312/bin/python",
+            "/Users/zuevvladimir/AI/docs-agent/docs_agent.py",
+            "show-config-status",
+            "--json-output"
+          ],
+          "timeout_sec": 60
+        },
+        "_retry": {
+          "used": false,
+          "attempt_count": 1,
+          "attempts": [
+            {
+              "attempt": 1,
+              "ok": true,
+              "error_type": null,
+              "error_message": null
+            }
+          ]
+        }
+      }
+    },
+    "master_index_lookup": {
+      "ok": true,
+      "command": "find-doc-any",
+      "query": "DOC-0001",
+      "matched_by": "Document ID",
+      "result": {
+        "ok": true,
+        "command": "find-row-by-column",
+        "spreadsheet_id": "1hyWNNzsIHRLGJ65urOQUA0x_kOqCP61OkXcM3MMyedw",
+        "sheet_name": "MASTER_INDEX",
+        "column_name": "Document ID",
+        "match_value": "DOC-0001",
+        "header_row": 1,
+        "matches_found": 1,
+        "matches": [
+          {
+            "row_number": 2,
+            "row_values": [
+              "DOC-0001",
+              "00_MASTER_INDEX_АСТЦВ_v3",
+              "Реестр",
+              "YES",
+              "Базовый документ",
+              "Актуален",
+              "00_Управление_проектом",
+              "Project Owner",
+              "Управление проектным хранилищем",
+              "ADR-007",
+              "Monthly",
+              "2026-05-07",
+              "Critical",
+              "Основной утверждённый индекс проектного хранилища",
+              "https://docs.google.com/spreadsheets/d/1hyWNNzsIHRLGJ65urOQUA0x_kOqCP61OkXcM3MMyedw"
+            ]
+          }
+        ],
+        "_debug": {
+          "returncode": 0,
+          "stderr": "",
+          "cmd": [
+            "/Users/zuevvladimir/AI/docs-agent/venv312/bin/python",
+            "/Users/zuevvladimir/AI/docs-agent/docs_agent.py",
+            "find-row-by-column",
+            "1hyWNNzsIHRLGJ65urOQUA0x_kOqCP61OkXcM3MMyedw",
+            "MASTER_INDEX",
+            "Document ID",
+            "DOC-0001",
+            "--json-output"
+          ],
+          "timeout_sec": 60
+        },
+        "_retry": {
+          "used": false,
+          "attempt_count": 1,
+          "attempts": [
+            {
+              "attempt": 1,
+              "ok": true,
+              "error_type": null,
+              "error_message": null
+            }
+          ]
+        }
+      },
+      "summary": {
+        "document_id": "DOC-0001",
+        "document_name": "00_MASTER_INDEX_АСТЦВ_v3",
+        "link": "https://docs.google.com/spreadsheets/d/1hyWNNzsIHRLGJ65urOQUA0x_kOqCP61OkXcM3MMyedw"
+      },
+      "attempts": [
+        {
+          "strategy": "Document ID",
+          "ok": true,
+          "matches_found": 1,
+          "error_type": null,
+          "error_message": null,
+          "debug": {
+            "returncode": 0,
+            "stderr": "",
+            "cmd": [
+              "/Users/zuevvladimir/AI/docs-agent/venv312/bin/python",
+              "/Users/zuevvladimir/AI/docs-agent/docs_agent.py",
+              "find-row-by-column",
+              "1hyWNNzsIHRLGJ65urOQUA0x_kOqCP61OkXcM3MMyedw",
+              "MASTER_INDEX",
+              "Document ID",
+              "DOC-0001",
+              "--json-output"
+            ],
+            "timeout_sec": 60
+          }
+        }
+      ]
+    },
+    "smoke_probe": {
+      "ok": false,
+      "command": "smoke-explain",
+      "returncode": 1,
+      "stdout": "== step: py_compile ==\nrc=0\n\n== step: regression_error_contract ==\nrc=0\n\n== step: regression_exit_codes ==\nrc=1\ndiagnosis: internal\nlikely_cause: Нарушен контракт exit codes.\nrecommended_action: Запусти bash ./scripts/regression_exit_codes.sh без >/dev/null и найди первый FAIL.",
+      "stderr": "",
+      "diagnosis": "internal",
+      "likely_cause": "Похоже на внутренний сбой smoke-проверки.",
+      "recommended_action": "Запусти bash scripts/regression_smoke_explain.sh отдельно и проверь первый failing step.",
+      "_debug": {
+        "cmd": [
+          "bash",
+          "/Users/zuevvladimir/AI/docs-agent/scripts/regression_smoke_explain.sh"
+        ],
+        "timeout_sec": 60
+      },
+      "error_type": "SmokeCheckFailed",
+      "error_message": "regression_smoke_explain.sh returned non-zero exit code.",
+      "retryable": false,
+      "auth_related": false,
+      "network_related": false
+    }
+  },
+  "summary": "Обнаружены проблемы в следующих зонах: smoke_probe.",
+  "next_step": "Проверь diagnosis / likely_cause / recommended_action или запусти bash scripts/regression_smoke_explain.sh.",
+  "diagnosis": "internal",
+  "likely_cause": "Похоже на внутренний сбой smoke-проверки.",
+  "recommended_action": "Запусти bash scripts/regression_smoke_explain.sh отдельно и проверь первый failing step.",
+  "error_type": "SmokeCheckFailed",
+  "error_message": "regression_smoke_explain.sh returned non-zero exit code.",
+  "retryable": false,
+  "auth_related": false,
+  "network_related": false
+}

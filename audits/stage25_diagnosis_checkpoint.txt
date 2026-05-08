@@ -1,0 +1,12 @@
+Stage25 diagnosis checkpoint.
+
+Goal:
+- distinguish script-level regression_exit_codes failure from temporary API/quota instability.
+
+Interpretation:
+- if rc_exit_codes != 0 and doctor-lite becomes healthy after cooldown:
+  primary blocker = regression_exit_codes script/contract
+- if doctor-lite still fails on master_index_lookup after cooldown:
+  concurrent external/API instability is present
+- if both are green after cooldown:
+  prior failures were likely transient

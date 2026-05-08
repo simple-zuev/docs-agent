@@ -1,0 +1,61 @@
++ set -euo pipefail
++ cd /Users/zuevvladimir/AI/docs-agent
++ source venv312/bin/activate
+++ deactivate nondestructive
+++ '[' -n '' ']'
+++ '[' -n '' ']'
+++ hash -r
+++ '[' -n '' ']'
+++ unset VIRTUAL_ENV
+++ unset VIRTUAL_ENV_PROMPT
+++ '[' '!' nondestructive = nondestructive ']'
+++ case "$(uname)" in
++++ uname
+++ export VIRTUAL_ENV=/Users/zuevvladimir/AI/docs-agent/venv312
+++ VIRTUAL_ENV=/Users/zuevvladimir/AI/docs-agent/venv312
+++ _OLD_VIRTUAL_PATH=/Users/zuevvladimir/AI/docs-agent/venv312/bin:/Library/Frameworks/Python.framework/Versions/3.12/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/pmk/env/global/bin
+++ PATH=/Users/zuevvladimir/AI/docs-agent/venv312/bin:/Users/zuevvladimir/AI/docs-agent/venv312/bin:/Library/Frameworks/Python.framework/Versions/3.12/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/pmk/env/global/bin
+++ export PATH
+++ VIRTUAL_ENV_PROMPT='(venv312) '
+++ export VIRTUAL_ENV_PROMPT
+++ '[' -n '' ']'
+++ '[' -z '' ']'
+++ _OLD_VIRTUAL_PS1=
+++ PS1='((venv312) ) '
+++ export PS1
+++ hash -r
++ echo '== step: py_compile =='
+== step: py_compile ==
++ set +e
++ python -m py_compile agent_cli.py
++ rc=0
++ set -e
++ echo rc=0
+rc=0
++ [[ 0 -ne 0 ]]
++ echo
+
++ echo '== step: regression_error_contract =='
+== step: regression_error_contract ==
++ set +e
++ ./scripts/regression_error_contract.sh
++ rc=0
++ set -e
++ echo rc=0
+rc=0
++ [[ 0 -ne 0 ]]
++ echo
+
++ echo '== step: regression_exit_codes =='
+== step: regression_exit_codes ==
++ set +e
++ bash ./scripts/regression_exit_codes.sh
++ rc=0
++ set -e
++ echo rc=0
+rc=0
++ [[ 0 -ne 0 ]]
++ echo
+
++ echo 'smoke_explain: OK'
+smoke_explain: OK

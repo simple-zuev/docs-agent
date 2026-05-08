@@ -1,0 +1,28 @@
+Stage25 reconciled summary.
+
+Final result:
+- stage25 baseline confirmed as green after reconciliation run
+
+Confirmed:
+- operator_start OK
+- preflight_check OK
+- doctor-lite snapshot healthy
+- doctor snapshot healthy
+- regression_exit_codes OK
+- regression_smoke_explain OK after reconciliation
+- structure snapshot generated
+
+Interpretation:
+- earlier failures were transient
+- no stable regression in exit-code contract was reproduced
+- no stable regression in deep diagnostic path was reproduced
+- routine and deep operating paths are currently healthy
+
+Operational state:
+- ready for controlled daily use
+- ready for deep diagnostic use
+- stage25 may be treated as current stable baseline
+
+Best-practice note:
+- quota-sensitive validation should be confirmed by reconciliation run
+- final release conclusion should rely on structured JSON verification, not grep

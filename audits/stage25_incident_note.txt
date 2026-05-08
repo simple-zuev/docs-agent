@@ -1,0 +1,14 @@
+Stage25 incident note.
+
+Observed problem:
+- Google Sheets API returned 429 RATE_LIMIT_EXCEEDED on MASTER_INDEX lookups
+- doctor top-level classification became degraded
+- regression_smoke_explain failed because regression_exit_codes likely hit quota-sensitive lookup during run
+
+Interpretation:
+- this looks like external quota pressure, not a confirmed stable CLI contract regression
+
+Immediate action:
+- cooldown
+- rerun diagnostics
+- only after stable rerun decide whether code patch is needed

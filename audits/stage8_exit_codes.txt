@@ -1,0 +1,86 @@
+== usage no command ==
+ok: False
+command: usage
+error_type: UsageError
+error_message: Missing command.
+
+Usage:
+  python agent_cli.py status
+  python agent_cli.py find-doc-id <DOC-XXXX>
+  python agent_cli.py find-doc-name <document name>
+  python agent_cli.py find-link <drive_id_or_url_fragment>
+  python agent_cli.py find-doc-any <query>   | f <query>
+  python agent_cli.py open-doc-from-query <query>   | o <query>
+  python agent_cli.py read-doc-from-query <query>   | r <query>
+  python agent_cli.py get-file <google_drive_file_id>
+  python agent_cli.py read-doc <google_doc_id>
+  python agent_cli.py ask [--json] <free text query>   | q [--json] <query>
+
+exit_code=1 expected=1
+== usage missing query ==
+ok: False
+command: usage
+error_type: UsageError
+error_message: Missing query argument.
+
+Usage:
+  python agent_cli.py status
+  python agent_cli.py find-doc-id <DOC-XXXX>
+  python agent_cli.py find-doc-name <document name>
+  python agent_cli.py find-link <drive_id_or_url_fragment>
+  python agent_cli.py find-doc-any <query>   | f <query>
+  python agent_cli.py open-doc-from-query <query>   | o <query>
+  python agent_cli.py read-doc-from-query <query>   | r <query>
+  python agent_cli.py get-file <google_drive_file_id>
+  python agent_cli.py read-doc <google_doc_id>
+  python agent_cli.py ask [--json] <free text query>   | q [--json] <query>
+
+exit_code=1 expected=1
+== find success ==
+ok: True
+route: find-doc-any
+query: DOC-0001
+document_id: DOC-0001
+document_name: 00_MASTER_INDEX_АСТЦВ_v3
+link: https://docs.google.com/spreadsheets/d/1hyWNNzsIHRLGJ65urOQUA0x_kOqCP61OkXcM3MMyedw
+exit_code=0 expected=0
+== find not found ==
+ok: False
+command: find-doc-any
+query: DOC-9999
+error_type: NotFound
+error_message: No matches found by Document ID, Document Name, or Link fragment.
+retryable: False
+auth_related: False
+network_related: False
+exit_code=2 expected=2
+== open success ==
+ok: True
+route: open-doc-from-query
+query: DOC-0002
+google_object_id: 1Sb24YW8UvEMq3qIP5KPc-MfHK0Sx7ABqEhM9Espvhc0
+document_id: DOC-0002
+document_name: 00_PROJECT_AI_OPERATING_PROMPT_АСТЦВ
+link: https://docs.google.com/document/d/1Sb24YW8UvEMq3qIP5KPc-MfHK0Sx7ABqEhM9Espvhc0
+exit_code=0 expected=0
+== open not found ==
+ok: False
+command: find-doc-any
+query: DOC-9999
+error_type: NotFound
+error_message: No matches found by Document ID, Document Name, or Link fragment.
+retryable: False
+auth_related: False
+network_related: False
+exit_code=2 expected=2
+== read success ==
+ok: False
+command: find-doc-any
+query: 00_PROJECT_AI_OPERATING_PROMPT_АСТЦВ
+error_type: NotFound
+error_message: No matches found by Document ID, Document Name, or Link fragment.
+retryable: False
+auth_related: False
+network_related: False
+exit_code=2 expected=0
+FAIL: read success

@@ -1,0 +1,17 @@
+Stage18 passed.
+
+Done:
+- diagnostic explanation layer expanded
+- compact error output now explains auth/network/internal cases
+- compact ask read error output now explains auth/network/internal cases
+- operator troubleshooting coverage widened beyond NotFound
+
+Validated:
+- py_compile OK
+- open missing-doc output OK
+- ask missing-doc output OK
+- regression_smoke_quiet OK
+
+Operational effect:
+- CLI now explains not only missing documents, but also likely auth, network and internal failure classes
+- operator can understand failure cause faster and choose a next action

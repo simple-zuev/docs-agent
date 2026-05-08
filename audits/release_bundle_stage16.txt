@@ -1,0 +1,30 @@
+Release Bundle — stage16
+
+Component:
+- agent_cli.py
+
+Bundle contents:
+- audits/current_release_status.txt
+- audits/final_operator_runbook.txt
+- audits/stage8_exit_codes.txt
+- audits/stage10_summary.txt
+- audits/stage11_release_summary.txt
+- audits/stage12_summary.txt
+- audits/stage13_summary.txt
+- audits/stage14_summary.txt
+- audits/stage15_summary.txt
+- audits/agent_cli_structure_stage16.txt
+
+Validated on bundle build:
+- py_compile OK
+- regression_smoke_quiet OK
+- operator_start OK
+- structure snapshot refreshed
+
+Operational state:
+- ready for controlled daily use
+
+Entry points:
+- bash scripts/operator_start.sh
+- bash scripts/daily_run_check.sh
+- bash scripts/regression_smoke_quiet.sh

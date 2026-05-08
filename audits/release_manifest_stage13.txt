@@ -1,0 +1,42 @@
+Release Manifest — stage13
+
+Component:
+- agent_cli.py
+
+Operational state:
+- ready for controlled daily use
+
+Validated capabilities:
+- status
+- find-doc-any
+- open-doc-from-query
+- read-doc-from-query
+- ask
+
+Supported output modes:
+- compact human output
+- json output where supported by command contract
+
+Exit code contract:
+- 0 success
+- 1 usage error
+- 2 not found
+- 3 auth error
+- 4 network/retryable error
+- 5 internal error
+- 130 interrupted
+
+Stability notes:
+- read flow unified
+- compact error output implemented
+- compact status output implemented
+- status --json supported
+- help/examples polished
+- quiet smoke wrapper available
+
+Audit artifacts:
+- audits/stage8_exit_codes.txt
+- audits/stage10_summary.txt
+- audits/stage11_release_summary.txt
+- audits/stage12_summary.txt
+- audits/agent_cli_structure_stage13.txt

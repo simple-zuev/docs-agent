@@ -1,0 +1,14 @@
+Stage27 actual status.
+
+Confirmed:
+- quota/rate-limit helper functions added
+- Google API operating notes added
+- doctor-lite healthy on current run
+
+Still under verification:
+- deep smoke path
+- exact reason why regression_smoke_explain reports regression_exit_codes rc=1
+
+Important shell note:
+- in zsh, pipeline status must be read via $pipestatus
+- ${PIPESTATUS[0]} is bash-specific and should not be used here

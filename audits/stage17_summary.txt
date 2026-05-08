@@ -1,0 +1,17 @@
+Stage17 passed.
+
+Done:
+- human diagnostic explanation layer added
+- compact error output now explains likely cause
+- compact ask error output now explains next steps
+- read/open/find operator failures are easier to interpret
+
+Validated:
+- py_compile OK
+- ask missing-doc flow explains failure
+- open missing-doc flow explains failure
+- regression_smoke_quiet OK
+
+Operational effect:
+- agent can now explain what went wrong during CLI interaction
+- operator troubleshooting is faster

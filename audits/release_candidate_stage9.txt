@@ -1,0 +1,29 @@
+Release candidate prepared.
+
+Completed:
+- compact/json contract stabilized
+- retry/debug metadata preserved
+- timeout contract added
+- ask router split completed
+- read flow unified
+- compact error output added
+- exit codes implemented
+
+Validated exit codes:
+- 0 success
+- 1 usage error
+- 2 not found
+- 3 auth error
+- 4 network/retryable error
+- 5 internal error
+- 130 interrupted
+
+Validated commands:
+- status
+- find-doc-any
+- open-doc-from-query
+- read-doc-from-query
+- ask
+
+Status:
+Ready for controlled daily use.

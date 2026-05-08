@@ -1,0 +1,15 @@
+Stage25 actual status.
+
+What is confirmed:
+- operator_start OK
+- preflight_check OK
+- doctor-lite snapshot captured
+- doctor snapshot captured
+
+What is NOT yet confirmed:
+- regression_smoke_explain OK
+- full deep-smoke baseline green
+
+Current interpretation:
+- routine operating path is ready
+- deep smoke / exit-code regression still requires investigation before final freeze can be declared fully green

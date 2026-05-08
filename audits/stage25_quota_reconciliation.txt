@@ -1,0 +1,12 @@
+Stage25 quota reconciliation.
+
+Results:
+- rc_exit_codes=0
+- rc_smoke_explain=0
+- rc_doctor_lite=2
+- rc_doctor=2
+
+Decision rule:
+- if all rc values are 0, incident was transient quota pressure
+- if doctor-lite/doctor still show MASTER_INDEX lookup issues, quota pressure is ongoing
+- if smoke_explain alone fails while doctor-lite is green, remaining problem is in deep regression path only

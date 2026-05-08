@@ -1,0 +1,16 @@
+Stage23 passed.
+
+Done:
+- added regression_smoke_explain.sh
+- smoke troubleshooting now identifies first failing stage
+- runbook updated
+- current release status updated
+
+Validated:
+- operator_start executed
+- preflight_check executed
+- smoke_explain executed
+
+Operational state:
+- ready for controlled daily use
+- deep smoke failures are now easier to localize

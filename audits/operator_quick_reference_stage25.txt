@@ -1,0 +1,33 @@
+Operator Quick Reference — stage25
+
+Start of day:
+1. cd ~/AI/docs-agent
+2. source venv312/bin/activate
+3. bash scripts/operator_start.sh
+
+Routine preflight:
+- bash scripts/preflight_check.sh
+
+Routine health:
+- python agent_cli.py doctor-lite
+- python agent_cli.py doctor-lite --json
+
+Deep health:
+- python agent_cli.py doctor
+- python agent_cli.py doctor --json
+
+Explain smoke failure:
+- bash scripts/regression_smoke_explain.sh
+
+Main work commands:
+- python agent_cli.py status
+- python agent_cli.py f "DOC-0001"
+- python agent_cli.py o "DOC-0002"
+- python agent_cli.py r "DOC-0002"
+- python agent_cli.py q "прочитай DOC-0002"
+
+Interpretation:
+- healthy = normal work may start
+- network = retryable external condition or quota pressure
+- auth = access/credentials problem
+- internal = CLI or script logic issue

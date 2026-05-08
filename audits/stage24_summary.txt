@@ -1,0 +1,17 @@
+Stage24 passed.
+
+Done:
+- doctor switched to explained smoke diagnostics
+- doctor_payload now calls run_smoke_explain_payload
+- deep diagnostic now reports more actionable smoke failure context
+
+Validated:
+- doctor function replaced successfully
+- py_compile OK
+- doctor compact executed
+- doctor json executed
+- regression_smoke_explain executed
+
+Operational state:
+- ready for controlled daily use
+- deep diagnostic is now more explainable

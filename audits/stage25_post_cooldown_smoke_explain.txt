@@ -1,0 +1,11 @@
+== step: py_compile ==
+rc=0
+
+== step: regression_error_contract ==
+rc=0
+
+== step: regression_exit_codes ==
+rc=1
+diagnosis: internal
+likely_cause: Нарушен контракт exit codes.
+recommended_action: Запусти bash ./scripts/regression_exit_codes.sh без >/dev/null и найди первый FAIL.

@@ -1,0 +1,11 @@
+Preflight Check — stage16
+
+Run before starting work:
+1. cd ~/AI/docs-agent
+2. source venv312/bin/activate
+3. bash scripts/preflight_check.sh
+
+Expected result:
+- status prints compact OK block
+- smoke_quiet returns OK
+- process exits with code 0

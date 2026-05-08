@@ -1,0 +1,16 @@
+Stage10 passed.
+
+Done:
+- compact status output added
+- status --json supported
+- quiet smoke regression wrapper added
+
+Validated:
+- py_compile OK
+- regression_error_contract OK
+- regression_exit_codes OK
+- regression_smoke_quiet OK
+
+Contract status:
+- stable
+- no breaking changes introduced
