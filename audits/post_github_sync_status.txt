@@ -1,0 +1,27 @@
+Post GitHub sync status.
+
+Done:
+- local git repository initialized
+- initial baseline committed
+- GitHub remote connected
+- main branch pushed successfully
+- origin/main tracking configured
+
+Current synchronized baseline:
+- commit 7060e4f
+- stage27 reconciled baseline in GitHub
+
+Untracked items pending review:
+- append_change_log_test.py
+- auth_and_scan.py
+- cass_audit.py
+- config/
+- docs_agent_v2.py
+- requirements-py312.txt
+- write_test.py
+- write_test_in_cass.py
+
+Next step:
+- review untracked items
+- separate baseline files from experiments/config-sensitive files
+- create a second curated commit only for approved files

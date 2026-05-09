@@ -1,0 +1,16 @@
+Untracked review stage1.
+
+Goal:
+- inspect all untracked files before second curated commit
+
+Review criteria:
+- baseline production/useful file
+- experiment/test-only file
+- config-sensitive or secret-bearing file
+- should be committed
+- should be ignored
+
+Next step after review:
+- prepare curated add list
+- extend .gitignore if needed
+- create second commit only for approved items
