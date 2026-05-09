@@ -2,46 +2,42 @@
 
 ## Назначение
 
-Stage29 вводит кэш для MASTER_INDEX с целью:
+Stage30 переводит кэширование MASTER_INDEX на более зрелую модель:
 
-- уменьшить давление на Google Sheets API;
-- сократить число повторных lookup;
-- повысить устойчивость doctor-lite и routine path;
-- сохранить fallback на live lookup.
+- полный fetch листа MASTER_INDEX одним чтением;
+- локальный snapshot на диске;
+- локальный поиск по всем строкам;
+- fallback на live lookup.
 
-## Что кэшируется
+## Что изменилось относительно Stage29
 
-На текущем этапе:
-- локальный snapshot данных MASTER_INDEX для повторных lookup;
-- результаты успешных live lookup расширяют локальный cache set.
+Stage29:
+- seed / extension cache
+- reuse successful lookup
+
+Stage30:
+- full sheet fetch
+- rows_count
+- локальный поиск по полному snapshot
+- более полезная база для дальнейшего throttle/memoization слоя
 
 ## Поведение
 
-1. CLI сначала пытается ответить из cache.
-2. Если cache отсутствует или query не найден, выполняется live lookup.
-3. Успешный live lookup добавляется в cache.
-4. При quota/rate-limit ошибках fallback-классификация должна быть:
-   - diagnosis = network
-   - retryable = true
-   - network_related = true
+1. При отсутствии или истечении TTL cache выполняется единичное чтение листа MASTER_INDEX.
+2. Полный snapshot сохраняется в disk cache.
+3. Поиск выполняется локально:
+   - по Document ID
+   - по Document Name
+   - по Link fragment
+4. Если cache path не сработал, CLI использует live fallback.
 
 ## TTL
 
-Текущий TTL:
 - 90 секунд
-
-## Ограничения текущей реализации
-
-Stage29 — это переходный шаг:
-- есть cache path;
-- есть disk cache;
-- есть reuse successful lookup;
-- но это ещё не полный one-fetch всего MASTER_INDEX через единичное чтение листа.
 
 ## Следующий шаг
 
-Stage30:
-- единичное чтение полного MASTER_INDEX;
-- полноценный local filtering по всем строкам;
-- negative cache;
-- explicit cooldown/throttle budget.
+Stage31:
+- in-process memoization
+- negative cache
+- throttle budget for quota-sensitive paths
