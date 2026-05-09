@@ -1,0 +1,14 @@
+Baseline restored status.
+
+Result:
+- broken intermediate runtime cache patch path was rolled back
+- working agent_cli.py restored from local backup
+- hotfix pushed to origin/main
+
+Current stable baseline:
+- commit 2e04da3
+
+Recommended operating mode:
+- continue routine work from restored baseline
+- treat stage30 full-sheet runtime cache as unfinished
+- resume cache refactor only as a clean future iteration

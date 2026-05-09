@@ -73,3 +73,28 @@
 
 - added MASTER_INDEX disk cache path with TTL-based reuse
 - doctor-lite confirmed healthy with cache-backed MASTER_INDEX lookup
+
+## Baseline restore note
+
+Current stable baseline:
+- commit 2e04da3
+
+What happened:
+- experimental stage30 runtime cache activation path was attempted
+- runtime issues were discovered during duplicate-removal and full-sheet cache activation
+- working agent_cli.py was restored from local backup
+- hotfix was pushed to origin/main
+
+Current recommendation:
+- treat current main as restored stable baseline
+- do not continue patching stage30 runtime on top of the current file state
+- if full-sheet cache work resumes, do it as a clean refactor in a separate iteration
+
+Stable now:
+- GitHub sync
+- onboarding and operations docs
+- routine path via doctor-lite
+- restored runtime baseline
+
+Not fully completed:
+- full-sheet stage30 runtime cache activation
