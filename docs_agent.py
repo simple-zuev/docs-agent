@@ -78,8 +78,7 @@ def get_change_log_sheet():
 
 
 def get_sheets_service():
-    creds = get_credentials()
-    return build("sheets", "v4", credentials=creds)
+    return services()["sheets"]
 
 def normalize_jsonable(value):
     if value is None:

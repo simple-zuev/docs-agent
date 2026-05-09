@@ -1,0 +1,15 @@
+Stage30.3 passed.
+
+Done:
+- fixed get_sheets_service to use existing services() factory
+- rechecked read-sheet-values runtime path
+- rechecked stage30 cache rebuild after cache reset
+
+Validated:
+- py_compile docs_agent.py OK
+- py_compile agent_cli.py OK
+- read-sheet-values JSON output rechecked
+- doctor-lite rechecked after cache reset
+
+Operational effect:
+- stage30 full-sheet cache runtime path should now work through the existing services() helper
