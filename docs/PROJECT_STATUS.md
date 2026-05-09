@@ -2,7 +2,9 @@
 
 ## Текущий baseline
 
-- stage27-reconciled
+- restored stable baseline
+- commit: a8ab54b
+- current main считать restored stable baseline
 
 ## Git status
 
@@ -62,12 +64,16 @@
 
 Система пока не идеальна для:
 - частых серийных deep checks
-- безоглядочного масштабирования без cache/memoization
+- безоглядочного масштабирования без clean cache refactor
 
 ## Следующий инженерный приоритет
 
-- MASTER_INDEX cache + memoization
-- stage28 adds minimal lookup cache in agent_cli for repeated find_doc_any queries
+- не продолжать patching старого stage30 runtime path
+- подготовить clean refactor plan для MASTER_INDEX cache в отдельной ветке
+- сначала зафиксировать branch strategy
+- выписать карту текущих lookup/cache функций
+- определить canonical single-source cache flow
+- потом делать clean implementation
 
 ## Stage29 note
 
@@ -77,18 +83,20 @@
 ## Baseline restore note
 
 Current stable baseline:
-- commit 2e04da3
+- commit a8ab54b
 
 What happened:
 - experimental stage30 runtime cache activation path was attempted
 - runtime issues were discovered during duplicate-removal and full-sheet cache activation
 - working agent_cli.py was restored from local backup
 - hotfix was pushed to origin/main
+- documentation note for restored baseline was committed in GitHub
 
 Current recommendation:
 - treat current main as restored stable baseline
 - do not continue patching stage30 runtime on top of the current file state
 - if full-sheet cache work resumes, do it as a clean refactor in a separate iteration
+- prefer a separate branch for any new serious cache/runtime work
 
 Stable now:
 - GitHub sync
@@ -98,3 +106,4 @@ Stable now:
 
 Not fully completed:
 - full-sheet stage30 runtime cache activation
+- canonical clean refactor for MASTER_INDEX cache flow
