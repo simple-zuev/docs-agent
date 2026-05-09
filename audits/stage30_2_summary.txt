@@ -1,0 +1,15 @@
+Stage30.2 passed.
+
+Done:
+- added missing get_sheets_service helper to docs_agent.py
+- fixed runtime dependency for read-sheet-values
+- rechecked stage30 full-sheet cache rebuild after cache reset
+
+Validated:
+- py_compile docs_agent.py OK
+- py_compile agent_cli.py OK
+- read-sheet-values JSON output rechecked
+- doctor-lite rechecked after cache reset
+
+Operational effect:
+- stage30 full-sheet cache runtime path should now be executable if Google Sheets API access is healthy
