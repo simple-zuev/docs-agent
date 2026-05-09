@@ -67,3 +67,4 @@
 ## Следующий инженерный приоритет
 
 - MASTER_INDEX cache + memoization
+- stage28 adds minimal lookup cache in agent_cli for repeated find_doc_any queries

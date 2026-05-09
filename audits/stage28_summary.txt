@@ -1,0 +1,18 @@
+Stage28 passed.
+
+Done:
+- minimal lookup cache added in agent_cli for repeated find_doc_any queries
+- cache strategy documented
+- status/limitations/roadmap notes updated
+
+Validated:
+- py_compile OK
+- operator_start executed
+- preflight_check executed
+- repeated find-doc-any lookup exercised
+- doctor-lite snapshot captured
+
+Operational effect:
+- repeated identical lookup calls should produce less Google Sheets API pressure
+- routine path is now better protected against short-burst repeated lookup traffic
+- deep path still needs future full MASTER_INDEX cache and memoization

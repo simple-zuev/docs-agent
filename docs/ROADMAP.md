@@ -10,6 +10,7 @@
 ## Ближайшие шаги
 
 1. MASTER_INDEX cache + memoization
+- stage28 adds minimal lookup cache in agent_cli for repeated find_doc_any queries
 2. Улучшение deep diagnostics
 3. Курирование audits
 4. Нормализация docs_agent_v2
