@@ -1,0 +1,11 @@
+{
+  "ok": false,
+  "command": "read-sheet-values",
+  "spreadsheet_id": "1hyWNNzsIHRLGJ65urOQUA0x_kOqCP61OkXcM3MMyedw",
+  "sheet_name": "MASTER_INDEX",
+  "error_type": "NameError",
+  "error_message": "name 'get_sheets_service' is not defined",
+  "retryable": false,
+  "network_related": false,
+  "auth_related": false
+}

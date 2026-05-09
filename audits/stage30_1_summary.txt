@@ -1,0 +1,17 @@
+Stage30.1 passed.
+
+Done:
+- added read-sheet-values command to docs_agent.py
+- enabled stage30 full-sheet MASTER_INDEX fetch dependency
+- revalidated doctor-lite after cache reset
+
+Validated:
+- py_compile docs_agent.py OK
+- py_compile agent_cli.py OK
+- docs_agent read-sheet-values JSON output works
+- doctor-lite snapshot captured
+- cache regenerated after reset
+
+Operational effect:
+- stage30 full-sheet cache path is now executable at runtime
+- MASTER_INDEX cache can be rebuilt from full sheet data instead of seed-cache fallback
