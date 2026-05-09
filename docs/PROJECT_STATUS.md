@@ -68,3 +68,8 @@
 
 - MASTER_INDEX cache + memoization
 - stage28 adds minimal lookup cache in agent_cli for repeated find_doc_any queries
+
+## Stage29 note
+
+- added MASTER_INDEX disk cache path with TTL-based reuse
+- doctor-lite confirmed healthy with cache-backed MASTER_INDEX lookup

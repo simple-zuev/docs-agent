@@ -1,0 +1,20 @@
+Stage29 passed.
+
+Done:
+- added MASTER_INDEX disk cache path
+- added TTL-based cache loading
+- added local cache search by Document ID / Document Name / Link fragment
+- added fallback to live lookup
+- added cache strategy documentation
+
+Validated:
+- py_compile OK
+- doctor-lite healthy
+- MASTER_INDEX lookup served from cache
+- repeated find-doc-any lookup executed
+- cache file generated
+
+Operational effect:
+- repeated find_doc_any queries should produce less pressure on Google Sheets API
+- routine lookup path is more resilient
+- groundwork for full one-fetch MASTER_INDEX cache is now in place

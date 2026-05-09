@@ -20,3 +20,14 @@
 1. Не расширять функциональность быстрее, чем стабилизируется доступ к MASTER_INDEX
 2. Не усложнять baseline без необходимости
 3. Сначала reliability, потом features
+
+## After Stage29
+
+Completed:
+- disk-backed MASTER_INDEX cache path
+
+Next:
+- full sheet fetch
+- local filtering over full registry
+- negative cache
+- explicit throttle budget

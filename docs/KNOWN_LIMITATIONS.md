@@ -73,3 +73,7 @@ docs_agent_v2.py пока следует считать:
 2. deep checks только по необходимости
 3. не запускать deep path сериями
 4. при спорном результате делать cooldown и reconciliation
+
+## Stage29 limitation note
+
+Current cache reduces repeated lookup pressure, but it is not yet a full one-fetch MASTER_INDEX cache.

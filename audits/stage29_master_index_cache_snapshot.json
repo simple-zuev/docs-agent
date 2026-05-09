@@ -1,0 +1,40 @@
+{
+  "fetched_at_epoch": 1778287482,
+  "header": [
+    "Document ID",
+    "Document Name",
+    "Type",
+    "Baseline",
+    "Status Class",
+    "Status",
+    "Folder",
+    "Owner",
+    "Purpose",
+    "ADR",
+    "Review Cadence",
+    "Last Review Date",
+    "Criticality",
+    "Description",
+    "Link"
+  ],
+  "rows": [
+    [
+      "DOC-0001",
+      "00_MASTER_INDEX_АСТЦВ_v3",
+      "Реестр",
+      "YES",
+      "Базовый документ",
+      "Актуален",
+      "00_Управление_проектом",
+      "Project Owner",
+      "Управление проектным хранилищем",
+      "ADR-007",
+      "Monthly",
+      "2026-05-07",
+      "Critical",
+      "Основной утверждённый индекс проектного хранилища",
+      "https://docs.google.com/spreadsheets/d/1hyWNNzsIHRLGJ65urOQUA0x_kOqCP61OkXcM3MMyedw"
+    ]
+  ],
+  "mode": "stage29-seed-cache"
+}

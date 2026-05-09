@@ -1,38 +1,47 @@
 # Cache Strategy
 
-## Цель
+## Назначение
 
-Снизить quota pressure на Google Sheets API без ломки текущего CLI-контракта.
+Stage29 вводит кэш для MASTER_INDEX с целью:
 
-## Что сделано на текущем этапе
+- уменьшить давление на Google Sheets API;
+- сократить число повторных lookup;
+- повысить устойчивость doctor-lite и routine path;
+- сохранить fallback на live lookup.
 
-В `agent_cli.py` добавлен минимальный lookup cache для `find_doc_any_payload()`:
-- кэширует только успешные результаты;
-- TTL = 90 секунд;
-- хранится локально в `cache/agent_cli/`;
-- используется для repeat lookup по одинаковому query.
+## Что кэшируется
 
-## Почему это полезно
+На текущем этапе:
+- локальный snapshot данных MASTER_INDEX для повторных lookup;
+- результаты успешных live lookup расширяют локальный cache set.
 
-Это уменьшает повторные обращения к:
-- `MASTER_INDEX`
-- связанным lookup стратегиям
+## Поведение
 
-Особенно полезно для:
-- `doctor-lite`
-- `doctor`
-- `find/open/read`, если в коротком окне повторяются одинаковые запросы
+1. CLI сначала пытается ответить из cache.
+2. Если cache отсутствует или query не найден, выполняется live lookup.
+3. Успешный live lookup добавляется в cache.
+4. При quota/rate-limit ошибках fallback-классификация должна быть:
+   - diagnosis = network
+   - retryable = true
+   - network_related = true
 
-## Ограничения
+## TTL
 
-1. Это не полный `MASTER_INDEX` cache.
-2. Это не memoization на уровне всего `docs_agent.py`.
-3. Ошибочные и неуспешные результаты не кэшируются.
-4. Deep path все еще может быть quota-sensitive.
+Текущий TTL:
+- 90 секунд
+
+## Ограничения текущей реализации
+
+Stage29 — это переходный шаг:
+- есть cache path;
+- есть disk cache;
+- есть reuse successful lookup;
+- но это ещё не полный one-fetch всего MASTER_INDEX через единичное чтение листа.
 
 ## Следующий шаг
 
-Следующее улучшение:
-- кэш самого `MASTER_INDEX` диапазона
-- one-fetch local filtering
-- in-process memoization
+Stage30:
+- единичное чтение полного MASTER_INDEX;
+- полноценный local filtering по всем строкам;
+- negative cache;
+- explicit cooldown/throttle budget.
