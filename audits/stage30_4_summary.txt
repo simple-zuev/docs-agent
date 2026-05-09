@@ -1,0 +1,15 @@
+Stage30.4 passed.
+
+Done:
+- removed duplicate old stage29 refresh function from agent_cli.py
+- restored stage30 refresh function as active runtime implementation
+- revalidated cache rebuild after cache reset
+
+Validated:
+- py_compile agent_cli.py OK
+- doctor-lite rechecked after duplicate removal
+- cache file regenerated after reset
+
+Operational effect:
+- stage30 full-sheet cache should now be the active runtime path
+- old stage29 seed-cache refresh override is removed
