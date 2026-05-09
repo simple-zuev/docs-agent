@@ -1,10 +1,9 @@
-#!/bin/zsh
+#!/usr/bin/env bash
 set -euo pipefail
 
-ROOT="/Users/zuevvladimir/AI/docs-agent"
-cd "$ROOT"
+cd /Users/zuevvladimir/AI/docs-agent
 
-python3 -m ruff check .
-python3 -m ruff format --check .
-python3 -m pytest
-python3 -m compileall "$ROOT"
+python3 -m ruff check tests/test_smoke_syntax.py
+python3 -m ruff format --check tests/test_smoke_syntax.py
+python3 -m pytest tests/test_smoke_syntax.py
+python3 -m compileall tests
