@@ -19,7 +19,9 @@ docs-agent — это локальный инструмент, который п
 
 ## Текущий baseline
 
-- stage27-reconciled
+- restored stable baseline
+- commit: a8ab54b
+- current main считать restored stable baseline
 
 ## Быстрый старт
 
@@ -69,6 +71,9 @@ Deep:
 - docs/REPOSITORY_RULES.md
 - docs/ARCHITECTURAL_NOTES.md
 - docs/ROADMAP.md
+- docs/PROJECT_STATUS.md
+- docs/KNOWN_LIMITATIONS.md
+- docs/CACHE_STRATEGY.md
 
 ## Важно
 
@@ -80,4 +85,7 @@ Deep:
 
 ## Следующий технический шаг
 
-- MASTER_INDEX cache + memoization
+- не продолжать старую цепочку stage30-патчей поверх текущего file state
+- следующий серьезный шаг делать только как clean refactor
+- предпочтительно в отдельной ветке
+- сначала зафиксировать branch strategy, карту lookup/cache функций и canonical single-source cache flow
