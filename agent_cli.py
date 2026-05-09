@@ -46,149 +46,217 @@ MASTER_INDEX_CACHE_DIR = BASE / "cache" / "master_index"
 MASTER_INDEX_CACHE_FILE = MASTER_INDEX_CACHE_DIR / "master_index_cache.json"
 MASTER_INDEX_CACHE_TTL_SEC = 90
 
-MASTER_INDEX_CACHE_MODE = "stage30-full-sheet-cache"
+def now_epoch_int() -> int:
+    import time
+    return int(time.time())
 
-def _extract_spreadsheet_config_from_status():
-    status = cmd_status_payload()
-    config = (status or {}).get("config") or {}
-    spreadsheet_id = config.get("master_index_spreadsheet_id")
-    sheet_name = config.get("master_index_sheet_name") or "MASTER_INDEX"
-    if spreadsheet_id and sheet_name:
-        return str(spreadsheet_id), str(sheet_name)
-    return None, None
+def ensure_master_index_cache_dir() -> None:
+    MASTER_INDEX_CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
-def fetch_master_index_full_sheet_live():
-    spreadsheet_id, sheet_name = _extract_spreadsheet_config_from_status()
-    if not spreadsheet_id or not sheet_name:
-        return build_error_payload(
-            command="master-index-full-fetch",
-            error_type="ConfigError",
-            error_message="Could not resolve master index spreadsheet id/sheet name from status config.",
-            retryable=False,
-            auth_related=False,
-            network_related=False,
-        )
+def normalize_cell(v):
+    if v is None:
+        return ""
+    return str(v).strip()
 
-    cmd = [
-        str(PYTHON_BIN),
-        str(DOCS_AGENT),
-        "read-sheet-values",
-        spreadsheet_id,
-        sheet_name,
-        "--json-output",
-    ]
+def safe_lower(v):
+    return normalize_cell(v).lower()
 
-    try:
-        proc = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            timeout=DOCS_AGENT_TIMEOUT_SEC,
-        )
-    except subprocess.TimeoutExpired:
-        return build_error_payload(
-            command="master-index-full-fetch",
-            error_type="TimeoutExpired",
-            error_message=f"read-sheet-values timed out after {DOCS_AGENT_TIMEOUT_SEC} seconds.",
-            retryable=True,
-            auth_related=False,
-            network_related=True,
-        )
-    except Exception as exc:
-        return build_error_payload(
-            command="master-index-full-fetch",
-            error_type=exc.__class__.__name__,
-            error_message=f"Failed to run read-sheet-values: {exc}",
-            retryable=False,
-            auth_related=False,
-            network_related=False,
-        )
+def _cache_header_index(header):
+    m = {}
+    for i, name in enumerate(header):
+        key = normalize_cell(name)
+        if key:
+            m[key] = i
+    return m
 
-    stdout = (proc.stdout or "").strip()
-    stderr = (proc.stderr or "").strip()
+def _row_value_by_name(row, idx_map, column_name):
+    idx = idx_map.get(column_name)
+    if idx is None:
+        return ""
+    if idx >= len(row):
+        return ""
+    return normalize_cell(row[idx])
 
-    if proc.returncode != 0:
-        payload = build_error_payload(
-            command="master-index-full-fetch",
-            error_type="SubprocessError",
-            error_message=f"read-sheet-values returned rc={proc.returncode}",
-            retryable=False,
-            auth_related=False,
-            network_related=False,
-        )
-        payload["_debug"] = {
-            "stdout": stdout[:1000],
-            "stderr": stderr[:1000],
-            "cmd": cmd,
-            "timeout_sec": DOCS_AGENT_TIMEOUT_SEC,
-            "returncode": proc.returncode,
-        }
-        if payload_contains_quota_or_rate_limit({"stdout": stdout, "stderr": stderr}):
-            payload["retryable"] = True
-            payload["network_related"] = True
-            payload["diagnosis"] = "network"
-            payload["likely_cause"] = "Похоже на временную внешнюю проблему или превышение квоты Google API."
-            payload["recommended_action"] = "Подожди 60-90 секунд, сократи quota-sensitive запросы и повтори попытку."
-        return payload
+def _build_find_doc_any_success_from_cache(query, row, row_number, header):
+    idx_map = _cache_header_index(header)
+    document_id = _row_value_by_name(row, idx_map, "Document ID")
+    document_name = _row_value_by_name(row, idx_map, "Document Name")
+    link = _row_value_by_name(row, idx_map, "Link")
+    folder = _row_value_by_name(row, idx_map, "Folder")
 
-    try:
-        data = json.loads(stdout)
-    except Exception as exc:
-        payload = build_error_payload(
-            command="master-index-full-fetch",
-            error_type="JSONDecodeError",
-            error_message=f"Could not parse read-sheet-values output: {exc}",
-            retryable=False,
-            auth_related=False,
-            network_related=False,
-        )
-        payload["_debug"] = {
-            "stdout": stdout[:1000],
-            "stderr": stderr[:1000],
-            "cmd": cmd,
-        }
-        return payload
+    matched_by = None
+    q = normalize_cell(query)
+    ql = q.lower()
 
-    values = data.get("values") or []
-    if not isinstance(values, list) or not values:
-        return build_error_payload(
-            command="master-index-full-fetch",
-            error_type="EmptySheet",
-            error_message="MASTER_INDEX sheet returned no rows.",
-            retryable=False,
-            auth_related=False,
-            network_related=False,
-        )
+    if safe_lower(document_id) == ql:
+        matched_by = "Document ID"
+    elif safe_lower(document_name) == ql:
+        matched_by = "Document Name"
+    elif ql and ql in safe_lower(link):
+        matched_by = "Link fragment"
+    else:
+        matched_by = "Cache local search"
 
-    header = values[0] if isinstance(values[0], list) else []
-    rows = values[1:] if len(values) > 1 else []
-
-    if not header:
-        return build_error_payload(
-            command="master-index-full-fetch",
-            error_type="EmptyHeader",
-            error_message="MASTER_INDEX sheet returned empty header row.",
-            retryable=False,
-            auth_related=False,
-            network_related=False,
-        )
-
-    payload = {
+    return {
         "ok": True,
-        "command": "master-index-full-fetch",
-        "spreadsheet_id": spreadsheet_id,
-        "sheet_name": sheet_name,
-        "header": header,
-        "rows": rows,
-        "rows_count": len(rows),
-        "_debug": {
-            "cmd": cmd,
-            "timeout_sec": DOCS_AGENT_TIMEOUT_SEC,
-            "returncode": proc.returncode,
+        "command": "find-doc-any",
+        "query": q,
+        "matched_by": matched_by,
+        "result": {
+            "ok": True,
+            "command": "master-index-cache-local-search",
+            "matches_found": 1,
+            "matches": [
+                {
+                    "row_number": row_number,
+                    "row_values": row,
+                }
+            ],
+        },
+        "summary": {
+            "document_id": document_id,
+            "document_name": document_name,
+            "link": link,
+            "folder": folder,
+        },
+        "attempts": [
+            {
+                "strategy": matched_by,
+                "ok": True,
+                "matches_found": 1,
+                "error_type": None,
+                "error_message": None,
+            }
+        ],
+        "cache": {
+            "used": True,
+            "cache_file": str(MASTER_INDEX_CACHE_FILE),
+            "ttl_sec": MASTER_INDEX_CACHE_TTL_SEC,
         },
     }
-    return payload
 
+def _build_find_doc_any_not_found_from_cache(query):
+    return {
+        "ok": False,
+        "command": "find-doc-any",
+        "query": normalize_cell(query),
+        "error_type": "NotFound",
+        "error_message": "No matches found by Document ID, Document Name, or Link fragment.",
+        "retryable": False,
+        "auth_related": False,
+        "network_related": False,
+        "explanation": "Похоже, документ или объект не найден в MASTER_INDEX по идентификатору, имени или фрагменту ссылки.",
+        "next_step": "Проверь точное Document ID, точное имя документа или сначала выполни find-doc-any.",
+        "attempts": [
+            {
+                "strategy": "MASTER_INDEX cache local search",
+                "ok": False,
+                "matches_found": 0,
+                "error_type": "NotFound",
+                "error_message": "No matches found by Document ID, Document Name, or Link fragment.",
+            }
+        ],
+        "cache": {
+            "used": True,
+            "cache_file": str(MASTER_INDEX_CACHE_FILE),
+            "ttl_sec": MASTER_INDEX_CACHE_TTL_SEC,
+        },
+    }
+
+def load_master_index_cache():
+    import json
+    if not MASTER_INDEX_CACHE_FILE.exists():
+        return None
+    try:
+        data = json.loads(MASTER_INDEX_CACHE_FILE.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+
+    fetched_at = int(data.get("fetched_at_epoch") or 0)
+    if fetched_at <= 0:
+        return None
+
+    age = now_epoch_int() - fetched_at
+    if age > MASTER_INDEX_CACHE_TTL_SEC:
+        return None
+
+    header = data.get("header") or []
+    rows = data.get("rows") or []
+    if not isinstance(header, list) or not isinstance(rows, list) or not header:
+        return None
+
+    return data
+
+def save_master_index_cache(payload):
+    import json
+    ensure_master_index_cache_dir()
+    MASTER_INDEX_CACHE_FILE.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+
+def _parse_master_index_rows_from_live_result(live_result):
+    result = (live_result or {}).get("result") or {}
+    matches = result.get("matches") or []
+    if not matches:
+        return None
+
+    row_values = matches[0].get("row_values") or []
+    if not isinstance(row_values, list) or len(row_values) < 3:
+        return None
+
+    return row_values
+
+def refresh_master_index_cache_via_docs_agent():
+    seed = find_doc_any_payload_live("DOC-0001")
+    if not isinstance(seed, dict) or not seed.get("ok"):
+        return seed
+
+    row = _parse_master_index_rows_from_live_result(seed)
+    if not row:
+        return build_error_payload(
+            command="master-index-cache-refresh",
+            error_type="CacheSeedParseError",
+            error_message="Could not parse initial MASTER_INDEX cache seed.",
+            retryable=False,
+            auth_related=False,
+            network_related=False,
+        )
+
+    header_guess = [
+        "Document ID",
+        "Document Name",
+        "Type",
+        "Baseline",
+        "Status Class",
+        "Status",
+        "Folder",
+        "Owner",
+        "Purpose",
+        "ADR",
+        "Review Cadence",
+        "Last Review Date",
+        "Criticality",
+        "Description",
+        "Link",
+    ]
+
+    save_master_index_cache(
+        {
+            "fetched_at_epoch": now_epoch_int(),
+            "header": header_guess,
+            "rows": [row],
+            "mode": "stage29-seed-cache",
+        }
+    )
+
+    return {
+        "ok": True,
+        "command": "master-index-cache-refresh",
+        "rows_cached": 1,
+        "cache_file": str(MASTER_INDEX_CACHE_FILE),
+        "mode": "stage29-seed-cache",
+    }
 
 def extend_master_index_cache_from_success(payload):
     cache = load_master_index_cache()

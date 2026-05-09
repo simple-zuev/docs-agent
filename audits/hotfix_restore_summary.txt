@@ -1,0 +1,13 @@
+Hotfix restore applied.
+
+Done:
+- restored agent_cli.py from known local backup after broken duplicate-removal patch
+- revalidated basic runtime path
+
+Validated:
+- py_compile agent_cli.py OK
+- doctor-lite rechecked after restore
+
+Operational effect:
+- baseline runtime restored
+- broken intermediate cache-refactor state rolled back
