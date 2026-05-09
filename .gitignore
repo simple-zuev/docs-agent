@@ -63,3 +63,11 @@ config/*.yaml
 append_change_log_test.py
 write_test.py
 write_test_in_cass.py
+
+# Local stage backups
+*.bak-stage*
+docs_agent.py.bak-stage*
+agent_cli.py.bak-stage*
+
+# Local ad-hoc recheck artifacts
+audits/stage30_recheck_doctor_lite.json
