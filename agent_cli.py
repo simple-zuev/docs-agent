@@ -941,7 +941,7 @@ def run_docs_agent_with_retry(
 
 
 def run_docs_agent(args: list[str]) -> dict:
-    cmd = [PYTHON_BIN, str(DOCS_AGENT)] + args + ["--json-output"]
+    cmd = [str(PYTHON_BIN), str(DOCS_AGENT)] + args + ["--json-output"]
 
     try:
         proc = subprocess.run(
