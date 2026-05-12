@@ -1,0 +1,14 @@
+
+## docs_agent.py
+services() line=231
+find_folder(drive, name, parent_id) line=263
+get_file_meta(drive, file_id) line=382
+append_log(sheets, action, obj, from_, to, reason, impact, status, notes) line=394
+patch_doc(document_id, text_to_insert) line=636
+read_doc(document_id, max_chars, json_output) line=820
+replace_doc_text(document_id, old_text, new_text) line=881
+replace_doc_text_safe(document_id, old_text, new_text, backup_folder, dry_run, confirm) line=942
+
+## runtime_config.py
+ensure_write_allowed(operation_name, target) line=35
+ensure_confirmed(confirm, operation_name) line=95

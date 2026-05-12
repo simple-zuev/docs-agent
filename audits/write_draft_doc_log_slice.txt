@@ -1,0 +1,91 @@
+
+
+def get_file_meta(drive, file_id: str):
+    return (
+        drive.files()
+        .get(
+            fileId=file_id,
+            fields="id,name,mimeType,webViewLink,modifiedTime,parents",
+            supportsAllDrives=True,
+        )
+        .execute()
+    )
+
+
+def append_log(
+    sheets, action, obj, from_, to, reason, impact="Low", status="Done", notes=""
+):
+    now = datetime.now()
+    change_id = f"CHG-{now.strftime('%Y-%m-%d-%H%M%S')}-LOCAL"
+    row = [
+        change_id,
+        now.strftime("%Y-%m-%d"),
+        action,
+        obj,
+        from_,
+        to,
+        reason,
+        impact,
+        status,
+        notes,
+    ]
+    result = (
+        sheets.spreadsheets()
+        .values()
+        .append(
+            spreadsheetId=CHANGE_LOG_ID,
+            range="'Change Log Lite'!A:J",
+            valueInputOption="USER_ENTERED",
+            insertDataOption="INSERT_ROWS",
+            body={"values": [row]},
+        )
+        .execute()
+    )
+    return change_id, result.get("updates", {}).get("updatedRange")
+
+
+@app.command()
+def audit():
+    """Read-only scan Cass and save snapshot/report."""
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    REPORTS_DIR.mkdir(parents=True, exist_ok=True)
+
+    s = services()
+    drive = s["drive"]
+
+    cass = find_folder(drive, "Cass")
+    top = list_children(drive, cass["id"])
+
+    snapshot = {
+        "generated_at": datetime.now().isoformat(timespec="seconds"),
+        "cass": cass,
+        "top_level": top,
+    }
+
+    out = CACHE_DIR / "cass_snapshot.json"
+    out.write_text(json.dumps(snapshot, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    report = (
+        REPORTS_DIR / f"cass_audit_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.txt"
+    )
+    lines = [
+        "Cass audit report",
+        f"Generated: {snapshot['generated_at']}",
+        f"Cass ID: {cass['id']}",
+        "",
+        "Top-level Cass items:",
+    ]
+    for item in top:
+        lines.append(f"- {item['name']} | {item['mimeType']} | {item['id']}")
+    report.write_text("\n".join(lines), encoding="utf-8")
+
+    print("Audit OK")
+    print(f"Snapshot: {out}")
+    print(f"Report: {report}")
+
+
+@app.command("create-temp-doc")
+def create_temp_doc():
+    """Create staging test document in default test folder (config; usually Cass / 200_Офис) and log it."""
+    ensure_write_allowed("create-temp-doc", target=get_default_test_folder_name())
+    s = services()
