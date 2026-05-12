@@ -1,0 +1,18 @@
+Audit scope
+- post-PR48 adjacent candidate selection near verify/export surface only
+- verify_doc_text is already parity-aligned on the current stacked base
+- avoid capability expansion and avoid moving into upload/move flows unless export_doc is not viable
+
+Candidate preference order
+1. docs_agent_v2.py::export_doc()
+2. no-go / stop if export_doc is already parity-aligned or if next step would widen scope
+3. upload_file_to_folder only if export_doc is rejected and a bounded read/export line can no longer continue
+
+Decision rule
+- choose only one existing adjacent function
+- prefer direct neighbor after verify_doc_text()
+- prefer output-only or parity-only implementation
+- reject candidates that require broader helper rollout or multi-route migration
+
+Expected safe outcome
+- identify whether export_doc() is the next narrow candidate after read/verify parity
