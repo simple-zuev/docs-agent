@@ -1,0 +1,27 @@
+Agent-assisted mode protocol
+
+Default workflow
+1. inspect state
+   - status or repo-state
+2. locate target
+   - find-doc-id / find-doc-name / find-link / find-doc-any
+3. decide route
+   - if lookup/navigation is enough, stop there
+   - if write-preparation is needed, use artifact-state or doc-body-only
+4. avoid degraded path by default
+   - do not require read-doc/get-file/read-doc-from-query unless explicitly necessary
+5. on instability
+   - stop
+   - report degraded runtime behavior
+   - do not escalate into broad mutation
+
+Default command preference
+- first choice: status, repo-state, find-doc-id, find-doc-name, find-link, find-doc-any
+- second choice: artifact-state, doc-body-only
+- degraded/optional only: read-doc, get-file, read-doc-from-query
+
+Agent role at current readiness level
+- bounded operator
+- navigation assistant
+- mutation-preparation assistant
+- not a broad autonomous executor

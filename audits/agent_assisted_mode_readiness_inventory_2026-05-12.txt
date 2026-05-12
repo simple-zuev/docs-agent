@@ -1,0 +1,24 @@
+Agent-assisted mode readiness inventory
+
+Purpose
+- define the currently acceptable limited operating mode for a ChatGPT-based agent
+- separate usable bounded surfaces from degraded or not-yet-reliable surfaces
+
+Usable now
+- status
+- repo-state / rs
+- doctor / diagnose
+- find-doc-id
+- find-doc-name
+- find-link
+- find-doc-any / f
+- artifact-state
+- doc-body-only
+
+Degraded / not yet reliable enough for default agent workflows
+- read-doc
+- get-file
+- read-doc-from-query / r
+
+Operating assumption
+- the agent should run in assisted bounded mode, not in broad autonomous mode

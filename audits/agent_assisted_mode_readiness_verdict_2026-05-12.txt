@@ -1,0 +1,28 @@
+Readiness verdict
+
+Decision
+- the application is ready for a limited ChatGPT-agent assisted mode
+- it is not yet ready for broad document-reading-dependent or mutation-heavy autonomous operation
+
+Allowed agent mode
+- bounded assisted mode
+- lookup/navigation/state inspection
+- bounded mutation-preparation mode through artifact-state and doc-body-only
+
+Disallowed or degraded by default
+- relying on read-doc/get-file/read-doc-from-query as mandatory baseline steps
+- broad autonomous write behavior
+- repo-wide cleanup
+- unrelated refactors
+- speculative recovery actions after unstable document-access runtime behavior
+
+Guardrails
+1. start with status or repo-state when useful
+2. prefer lookup/navigation commands over direct document-read commands
+3. treat document-access runtime as degraded until separately stabilized
+4. use artifact-state and doc-body-only as the only default write-capable contour
+5. if runtime behavior is unclear, stop at audit/inspection mode
+
+Practical implication
+- ChatGPT-agent integration can begin now in assisted mode
+- document-access runtime stabilization remains a follow-on hardening task, not a blocker for the limited rollout

@@ -1,0 +1,19 @@
+Management note
+
+Current readiness level
+- sufficient for limited assisted agent rollout
+- insufficient for broad autonomous operation
+
+Why rollout is justified now
+- help and entrypoint consistency were improved across lookup, read, document-access, and mutation entrypoints
+- bounded mutation-preparation contour exists
+- document-access runtime remains degraded, but this does not block a limited rollout focused on navigation, lookup, state inspection, and bounded preparation
+
+Recommended rollout posture
+- connect the ChatGPT-agent now in a constrained mode
+- continue hardening document-access runtime and mutation contract iteratively after rollout
+
+Recommended next hardening themes after rollout
+1. document-access runtime stabilization
+2. mutation result / contract alignment
+3. explicit agent operating prompt and command policy formalization
