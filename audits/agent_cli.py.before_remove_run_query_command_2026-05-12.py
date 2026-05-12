@@ -2506,6 +2506,19 @@ def handle_query_command(
     return handler(value)
 
 
+def run_query_command(
+    argv: list[str],
+    handler,
+) -> int:
+    json_output, args = parse_json_flag(argv)
+    if not args:
+        usage()
+        return 1
+    value = " ".join(args)
+    handler(value, json_output=json_output)
+    return 0
+
+
 def usage() -> None:
     print(
         "Usage:\n"

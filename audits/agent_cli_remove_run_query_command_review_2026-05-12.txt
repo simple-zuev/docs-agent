@@ -1,0 +1,13 @@
+Narrow cleanup target
+- remove only run_query_command from agent_cli.py
+
+Basis
+- query-wrapper audit artifacts in PR #27
+- run_query_command definition present on main baseline
+- no active call sites found
+
+Out of scope
+- handle_query_command
+- query dispatch restructuring
+- alias cleanup
+- help/usage behavior changes
