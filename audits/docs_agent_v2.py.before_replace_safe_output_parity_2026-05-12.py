@@ -49,27 +49,6 @@ def ensure_master_index_write_allowed():
         raise RuntimeError("Master Index write is forbidden by config")
 
 
-def normalize_jsonable(value):
-    if isinstance(value, dict):
-        return {str(k): normalize_jsonable(v) for k, v in value.items()}
-    if isinstance(value, (list, tuple)):
-        return [normalize_jsonable(v) for v in value]
-    if isinstance(value, set):
-        return [normalize_jsonable(v) for v in sorted(value, key=lambda x: str(x))]
-    if isinstance(value, Path):
-        return str(value)
-    if hasattr(value, "isoformat"):
-        try:
-            return value.isoformat()
-        except Exception:
-            pass
-    return value
-
-
-def emit_json(payload: dict):
-    print(json.dumps(normalize_jsonable(payload), ensure_ascii=False, indent=2))
-
-
 def print_dry_run(payload: dict):
     print("DRY RUN OK")
     print(json.dumps(payload, ensure_ascii=False, indent=2))

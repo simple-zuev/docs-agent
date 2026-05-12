@@ -1,0 +1,13 @@
+Parity implementation review
+- source function: docs_agent.py::replace_doc_text_safe()
+- target function: docs_agent_v2.py::replace_doc_text_safe()
+- implementation mode: exact function body parity + local emit_json helper injection if absent
+
+Source replace_doc_text_safe references:
+  - should_dry_run
+  - print_dry_run
+  - replace_all_text
+  - append_log
+  - no emit_json reference in source
+  - no emit_output reference in source
+  - no emit_error reference in source
