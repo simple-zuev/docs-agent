@@ -2277,6 +2277,70 @@ def doc_body_only_payload(profile: str, document_type: str, title: str) -> dict:
     }
 
 
+def artifact_state_payload(file_id: str) -> dict:
+    file_payload = run_docs_agent_with_retry(["get-file", file_id])
+    if not isinstance(file_payload, dict) or not file_payload.get("ok"):
+        return build_error_payload(
+            command="artifact-state",
+            error_type=(file_payload or {}).get("error_type", "ArtifactLookupError"),
+            error_message=(file_payload or {}).get(
+                "error_message", "Failed to read artifact metadata."
+            ),
+            retryable=bool((file_payload or {}).get("retryable")),
+            auth_related=bool((file_payload or {}).get("auth_related")),
+            network_related=bool((file_payload or {}).get("network_related")),
+            target_artifact={"file_id": file_id},
+            lookup_result=file_payload,
+        )
+
+    file_meta = file_payload.get("file") or {}
+    name = str(file_meta.get("name") or "")
+    parents = file_meta.get("parents") or []
+
+    default_test_folder = (
+        (cmd_status_payload().get("safety") or {}).get("default_test_folder")
+    ) or ""
+
+    placement = {
+        "parents": parents,
+        "known_review_scope": "13_Черновики_и_review" in name or False,
+        "default_test_folder": default_test_folder,
+    }
+
+    artifact_state = "Unknown"
+    review_status = "Needs classification"
+    next_safe_step = "Review artifact placement and classify before write actions."
+
+    if name.startswith("STAGING_COPY__"):
+        artifact_state = "Pending review"
+        review_status = "Review required"
+        next_safe_step = "Inspect staging artifact and decide whether body placement or review note is needed."
+    elif name.startswith("BACKUP_BEFORE_REPLACE__"):
+        artifact_state = "Historical reference"
+        review_status = "Not for direct mutation"
+        next_safe_step = "Use as backup/reference only."
+    elif name:
+        artifact_state = "Draft"
+        review_status = "Working draft or unclassified working artifact"
+        next_safe_step = "Validate target scope before bounded write."
+
+    return {
+        "ok": True,
+        "command": "artifact-state",
+        "target_artifact": {
+            "file_id": file_id,
+            "name": name,
+            "mime_type": file_meta.get("mimeType"),
+            "web_view_link": file_meta.get("webViewLink"),
+        },
+        "artifact_state": artifact_state,
+        "review_status": review_status,
+        "placement": placement,
+        "next_safe_step": next_safe_step,
+        "lookup_result": file_payload,
+    }
+
+
 def cmd_capabilities(json_output: bool = False) -> int:
     payload = capabilities_payload()
     if json_output:
@@ -2337,6 +2401,25 @@ def cmd_doc_body_only(
         print(f"Title: {payload.get('title')}")
         print("")
         print(payload.get("body", ""))
+        return EXIT_OK
+
+    print_compact_error(payload)
+    return resolve_command_exit_code(payload)
+
+
+def cmd_artifact_state(file_id: str, json_output: bool = False) -> int:
+    payload = artifact_state_payload(file_id)
+    if json_output:
+        print_json(payload)
+        return resolve_command_exit_code(payload)
+
+    if payload.get("ok"):
+        print("ARTIFACT STATE OK")
+        print(f"File ID: {(payload.get('target_artifact') or {}).get('file_id')}")
+        print(f"Name: {(payload.get('target_artifact') or {}).get('name')}")
+        print(f"Artifact state: {payload.get('artifact_state')}")
+        print(f"Review status: {payload.get('review_status')}")
+        print(f"Next safe step: {payload.get('next_safe_step')}")
         return EXIT_OK
 
     print_compact_error(payload)
@@ -2422,6 +2505,7 @@ def usage() -> None:
         "  python agent_cli.py doctor [--json]        | diagnose [--json]\n"
         "  python agent_cli.py assemble-context [--json] --profile <profile>\n"
         "  python agent_cli.py doc-body-only [--json] --profile <profile> --document-type <type> --title <title>\n"
+        "  python agent_cli.py artifact-state [--json] --file-id <google_drive_file_id>\n"
         "  python agent_cli.py find-doc-id <DOC-XXXX>\n"
         "  python agent_cli.py find-doc-name <document name>\n"
         "  python agent_cli.py find-link <drive_id_or_url_fragment>\n"
@@ -2530,6 +2614,15 @@ def main() -> int:
                 args[5],
                 json_output=json_output,
             )
+
+        if cmd == "artifact-state":
+            json_output, args = parse_json_flag(argv)
+            if len(args) != 2 or args[0] != "--file-id":
+                print_usage_error(
+                    "artifact-state requires: --file-id <google_drive_file_id>"
+                )
+                return EXIT_USAGE_ERROR
+            return cmd_artifact_state(args[1], json_output=json_output)
 
         if cmd in {"doctor", "diagnose"}:
             json_output, args = parse_json_flag(argv)
