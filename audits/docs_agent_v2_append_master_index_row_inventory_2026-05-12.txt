@@ -1,0 +1,38 @@
+==== append-master-index-row parity audit ====
+
+==== definition points ====
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:47:def ensure_master_index_write_allowed():
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:132:def get_sheet_header_map(
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:304:    ensure_write_allowed("create-temp-doc", target=get_default_test_folder_name())
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:366:    ensure_write_allowed("append-log", target=get_change_log_sheet())
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:393:    ensure_write_allowed("create-staging-copy", target=target_folder)
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:469:    ensure_write_allowed("patch-doc", target=document_id)
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:534:    ensure_write_allowed("create-doc-in-folder", target=target_folder)
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:679:    ensure_write_allowed("replace-doc-text", target=document_id)
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:747:    ensure_write_allowed("replace-doc-text-safe", target=document_id)
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:925:    ensure_write_allowed("upload-file-to-folder", target=folder_name)
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:1001:    ensure_write_allowed("move-file-with-log", target=target_folder_name)
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:1204:def append_master_index_row(
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:1210:    ensure_write_allowed(
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:1217:    payload = json.loads(payload_json)
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:1264:    ensure_write_allowed(
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:1271:    payload = json.loads(payload_json)
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:48:def ensure_master_index_write_allowed():
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:298:def get_sheet_header_map(
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:470:    ensure_write_allowed("create-temp-doc", target=get_default_test_folder_name())
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:532:    ensure_write_allowed("append-log", target=get_change_log_sheet())
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:559:    ensure_write_allowed("create-staging-copy", target=target_folder)
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:635:    ensure_write_allowed("patch-doc", target=document_id)
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:700:    ensure_write_allowed("create-doc-in-folder", target=target_folder)
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:778:    ensure_write_allowed("create-draft-doc", target=target_folder)
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:870:    ensure_write_allowed("append-review-note", target=document_id)
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:955:    ensure_write_allowed("write-draft-doc", target=document_id)
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:1137:    ensure_write_allowed("replace-doc-text", target=document_id)
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:1205:    ensure_write_allowed("replace-doc-text-safe", target=document_id)
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:1383:    ensure_write_allowed("upload-file-to-folder", target=folder_name)
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:1459:    ensure_write_allowed("move-file-with-log", target=target_folder_name)
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:1697:def append_master_index_row(
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:1703:    ensure_write_allowed(
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:1710:    payload = json.loads(payload_json)
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:1757:    ensure_write_allowed(
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:1764:    payload = json.loads(payload_json)
