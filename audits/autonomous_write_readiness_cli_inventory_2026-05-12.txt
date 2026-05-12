@@ -1,0 +1,174 @@
+==== agent_cli write-adjacent routes ====
+312:    rows.append(row)
+370:                    stack.append(v)
+376:                    stack.append(v)
+398:    *, env_ok: bool, status_ok: bool, master_index_ok: bool, smoke_ok: bool
+400:    if env_ok and status_ok and master_index_ok and smoke_ok:
+401:        return "CLI выглядит работоспособным: окружение, status, доступ к MASTER_INDEX и smoke-проверка прошли успешно."
+404:        failed.append("окружение")
+405:    if not status_ok:
+406:        failed.append("status")
+408:        failed.append("MASTER_INDEX")
+410:        failed.append("smoke")
+445:                    nested_types.append(et)
+447:                    nested_messages.append(em)
+488:            "Проверь debug-вывод, timeout, stdout/stderr и отдельно запусти status/doctor --json.",
+499:    *, env_ok: bool, status_ok: bool, master_index_ok: bool, smoke_ok: bool
+503:    if not status_ok:
+504:        return "Сначала выполни python agent_cli.py status --json и проверь блоки safety/config."
+528:    status = cmd_status_payload()
+534:        "status": status,
+546:            "summary": "CLI выглядит работоспособным: окружение, status, доступ к MASTER_INDEX и smoke-проверка прошли успешно.",
+598:    status = cmd_status_payload()
+603:        "status": status,
+614:            "summary": "CLI выглядит работоспособным для рутинного старта: окружение, status и доступ к MASTER_INDEX проверены.",
+807:def print_compact_status(payload: dict):
+809:    print("route: status")
+815:    print(f"default_dry_run: {safety.get('default_dry_run')}")
+816:    print(f"forbid_master_index_write: {safety.get('forbid_master_index_write')}")
+817:    print(f"forbid_delete: {safety.get('forbid_delete')}")
+827:    print("route: repo-state")
+843:    entries = payload.get("diff_name_status_entries") or []
+845:        print("diff_name_status_entries:")
+858:    print(f"status_ok: {(payload.get('checks') or {}).get('status', {}).get('ok')}")
+878:    status_check = checks.get("status") or {}
+883:    print(f"status_ok: {status_check.get('ok')}")
+938:        attempts.append(
+1075:    lines.append(f"ok: {ok}")
+1076:    lines.append(f"command: {command}")
+1078:        lines.append(f"query: {query}")
+1079:    lines.append(f"error_type: {error_type}")
+1080:    lines.append(f"error_message: {error_message}")
+1081:    lines.append(f"retryable: {retryable}")
+1082:    lines.append(f"auth_related: {auth_related}")
+1083:    lines.append(f"network_related: {network_related}")
+1121:        next_step = "Проверь _debug, stderr и повтори сценарий через status / smoke / точечный вызов команды."
+1123:    lines.append(f"explanation: {explanation}")
+1124:    lines.append(f"next_step: {next_step}")
+1213:def cmd_status_payload() -> dict:
+1215:    config = run_docs_agent_with_retry(["show-config-status"])
+1218:        "command": "status",
+1232:        "command": "repo-state",
+1256:def cmd_status(json_output: bool = False) -> int:
+1257:    payload = cmd_status_payload()
+1261:        print_compact_status(payload)
+1344:    attempts.append(summarize_attempt("Document ID", by_id))
+1362:    attempts.append(summarize_attempt("Document Name", by_name))
+1379:    attempts.append(summarize_attempt("Link fragment", by_link))
+1617:def is_status_query(query_lower: str) -> bool:
+1621:            "status",
+1658:def ask_status_payload(query: str) -> dict:
+1659:    result = cmd_status_payload()
+1660:    return build_ask_result(query, "status", result)
+1694:    if is_status_query(ql):
+1695:        return ask_status_payload(query)
+1712:    lines.append(f"ok: {ok}")
+1713:    lines.append(f"route: {routed}")
+1714:    lines.append(f"query: {query}")
+1716:    if routed == "status":
+1720:        lines.append(f"mode: {safety.get('mode')}")
+1721:        lines.append(f"default_test_folder: {safety.get('default_test_folder')}")
+1722:        lines.append(
+1731:            lines.append(f"error_type: {result.get('error_type')}")
+1732:            lines.append(f"error_message: {result.get('error_message')}")
+1734:                lines.append(
+1737:                lines.append(
+1741:                lines.append(
+1744:                lines.append("next_step: Повтори команду или проверь status --json.")
+1746:                lines.append("explanation: Поиск завершился ошибкой.")
+1747:                lines.append(
+1754:            lines.append(f"document_id: {summary.get('document_id')}")
+1755:            lines.append(f"document_name: {summary.get('document_name')}")
+1756:            lines.append(f"link: {summary.get('link')}")
+1761:            lines.append(f"file_id: {f.get('id')}")
+1762:            lines.append(f"name: {f.get('name')}")
+1763:            lines.append(f"mime: {f.get('mimeType')}")
+1764:            lines.append(f"link: {f.get('webViewLink')}")
+1776:            lines.append(f"error_type: {error_type}")
+1777:            lines.append(f"error_message: {error_message}")
+1815:                next_step = "Проверь _debug и повтори сценарий через status и точечный read-doc вызов."
+1817:            lines.append(f"explanation: {explanation}")
+1818:            lines.append(f"next_step: {next_step}")
+1826:        lines.append(f"document_id: {summary.get('document_id')}")
+1827:        lines.append(f"document_name: {summary.get('document_name')}")
+1828:        lines.append(f"link: {summary.get('link')}")
+1829:        lines.append("")
+1830:        lines.append("content_preview:")
+1831:        lines.append(content_preview)
+1833:            lines.append("")
+1834:            lines.append("[truncated]")
+1839:        lines.append(
+1842:        lines.append(
+1845:        lines.append("explanation: Запрос маршрутизирован, но завершился ошибкой.")
+1846:        lines.append("next_step: Повтори команду в JSON-режиме и проверь debug-поля.")
+1849:    lines.append(json.dumps(payload, ensure_ascii=False, indent=2))
+1854:    status_payload = cmd_status_payload()
+1857:        "status",
+1860:        "repo-state",
+1871:        "create-temp-doc",
+1872:        "create-staging-copy",
+1873:        "create-doc-in-folder",
+1874:        "replace-doc-text-safe",
+1875:        "move-file-with-log",
+1883:        "append-log",
+1884:        "append-master-index-row",
+1888:        "show-config-status",
+1894:        "mode": ((status_payload.get("safety") or {}).get("mode")),
+1895:        "default_dry_run": (
+1896:            (status_payload.get("safety") or {}).get("default_dry_run")
+1898:        "forbid_master_index_write": (
+1899:            (status_payload.get("safety") or {}).get("forbid_master_index_write")
+1901:        "forbid_delete": ((status_payload.get("safety") or {}).get("forbid_delete")),
+1903:            (status_payload.get("safety") or {}).get("default_test_folder")
+1913:        "can_create_draft_doc": True,
+1914:        "can_create_staging_copy": True,
+1915:        "can_safe_replace": True,
+1920:        "master_index_write_allowed": not bool(safety.get("forbid_master_index_write")),
+1921:        "delete_allowed": not bool(safety.get("forbid_delete")),
+1926:        "Safe autonomous mode should prefer read-only, draft-first, create-staging-copy, and replace-doc-text-safe.",
+1943:        "status_snapshot_ok": bool(status_payload.get("ok")),
+1961:    status_payload = cmd_status_payload()
+1980:            "status",
+1983:        "working_drafts_and_review_artifacts": [
+1996:                    resolved_sources.append(
+2005:                    unresolved_sources.append(
+2015:            if item in {"status", "capabilities"}:
+2016:                resolved_sources.append(
+2027:                resolved_sources.append(
+2035:                                (status_payload.get("config") or {}).get(
+2040:                                (status_payload.get("config") or {}).get(
+2050:                resolved_sources.append(
+2062:                resolved_sources.append(
+2071:                unresolved_sources.append(
+2081:        "draft-doc" if len(unresolved_sources) == 0 else "doc-body-only"
+2092:        "safety_snapshot": status_payload,
+2100:            "Use draft-doc when all critical sources are resolved; otherwise prefer doc-body-only and avoid direct mutation."
+2143:        "draft-spec": [
+2222:            "Создать или выбрать draft document в review-контуре и перенести это тело документа в controlled write workflow.",
+2252:        "Further review is required before canonical or review-draft update.",
+2276:        "next_safe_step": "Create or select a draft document in review scope and use controlled write workflow to place this body.",
+2284:            command="artifact-state",
+2301:        (cmd_status_payload().get("safety") or {}).get("default_test_folder")
+2320:    review_status = "Needs classification"
+2325:        review_status = "Not for direct mutation"
+2329:        review_status = "Review required"
+2330:        next_safe_step = "Inspect staging artifact and decide whether body placement or review note is needed."
+2333:        review_status = "In review scope"
+2335:            "Safe candidate for bounded draft workflow after target validation."
+2339:        review_status = "In default test scope"
+2343:        review_status = "Outside review scope"
+2350:        "command": "artifact-state",
+2358:        "review_status": review_status,
+2373:    print(f"Default dry run: {payload['safety'].get('default_dry_run')}")
+2442:        print(f"Review status: {payload.get('review_status')}")
+2525:        "  python agent_cli.py status [--json]\n  python agent_cli.py repo-state [--json]    | rs [--json]\n"
+2529:        "  python agent_cli.py artifact-state [--json] --file-id <google_drive_file_id>\n"
+2541:        "  python agent_cli.py status\n"
+2542:        "  python agent_cli.py status --json\n  python agent_cli.py repo-state\n  python agent_cli.py repo-state --json\n"
+2574:        if cmd == "status":
+2577:                print_usage_error("status does not accept positional arguments.")
+2579:            return cmd_status(json_output=json_output)
+2581:        if cmd in {"repo-state", "rs"}:
+2584:                print_usage_error("repo-state does not accept positional arguments.")
+2639:        if cmd == "artifact-state":
+2643:                    "artifact-state requires: --file-id <google_drive_file_id>"

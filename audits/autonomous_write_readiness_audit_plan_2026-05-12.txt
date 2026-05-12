@@ -1,0 +1,24 @@
+Autonomous write readiness audit plan
+Date: 2026-05-12
+
+Goal
+- assess whether docs-agent can be safely evolved into a fully autonomous Google Drive agent
+
+Scope
+- write and mutation surfaces only
+- focus on Google Drive / Docs write-path readiness
+- no code mutation in this iteration
+
+Audit questions
+- which mutation helpers and routes already exist
+- which ones are live vs unused vs partial
+- which mutation operations have dry-run behavior
+- which mutation operations have safety guards
+- which mutation operations have structured result/error contracts
+- which mutation surfaces are suitable for autonomous use
+- which blockers prevent minimum autonomous mode
+
+Constraints
+- audit-only
+- no repo-wide cleanup
+- no behavior change

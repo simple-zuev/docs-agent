@@ -1,0 +1,454 @@
+==== python source write/mutation surface ====
+/Users/zuevvladimir/AI/docs-agent/runtime_config.py:31:def is_default_dry_run():
+/Users/zuevvladimir/AI/docs-agent/runtime_config.py:32:    return bool(config_get("safety.default_dry_run", True))
+/Users/zuevvladimir/AI/docs-agent/runtime_config.py:35:def ensure_write_allowed(operation_name: str, target: str = ""):
+/Users/zuevvladimir/AI/docs-agent/runtime_config.py:51:def get_change_log_id():
+/Users/zuevvladimir/AI/docs-agent/runtime_config.py:52:    return config_get("documents.change_log_spreadsheet_id", CHANGE_LOG_ID)
+/Users/zuevvladimir/AI/docs-agent/runtime_config.py:55:def get_change_log_sheet():
+/Users/zuevvladimir/AI/docs-agent/runtime_config.py:56:    return config_get("documents.change_log_sheet_name", "Change Log Lite")
+/Users/zuevvladimir/AI/docs-agent/runtime_config.py:65:def should_dry_run(dry_run: bool = False):
+/Users/zuevvladimir/AI/docs-agent/runtime_config.py:66:    return dry_run or is_default_dry_run()
+/Users/zuevvladimir/AI/docs-agent/runtime_config.py:87:def is_write_mode():
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:12:from doc_text_mutation import insert_text_at_index, replace_all_text
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:18:    get_change_log_id,
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:19:    get_change_log_sheet,
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:24:    is_default_dry_run,
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:26:    should_dry_run,
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:47:def ensure_master_index_write_allowed():
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:48:    if bool(config_get("safety.forbid_master_index_write", True)):
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:52:def print_dry_run(payload: dict):
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:229:def append_log(
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:302:def create_temp_doc():
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:329:    insert_text_at_index(
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:360:def append_log_cmd(
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:366:    ensure_write_allowed("append-log", target=get_change_log_sheet())
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:386:def create_staging_copy(
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:389:    dry_run: bool = False,
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:394:    if should_dry_run(dry_run):
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:395:        print_dry_run(
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:488:    insert_text_at_index(
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:516:def create_doc_in_folder(
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:519:    dry_run: bool = False,
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:523:    if should_dry_run(dry_run):
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:524:        print_dry_run(
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:560:    insert_text_at_index(
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:673:def replace_doc_text(
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:725:def replace_doc_text_safe(
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:730:    dry_run: bool = False,
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:734:    if should_dry_run(dry_run):
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:735:        print_dry_run(
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:907:    dry_run: bool = False,
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:913:    if should_dry_run(dry_run):
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:914:        print_dry_run(
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:981:def move_file_with_log(
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:985:    dry_run: bool = False,
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:989:    if should_dry_run(dry_run):
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:990:        print_dry_run(
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:1204:def append_master_index_row(
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:1390:                "default_dry_run": config_get("safety.default_dry_run", True),
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:1391:                "forbid_master_index_write": config_get(
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:1392:                    "safety.forbid_master_index_write", True
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:1394:                "forbid_delete": config_get("safety.forbid_delete", True),
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:1398:                "change_log_spreadsheet_id": get_change_log_id(),
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:1399:                "change_log_sheet_name": get_change_log_sheet(),
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:1416:                "default_dry_run": is_default_dry_run(),
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:1417:                "forbid_master_index_write": config_get(
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:1418:                    "safety.forbid_master_index_write", True
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:1420:                "forbid_delete": config_get("safety.forbid_delete", True),
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/packaging/tags.py:889:def create_compatible_tags_selector(
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/packaging/metadata.py:940:    def _write_metadata(self, message: RFC822Message) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/packaging/version.py:501:    def __replace__(self, **kwargs: Unpack[_VersionReplace]) -> Self:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pyasn1/codec/ber/decoder.py:82:    def _createComponent(self, asn1Spec, tagSet, value, **options):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pyasn1/codec/ber/decoder.py:164:    def _createComponent(self, asn1Spec, tagSet, value, **options):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pyasn1/type/univ.py:1699:    def append(self, value):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pyasn1/type/base.py:515:    def _moveSizeSpec(self, **kwargs):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/googleapiclient/discovery.py:1076:def createMethod(methodName, methodDesc, rootDesc, schema):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/googleapiclient/discovery.py:1341:def createNextMethod(
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/googleapiclient/discovery.py:1550:            def createResourceMethod(methodName, methodDesc):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/oauthlib/oauth2/rfc8628/endpoints/device_authorization.py:144:    def create_device_authorization_response(
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/oauthlib/oauth2/rfc8628/grant_types/device_code.py:13:    def create_authorization_response(
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/oauthlib/oauth2/rfc8628/grant_types/device_code.py:76:    def create_token_response(
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/oauthlib/oauth2/rfc6749/clients/base.py:467:    def create_code_verifier(self, length):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/oauthlib/oauth2/rfc6749/clients/base.py:499:    def create_code_challenge(self, code_verifier, code_challenge_method=None):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/oauthlib/oauth2/rfc6749/endpoints/token.py:86:    def create_token_response(self, uri, http_method='POST', body=None,
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/oauthlib/oauth2/rfc6749/endpoints/metadata.py:52:    def create_metadata_response(self, uri, http_method='GET', body=None,
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/oauthlib/oauth2/rfc6749/endpoints/introspect.py:48:    def create_introspect_response(self, uri, http_method='POST', body=None,
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/oauthlib/oauth2/rfc6749/endpoints/revocation.py:39:    def create_revocation_response(self, uri, http_method='POST', body=None,
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/oauthlib/oauth2/rfc6749/endpoints/authorization.py:86:    def create_authorization_response(self, uri, http_method='GET', body=None,
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/oauthlib/oauth2/rfc6749/tokens.py:292:    def create_token(self, request, refresh_token=False, **kwargs):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/oauthlib/oauth2/rfc6749/grant_types/resource_owner_password_credentials.py:69:    def create_token_response(self, request, token_handler):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/oauthlib/oauth2/rfc6749/grant_types/implicit.py:118:    def create_authorization_response(self, request, token_handler):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/oauthlib/oauth2/rfc6749/grant_types/implicit.py:165:    def create_token_response(self, request, token_handler):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/oauthlib/oauth2/rfc6749/grant_types/refresh_token.py:29:    def create_token_response(self, request, token_handler):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:160:    def create_authorization_code(self, request):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:174:    def create_authorization_response(self, request, token_handler):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:283:    def create_token_response(self, request, token_handler):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/oauthlib/oauth2/rfc6749/grant_types/client_credentials.py:49:    def create_token_response(self, request, token_handler):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/oauthlib/oauth2/rfc6749/grant_types/base.py:119:    def create_authorization_response(self, request, token_handler):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/oauthlib/oauth2/rfc6749/grant_types/base.py:128:    def create_token_response(self, request, token_handler):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/oauthlib/oauth2/rfc6749/grant_types/base.py:250:    def _create_cors_headers(self, request):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/oauthlib/openid/connect/core/endpoints/userinfo.py:29:    def create_userinfo_response(self, uri, http_method='GET', body=None, headers=None):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/oauthlib/openid/connect/core/tokens.py:27:    def create_token(self, request, refresh_token=False):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/oauthlib/openid/connect/core/grant_types/dispatchers.py:31:    def create_authorization_response(self, request, token_handler):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/oauthlib/openid/connect/core/grant_types/dispatchers.py:60:    def create_authorization_response(self, request, token_handler):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/oauthlib/openid/connect/core/grant_types/dispatchers.py:98:    def create_token_response(self, request, token_handler):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/oauthlib/oauth1/rfc5849/endpoints/access_token.py:32:    def create_access_token(self, request, credentials):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/oauthlib/oauth1/rfc5849/endpoints/access_token.py:54:    def create_access_token_response(self, uri, http_method='GET', body=None,
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/oauthlib/oauth1/rfc5849/endpoints/request_token.py:32:    def create_request_token(self, request, credentials):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/oauthlib/oauth1/rfc5849/endpoints/request_token.py:49:    def create_request_token_response(self, uri, http_method='GET', body=None,
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/oauthlib/oauth1/rfc5849/endpoints/authorization.py:37:    def create_verifier(self, request, credentials):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/oauthlib/oauth1/rfc5849/endpoints/authorization.py:54:    def create_authorization_response(self, uri, http_method='GET', body=None,
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/oauthlib/oauth1/rfc5849/endpoints/base.py:69:    def _create_request(self, uri, http_method, body, headers):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/oauthlib/oauth1/rfc5849/parameters.py:88:def _append_params(oauth_params, params):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pygments/filters/__init__.py:52:def _replace_special(ttype, value, regex, specialttype,
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pygments/filters/__init__.py:846:            def replacefunc(wschar):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pygments/lexers/slash.py:21:    def move_state(new_state):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pygments/lexers/robotframework.py:47:def normalize(string, remove=''):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pygments/lexers/robotframework.py:450:    def get_replaced_base(self, variables):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pygments/lexers/wowtoc.py:20:def _create_tag_line_pattern(inner_pattern, ignore_case=False):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pygments/lexers/wowtoc.py:27:def _create_tag_line_token(inner_pattern, inner_token, ignore_case=False):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pygments/lexers/_mysql_builtins.py:1353:    def parse_item_create_functions(f):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pygments/util.py:249:def duplicates_removed(it, already_seen=()):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pygments/sphinxext.py:121:        def write_row(*columns):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pygments/sphinxext.py:132:        def write_seperator():
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pygments/formatters/terminal.py:94:    def _write_lineno(self, outfile):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pygments/formatters/html.py:494:    def _create_stylesheet(self):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pygments/formatters/irc.py:129:    def _write_lineno(self, outfile):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pygments/formatters/other.py:95:            def write(text):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pygments/formatters/img.py:106:    def _create_nix(self):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pygments/formatters/img.py:129:    def _create_mac(self):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pygments/formatters/img.py:172:    def _create_win(self):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pygments/formatters/img.py:538:    def _create_drawables(self, tokensource):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pygments/formatters/terminal256.py:245:    def _write_lineno(self, outfile):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pygments/formatters/rtf.py:213:    def _create_color_mapping(self):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pygments/formatters/groff.py:91:    def _write_lineno(self, outfile):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pygments/formatters/latex.py:279:    def _create_stylesheet(self):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pygments/formatters/latex.py:317:            cmndef = cmndef.replace('$$', cp)
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pygments/lexer.py:851:def do_insertions(insertions, tokens):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/proto/datetime_helpers.py:95:    def replace(self, *args, **kw):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/proto/marshal/collections/repeated.py:71:    def insert(self, index: int, value):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/proto/marshal/collections/repeated.py:186:    def insert(self, index: int, value):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/httplib2/__init__.py:414:def _bind_write_headers(msg):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/httplib2/__init__.py:415:    def _write_headers(self):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/typer/core.py:501:        def _write_opts(opts: Sequence[str]) -> str:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/typer/main.py:877:        def create():
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pyparsing/results.py:355:           >>> def remove_first(tokens):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pyparsing/results.py:372:           >>> def remove_LABEL(tokens):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pyparsing/results.py:426:    def insert(self, index, ins_string):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pyparsing/results.py:442:           >>> def insert_locn(locn, tokens):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pyparsing/results.py:459:    def append(self, item):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pyparsing/results.py:473:           >>> def append_sum(tokens):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pyparsing/util.py:450:def replaced_by_pep8(compat_name: str, fn: C) -> C:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pyparsing/actions.py:59:def replace_with(repl_str: Any) -> ParseAction:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pyparsing/actions.py:79:def remove_quotes(s: str, l: int, t: ParseResults) -> Any:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pyparsing/core.py:2529:    def create_diagram(
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pyparsing/core.py:4317:    def append(self, other) -> ParserElement:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pyparsing/core.py:6715:        def remove_duplicate_chars(tokens):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pyparsing/helpers.py:754:def replace_html_entity(s, l, t):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/cryptography/hazmat/primitives/serialization/pkcs7.py:389:def _smime_remove_text_headers(data: bytes) -> bytes:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/cryptography/hazmat/primitives/serialization/pkcs7.py:410:    def _write_headers(self, generator) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/auth/pluggable.py:442:    def _create_default_metrics_options(self):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/auth/aio/transport/mtls.py:35:def _create_temp_file(content: bytes):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/auth/aws.py:808:    def _create_default_metrics_options(self):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/auth/identity_pool.py:415:    def _create_default_metrics_options(self):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/auth/external_account.py:635:    def _create_default_metrics_options(self):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/auth/_helpers.py:204:def update_query(url, params, remove=None):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/oauth2/service_account.py:466:    def _create_self_signed_jwt(self, audience):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/oauth2/gdch_credentials.py:106:    def _create_jwt(self):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/api_core/bidi_base.py:48:    def _create_queue(self):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/api_core/grpc_helpers.py:180:def _create_composite_credentials(
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/api_core/grpc_helpers.py:286:def create_channel(
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/api_core/_rest_streaming_base.py:100:    def _create_grab(self):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/api_core/grpc_helpers_async.py:119:    async def write(self, request):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/api_core/grpc_helpers_async.py:212:def create_channel(
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/api_core/path_template.py:131:def _replace_variable_with_pattern(match):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/api_core/bidi.py:250:    def _create_queue(self):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/api_core/bidi_async.py:165:    def _create_queue(self) -> asyncio.Queue:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/protobuf/text_format.py:88:  def write(self, val):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/protobuf/internal/well_known_types.py:615:  def get_or_create_list(self, key):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/protobuf/internal/well_known_types.py:622:  def get_or_create_struct(self, key):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/protobuf/internal/well_known_types.py:645:  def append(self, value):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/protobuf/internal/containers.py:128:  def append(self, value: _T) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/protobuf/internal/containers.py:134:  def insert(self, key: int, value: _T) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/protobuf/internal/containers.py:158:  def remove(self, elem: _T):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/protobuf/internal/containers.py:286:  def append(self, value: _T) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/protobuf/internal/containers.py:295:  def insert(self, key: int, value: _T) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/protobuf/internal/containers.py:328:  def remove(self, elem: _T) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/protobuf/internal/containers.py:520:  def get_or_create(self, key: _K) -> _V:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/protobuf/internal/encoder.py:352:  def EncodeVarint(write, value, unused_deterministic=None):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/protobuf/internal/encoder.py:370:  def EncodeSignedVarint(write, value, unused_deterministic=None):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/protobuf/internal/encoder.py:422:      def EncodePackedField(write, value, deterministic):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/protobuf/internal/encoder.py:433:      def EncodeRepeatedField(write, value, deterministic):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/protobuf/internal/encoder.py:440:      def EncodeField(write, value, deterministic):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/protobuf/internal/encoder.py:456:      def EncodePackedField(write, value, deterministic):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/protobuf/internal/encoder.py:467:      def EncodeRepeatedField(write, value, deterministic):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/protobuf/internal/encoder.py:474:      def EncodeField(write, value, deterministic):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/protobuf/internal/encoder.py:497:      def EncodePackedField(write, value, deterministic):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/protobuf/internal/encoder.py:505:      def EncodeRepeatedField(write, value, unused_deterministic=None):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/protobuf/internal/encoder.py:512:      def EncodeField(write, value, unused_deterministic=None):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/protobuf/internal/encoder.py:534:    def EncodeNonFiniteOrRaise(write, value):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/protobuf/internal/encoder.py:545:    def EncodeNonFiniteOrRaise(write, value):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/protobuf/internal/encoder.py:563:      def EncodePackedField(write, value, deterministic):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/protobuf/internal/encoder.py:576:      def EncodeRepeatedField(write, value, unused_deterministic=None):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/protobuf/internal/encoder.py:586:      def EncodeField(write, value, unused_deterministic=None):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/protobuf/internal/encoder.py:632:    def EncodePackedField(write, value, deterministic):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/protobuf/internal/encoder.py:643:    def EncodeRepeatedField(write, value, unused_deterministic=None):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/protobuf/internal/encoder.py:653:    def EncodeField(write, value, unused_deterministic=None):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/protobuf/internal/encoder.py:669:    def EncodeRepeatedField(write, value, deterministic):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/protobuf/internal/encoder.py:677:    def EncodeField(write, value, deterministic):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/protobuf/internal/encoder.py:693:    def EncodeRepeatedField(write, value, deterministic):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/protobuf/internal/encoder.py:700:    def EncodeField(write, value, deterministic):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/protobuf/internal/encoder.py:714:    def EncodeRepeatedField(write, value, deterministic):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/protobuf/internal/encoder.py:721:    def EncodeField(write, value, deterministic):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/protobuf/internal/encoder.py:735:    def EncodeRepeatedField(write, value, deterministic):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/protobuf/internal/encoder.py:742:    def EncodeField(write, value, deterministic):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/protobuf/internal/encoder.py:772:  def EncodeField(write, value, deterministic):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/protobuf/internal/encoder.py:800:  def EncodeField(write, value, deterministic):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/google/protobuf/internal/python_message.py:1174:  def InternalSerialize(self, write_bytes, deterministic=None):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/cffi/backend_ctypes.py:47:    def _create_ctype_obj(cls, init):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/cffi/backend_ctypes.py:58:    def _get_c_name(cls, replace_with=''):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/cffi/backend_ctypes.py:242:    def _create_ctype_obj(cls, init):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/cffi/backend_ctypes.py:385:            def _create_ctype_obj(init):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/cffi/backend_ctypes.py:765:        def _create_ctype_obj(init):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/cffi/backend_ctypes.py:1039:        def remove(k):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/cffi/backend_ctypes.py:1051:    def getcname(self, BType, replace_with):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/cffi/backend_ctypes.py:1116:    def write_variable(self, BType, name, value):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/cffi/vengine_gen.py:43:    def write_source_to_f(self):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/cffi/model.py:12:def qualify(quals, replace_with):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/cffi/model.py:29:    def get_c_name(self, replace_with='', context='a C file', quals=0):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/cffi/api.py:368:    def memmove(self, dest, src, n):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/cffi/api.py:405:    def getctype(self, cdecl, replace_with=''):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/cffi/vengine_cpy.py:55:    def write_source_to_f(self):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/cffi/recompiler.py:281:    def write_source_to_f(self, f, preamble):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/cffi/recompiler.py:295:    def write_c_source_to_f(self, f, preamble):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/cffi/recompiler.py:478:    def write_py_source_to_f(self, f):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/cffi/recompiler.py:1417:        def write(self, s):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/cffi/cparser.py:167:def _remove_line_directives(csource):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/cffi/cparser.py:173:    def replace(m):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/cffi/cparser.py:181:    def replace(m):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/cffi/cparser.py:195:    def replace_keeping_newlines(m):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/cffi/verifier.py:24:        def write(self, s):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/cffi/verifier.py:73:    def write_source(self, file=None):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/cffi/verifier.py:166:    def _write_source_to(self, file):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/cffi/verifier.py:173:    def _write_source(self, file=None):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/markdown_it/rules_core/smartquotes.py:17:def replaceAt(string: str, index: int, ch: str) -> str:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/markdown_it/rules_core/replacements.py:59:def replaceFn(match: re.Match[str]) -> str:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/markdown_it/rules_core/replacements.py:63:def replace_scoped(inlineTokens: list[Token]) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/markdown_it/rules_core/replacements.py:77:def replace_rare(inlineTokens: list[Token]) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/markdown_it/rules_core/replacements.py:113:def replace(state: StateCore) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/markdown_it/common/utils.py:98:def replaceEntityPattern(match: str, name: str) -> str:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/markdown_it/common/utils.py:118:    def replacer_func(match: Match[str]) -> str:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/wheel/_bdist_wheel.py:167:def remove_readonly(
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/wheel/_bdist_wheel.py:175:def remove_readonly_exc(func: Callable[..., object], path: str, exc: Exception) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/wheel/_bdist_wheel.py:465:            if not self.dry_run:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/wheel/_bdist_wheel.py:471:    def write_wheelfile(
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/wheel/wheelfile.py:168:    def write_files(self, base_dir: str) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/wheel/wheelfile.py:190:    def write(
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/wheel/wheelfile.py:207:    def writestr(
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/click/_winconsole.py:174:    def write(self, b: Buffer) -> int:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/click/_winconsole.py:203:    def write(self, x: t.AnyStr) -> int:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/click/_winconsole.py:212:    def writelines(self, lines: cabc.Iterable[t.AnyStr]) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/click/core.py:1762:    def result_callback(self, replace: bool = False) -> t.Callable[[F], F]:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/click/core.py:3055:        def _write_opts(opts: cabc.Sequence[str]) -> str:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/click/formatting.py:135:    def write(self, string: str) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/click/formatting.py:147:    def write_usage(self, prog: str, args: str = "", prefix: str | None = None) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/click/formatting.py:185:    def write_heading(self, heading: str) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/click/formatting.py:189:    def write_paragraph(self) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/click/formatting.py:194:    def write_text(self, text: str) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/click/formatting.py:210:    def write_dl(
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/click/_compat.py:160:def _is_binary_writer(stream: t.IO[t.Any], default: bool = False) -> bool:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/click/_compat.py:191:def _find_binary_writer(stream: t.IO[t.Any]) -> t.BinaryIO | None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/click/_compat.py:300:def _force_correct_text_writer(
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/click/_compat.py:541:        def _safe_write(s: str) -> int:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/click/testing.py:84:    def write(self, b: ReadableBuffer) -> int:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/charset_normalizer/models.py:286:    def append(self, item: CharsetMatch) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/charset_normalizer/utils.py:79:def remove_accent(character: str) -> str:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/requests/cookies.py:151:def remove_cookie_by_name(cookiejar, name, domain=None, path=None):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/requests/cookies.py:455:def create_cookie(name, value, **kwargs):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/requests/cookies.py:521:def cookiejar_from_dict(cookie_dict, cookiejar=None, overwrite=True):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_internal/network/download.py:153:    def write_chunk(self, data: bytes) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_internal/network/cache.py:80:    def _write_to_file(self, path: str, writer_func: Callable[[BinaryIO], Any]) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_internal/network/cache.py:93:    def _write(self, path: str, data: bytes) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_internal/network/cache.py:96:    def _write_from_io(self, path: str, source_file: BinaryIO) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_internal/utils/misc.py:368:def write_output(msg: Any, *args: Any) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_internal/utils/misc.py:516:def remove_auth_from_url(url: str) -> str:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_internal/utils/temp_dir.py:169:    def _create(self, kind: str) -> str:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_internal/utils/temp_dir.py:276:    def _create(self, kind: str) -> str:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_internal/models/search_scope.py:28:    def create(
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_internal/cli/cmdoptions.py:101:        if not options.dry_run and dist_restriction_set and not options.target_dir:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_internal/cli/index_command.py:36:def _create_truststore_ssl_context() -> SSLContext | None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_internal/cli/parser.py:181:    def insert_option_group(
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_internal/cli/spinners.py:59:    def _write(self, status: str) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_internal/cli/main_parser.py:21:def create_main_parser() -> ConfigOptionParser:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_internal/cli/progress_bars.py:103:    def write_progress(current: int, total: int) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_internal/operations/check.py:44:def create_package_set_from_installed() -> tuple[PackageSet, bool]:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_internal/operations/check.py:161:def _create_whitelist(
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_internal/operations/build/build_tracker.py:116:    def remove(self, req: InstallRequirement, key: TrackerId) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_internal/req/req_uninstall.py:352:    def remove(self, auto_confirm: bool = False, verbose: bool = False) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_internal/req/req_uninstall.py:568:        def iter_scripts_to_remove(
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_internal/req/req_uninstall.py:605:    def remove(self) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_internal/resolution/resolvelib/found_candidates.py:81:def _iter_built_with_inserted(
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_internal/index/collector.py:401:    def create(
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_internal/index/package_finder.py:418:    def create(
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_internal/index/package_finder.py:672:    def create(
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_internal/exceptions.py:459:    def append(self, error: HashError) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_internal/commands/cache.py:167:    def remove_cache_items(self, options: Values, args: list[str]) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_internal/commands/__init__.py:116:def create_command(name: str, **kwargs: Any) -> Command:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_internal/commands/debug.py:39:def create_vendor_txt_map() -> dict[str, str]:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_internal/commands/install.py:173:            dest="dry_run",
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_internal/commands/install.py:379:            not (options.dry_run and options.json_report_file)
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_internal/commands/install.py:491:            if options.dry_run:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_internal/commands/install.py:839:def create_os_error_message(
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/packaging/tags.py:889:def create_compatible_tags_selector(
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/packaging/metadata.py:940:    def _write_metadata(self, message: RFC822Message) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/packaging/version.py:501:    def __replace__(self, **kwargs: Unpack[_VersionReplace]) -> Self:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/msgpack/fallback.py:21:        def write(self, s):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/pygments/filters/__init__.py:52:def _replace_special(ttype, value, regex, specialttype,
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/pygments/filters/__init__.py:843:            def replacefunc(wschar):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/pygments/util.py:249:def duplicates_removed(it, already_seen=()):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/pygments/sphinxext.py:121:        def write_row(*columns):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/pygments/sphinxext.py:132:        def write_seperator():
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/pygments/lexer.py:851:def do_insertions(insertions, tokens):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/distlib/util.py:395:def write_exports(exports, stream):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/distlib/util.py:488:    def __init__(self, dry_run=False):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/distlib/util.py:489:        self.dry_run = dry_run
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/distlib/util.py:526:        if not self.dry_run:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/distlib/util.py:542:        if not self.dry_run:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/distlib/util.py:553:    def write_binary_file(self, path, data):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/distlib/util.py:555:        if not self.dry_run:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/distlib/util.py:562:    def write_text_file(self, path, data, encoding):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/distlib/util.py:570:                if self.dry_run:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/distlib/util.py:586:            if not self.dry_run:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/distlib/util.py:594:        if not self.dry_run:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/distlib/util.py:610:    def ensure_removed(self, path):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/distlib/util.py:614:                if not self.dry_run:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/distlib/util.py:625:                if not self.dry_run:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/distlib/util.py:654:        if not self.dry_run:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/distlib/util.py:1015:    def add(self, event, subscriber, append=True):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/distlib/util.py:1035:    def remove(self, event, subscriber):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/distlib/util.py:1090:    def remove_node(self, node, edges=False):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/distlib/util.py:1111:    def remove(self, pred, succ):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/distlib/util.py:1659:    def writerow(self, row):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/distlib/__init__.py:28:        def createLock(self):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/distlib/scripts.py:100:    def __init__(self, source_dir, target_dir, add_launchers=True, dry_run=False, fileop=None):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/distlib/scripts.py:109:        self._fileop = fileop or FileOperator(dry_run)
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/distlib/scripts.py:259:    def _write_script(self, names, shebang, script_bytes, filenames, ext):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/distlib/scripts.py:356:            if not self.dry_run:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/distlib/scripts.py:379:            if not self._fileop.dry_run:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/distlib/scripts.py:393:    def dry_run(self):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/distlib/scripts.py:394:        return self._fileop.dry_run
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/distlib/scripts.py:396:    @dry_run.setter
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/distlib/scripts.py:397:    def dry_run(self, value):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/distlib/scripts.py:398:        self._fileop.dry_run = value
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/cachecontrol/caches/file_cache.py:80:    def _write(self, path: str, data: bytes) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/requests/cookies.py:151:def remove_cookie_by_name(cookiejar, name, domain=None, path=None):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/requests/cookies.py:455:def create_cookie(name, value, **kwargs):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/requests/cookies.py:521:def cookiejar_from_dict(cookie_dict, cookiejar=None, overwrite=True):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/tomli/_parser.py:289:    def get_or_create_nest(
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/tomli/_parser.py:306:    def append_nest_to_list(self, key: Key) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/tomli/_parser.py:376:def create_dict_rule(src: str, pos: Pos, out: Output) -> tuple[Pos, Key]:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/tomli/_parser.py:396:def create_list_rule(src: str, pos: Pos, out: Output) -> tuple[Pos, Key]:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/pyproject_hooks/_impl.py:28:def write_json(obj: Mapping[str, Any], path: str, **kwargs) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/pyproject_hooks/_in_process/_in_process.py:31:def write_json(obj, path, **kwargs):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/rich/console.py:502:        def _replace(*args: Any, **kwargs: Any) -> Group:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/rich/console.py:1539:            def align_append(renderable: RenderableType) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/rich/console.py:2042:    def _write_buffer(self) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/rich/emoji.py:53:    def replace(cls, text: str) -> str:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/rich/containers.py:59:    def append(self, renderable: "RenderableType") -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/rich/containers.py:102:    def append(self, line: "Text") -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/rich/_emoji_replace.py:12:def _emoji_replace(
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/rich/_emoji_replace.py:23:    def do_replace(match: Match[str]) -> str:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/rich/control.py:79:    def move(cls, x: int = 0, y: int = 0) -> "Control":
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/rich/control.py:108:    def move_to_column(cls, x: int, y: int = 0) -> "Control":
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/rich/control.py:132:    def move_to(cls, x: int, y: int) -> "Control":
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/rich/_null_file.py:39:    def writelines(self, __lines: Iterable[str]) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/rich/_null_file.py:59:    def write(self, text: str) -> int:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/rich/file_proxy.py:28:    def write(self, text: str) -> int:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/rich/repr.py:42:    def do_replace(cls: Type[T], angular: Optional[bool] = None) -> Type[T]:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/rich/text.py:76:    def move(self, offset: int) -> "Span":
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/rich/text.py:543:    def remove_suffix(self, suffix: str) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/rich/text.py:965:    def append(
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/rich/text.py:1009:    def append_text(self, text: "Text") -> "Text":
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/rich/text.py:1031:    def append_tokens(
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/rich/segment.py:580:    def remove_color(cls, segments: Iterable["Segment"]) -> Iterable["Segment"]:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/rich/progress.py:278:    def write(self, s: Any) -> int:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/rich/progress.py:281:    def writelines(self, lines: Iterable[Any]) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/rich/progress.py:1642:    def remove_task(self, task_id: TaskID) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/rich/_win32_console.py:396:    def write_text(self, text: str) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/rich/_win32_console.py:405:    def write_styled(self, text: str, style: Style) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/rich/_win32_console.py:444:    def move_cursor_to(self, new_position: WindowsCoordinates) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/rich/_win32_console.py:493:    def move_cursor_up(self) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/rich/_win32_console.py:503:    def move_cursor_down(self) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/rich/_win32_console.py:514:    def move_cursor_forward(self) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/rich/_win32_console.py:526:    def move_cursor_to_column(self, column: int) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/rich/_win32_console.py:535:    def move_cursor_backward(self) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/urllib3/util/wait.py:120:def wait_for_write(sock: socket.socket, timeout: float | None = None) -> bool:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/urllib3/util/ssl_.py:225:def create_urllib3_context(
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/urllib3/util/url.py:263:def _remove_path_dot_segments(path: str) -> str:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/urllib3/util/connection.py:27:def create_connection(
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/pkg_resources/__init__.py:1170:    def remove(self, dist: Distribution):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/pkg_resources/__init__.py:2178:    def _warn_on_replacement(self, metadata):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/pkg_resources/__init__.py:3107:    def activate(self, path: list[str] | None = None, replace: bool = False):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/pkg_resources/__init__.py:3202:    def insert_on(  # noqa: C901
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/resolvelib/resolvers/resolution.py:154:    def _remove_information_from_criteria(
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/resolvelib/structs.py:78:    def remove(self, key: KT) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/platformdirs/api.py:81:    def _append_app_name_and_version(self, *base: str) -> str:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/platformdirs/api.py:91:    def _optionally_create_directory(self, path: str) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/pip/_vendor/platformdirs/windows.py:38:    def _append_parts(self, path: str, *, opinion_value: str | None = None) -> str:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/rich/console.py:496:        def _replace(*args: Any, **kwargs: Any) -> Group:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/rich/console.py:1541:            def align_append(renderable: RenderableType) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/rich/console.py:2059:    def _write_buffer(self) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/rich/emoji.py:53:    def replace(cls, text: str) -> str:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/rich/containers.py:59:    def append(self, renderable: "RenderableType") -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/rich/containers.py:102:    def append(self, line: "Text") -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/rich/_emoji_replace.py:9:def _emoji_replace(
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/rich/_emoji_replace.py:22:    def do_replace(match: Match[str]) -> str:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/rich/control.py:79:    def move(cls, x: int = 0, y: int = 0) -> "Control":
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/rich/control.py:108:    def move_to_column(cls, x: int, y: int = 0) -> "Control":
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/rich/control.py:132:    def move_to(cls, x: int, y: int) -> "Control":
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/rich/_null_file.py:39:    def writelines(self, __lines: Iterable[str]) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/rich/_null_file.py:59:    def write(self, text: str) -> int:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/rich/file_proxy.py:28:    def write(self, text: str) -> int:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/rich/repr.py:41:    def do_replace(cls: Type[T], angular: Optional[bool] = None) -> Type[T]:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/rich/markdown.py:29:    def create(cls, markdown: Markdown, token: Token) -> MarkdownElement:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/rich/markdown.py:114:    def create(cls, markdown: Markdown, token: Token) -> Paragraph:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/rich/markdown.py:146:    def create(cls, markdown: Markdown, token: Token) -> Heading:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/rich/markdown.py:173:    def create(cls, markdown: Markdown, token: Token) -> CodeBlock:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/rich/markdown.py:313:    def create(cls, markdown: Markdown, token: Token) -> MarkdownElement:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/rich/markdown.py:344:    def create(cls, markdown: Markdown, token: Token) -> ListElement:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/rich/markdown.py:416:    def create(cls, markdown: Markdown, token: Token) -> MarkdownElement:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/rich/markdown.py:431:    def create(cls, markdown: Markdown, token: Token) -> MarkdownElement:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/rich/text.py:76:    def move(self, offset: int) -> "Span":
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/rich/text.py:543:    def remove_suffix(self, suffix: str) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/rich/text.py:964:    def append(
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/rich/text.py:1008:    def append_text(self, text: "Text") -> "Text":
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/rich/text.py:1030:    def append_tokens(
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/rich/segment.py:608:    def remove_color(cls, segments: Iterable["Segment"]) -> Iterable["Segment"]:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/rich/progress.py:278:    def write(self, s: Any) -> int:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/rich/progress.py:281:    def writelines(self, lines: Iterable[Any]) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/rich/progress.py:1643:    def remove_task(self, task_id: TaskID) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/rich/_win32_console.py:396:    def write_text(self, text: str) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/rich/_win32_console.py:405:    def write_styled(self, text: str, style: Style) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/rich/_win32_console.py:444:    def move_cursor_to(self, new_position: WindowsCoordinates) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/rich/_win32_console.py:493:    def move_cursor_up(self) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/rich/_win32_console.py:503:    def move_cursor_down(self) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/rich/_win32_console.py:514:    def move_cursor_forward(self) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/rich/_win32_console.py:526:    def move_cursor_to_column(self, column: int) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/rich/_win32_console.py:535:    def move_cursor_backward(self) -> None:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/yaml/scanner.py:312:    def remove_possible_simple_key(self):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/yaml/emitter.py:792:    def write_stream_start(self):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/yaml/emitter.py:797:    def write_stream_end(self):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/yaml/emitter.py:800:    def write_indicator(self, indicator, need_whitespace,
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/yaml/emitter.py:814:    def write_indent(self):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/yaml/emitter.py:827:    def write_line_break(self, data=None):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/yaml/emitter.py:838:    def write_version_directive(self, version_text):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/yaml/emitter.py:845:    def write_tag_directive(self, handle_text, prefix_text):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/yaml/emitter.py:854:    def write_single_quoted(self, text, split=True):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/yaml/emitter.py:926:    def write_double_quoted(self, text, split=True):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/yaml/emitter.py:991:    def write_folded(self, text):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/yaml/emitter.py:1045:    def write_literal(self, text):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/yaml/emitter.py:1080:    def write_plain(self, text, split=True):
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/urllib3/util/wait.py:120:def wait_for_write(sock: socket.socket, timeout: float | None = None) -> bool:
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/urllib3/util/ssl_.py:180:def create_urllib3_context(
+/Users/zuevvladimir/AI/docs-agent/venv312/lib/python3.12/site-packages/urllib3/util/url.py:263:def _remove_path_dot_segments(path: str) -> str:
+/Users
