@@ -1,0 +1,5 @@
+Read-doc parity implementation review
+- source block: docs_agent.py @app.command("read-doc")
+- target block: docs_agent_v2.py @app.command("read-doc")
+- helper candidates: emit_output / classify_error / emit_error
+- replacement mode: regex callback replacement to preserve backslashes and string literals

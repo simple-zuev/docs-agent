@@ -8,7 +8,6 @@ from typing import Optional
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
 from googleapiclient.http import MediaIoBaseDownload
 from doc_text_mutation import insert_text_at_index, replace_all_text
 from runtime_config import (
@@ -53,65 +52,6 @@ def ensure_master_index_write_allowed():
 def print_dry_run(payload: dict):
     print("DRY RUN OK")
     print(json.dumps(payload, ensure_ascii=False, indent=2))
-
-
-def emit_output(json_output: bool, payload: dict, human_lines=None):
-    if json_output:
-        print(json.dumps(payload, ensure_ascii=False, indent=2))
-        return
-
-    if human_lines:
-        for line in human_lines:
-            print(line)
-
-
-def classify_error(exc: Exception):
-    name = exc.__class__.__name__
-    msg = str(exc)
-
-    retryable = False
-    auth_related = False
-    network_related = False
-
-    if isinstance(exc, HttpError):
-        status = getattr(getattr(exc, "resp", None), "status", None)
-        if status in {408, 409, 425, 429, 500, 502, 503, 504}:
-            retryable = True
-        if status in {401, 403}:
-            auth_related = True
-
-    if name in {"SSLEOFError", "TimeoutError", "ConnectionResetError"}:
-        retryable = True
-        network_related = True
-
-    if "EOF occurred in violation of protocol" in msg:
-        retryable = True
-        network_related = True
-
-    if "refresh" in msg.lower() or "token" in msg.lower():
-        auth_related = True
-
-    return {
-        "error_type": name,
-        "error_message": msg,
-        "retryable": retryable,
-        "auth_related": auth_related,
-        "network_related": network_related,
-    }
-
-
-def emit_error(json_output: bool, command: str, exc: Exception):
-    payload = {
-        "ok": False,
-        "command": command,
-        **classify_error(exc),
-    }
-
-    if json_output:
-        print(json.dumps(payload, ensure_ascii=False, indent=2))
-        raise typer.Exit(code=1)
-
-    raise exc
 
 
 def get_creds():
@@ -694,61 +634,39 @@ def extract_text(elements):
 def read_doc(
     document_id: str,
     max_chars: int = 4000,
-    json_output: bool = False,
 ):
     """Read Google Doc text content."""
-    try:
-        s = services()
-        docs = s["docs"]
-        drive = s["drive"]
+    s = services()
+    docs = s["docs"]
+    drive = s["drive"]
 
-        meta = (
-            drive.files()
-            .get(
-                fileId=document_id,
-                fields="id,name,mimeType,webViewLink,modifiedTime",
-                supportsAllDrives=True,
-            )
-            .execute()
+    meta = (
+        drive.files()
+        .get(
+            fileId=document_id,
+            fields="id,name,mimeType,webViewLink,modifiedTime",
+            supportsAllDrives=True,
         )
+        .execute()
+    )
 
-        doc = docs.documents().get(documentId=document_id).execute()
+    doc = docs.documents().get(documentId=document_id).execute()
 
-        content = doc.get("body", {}).get("content", [])
-        text_content = extract_text(content)
+    content = doc.get("body", {}).get("content", [])
+    text_content = extract_text(content)
 
-        truncated = False
-        if len(text_content) > max_chars:
-            text_content = text_content[:max_chars] + "\n\n...[TRUNCATED]..."
-            truncated = True
+    if len(text_content) > max_chars:
+        text_content = text_content[:max_chars] + "\n\n...[TRUNCATED]..."
 
-        payload = {
-            "ok": True,
-            "command": "read-doc",
-            "document_id": document_id,
-            "meta": meta,
-            "content": text_content,
-            "truncated": truncated,
-            "max_chars": max_chars,
-        }
-
-        emit_output(
-            json_output,
-            payload,
-            human_lines=[
-                "READ DOC OK",
-                f"Name: {meta['name']}",
-                f"ID: {meta['id']}",
-                f"Modified: {meta.get('modifiedTime')}",
-                f"URL: {meta.get('webViewLink')}",
-                "",
-                "----- DOCUMENT CONTENT BEGIN -----",
-                text_content,
-                "----- DOCUMENT CONTENT END -----",
-            ],
-        )
-    except Exception as exc:
-        emit_error(json_output, "read-doc", exc)
+    print("READ DOC OK")
+    print(f"Name: {meta['name']}")
+    print(f"ID: {meta['id']}")
+    print(f"Modified: {meta.get('modifiedTime')}")
+    print(f"URL: {meta.get('webViewLink')}")
+    print("")
+    print("----- DOCUMENT CONTENT BEGIN -----")
+    print(text_content)
+    print("----- DOCUMENT CONTENT END -----")
 
 
 @app.command("replace-doc-text")
