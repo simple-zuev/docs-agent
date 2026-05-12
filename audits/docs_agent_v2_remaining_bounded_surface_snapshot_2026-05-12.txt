@@ -1,0 +1,70 @@
+12:from doc_text_mutation import insert_text_at_index, replace_all_text
+47:def ensure_master_index_write_allowed():
+52:def print_dry_run(payload: dict):
+57:def get_creds():
+66:def services():
+75:def list_children(drive, folder_id, page_size=1000):
+98:def find_folder(drive, name, parent_id: Optional[str] = None):
+119:def get_sheet_values(sheets, spreadsheet_id: str, range_a1: str):
+132:def get_sheet_header_map(
+151:def get_sheet_rows(sheets, spreadsheet_id: str, sheet_name: str):
+155:def col_to_a1(col_num: int) -> str:
+164:def pad_row(row, size: int):
+171:def find_rows_by_column(
+194:def find_rows_by_link_fragment(
+217:def get_file_meta(drive, file_id: str):
+229:def append_log(
+262:def audit():
+302:def create_temp_doc():
+360:def append_log_cmd(
+386:def create_staging_copy(
+464:def patch_doc(
+516:def create_doc_in_folder(
+593:def list_folder_cmd(
+618:def extract_text(elements):
+634:def read_doc(
+672:@app.command("replace-doc-text")
+673:def replace_doc_text(
+679:    ensure_write_allowed("replace-doc-text", target=document_id)
+695:    replace_all_text(
+724:@app.command("replace-doc-text-safe")
+725:def replace_doc_text_safe(
+733:    """Backup document, then replace exact text fragment and log operation."""
+737:                "command": "replace-doc-text-safe",
+747:    ensure_write_allowed("replace-doc-text-safe", target=document_id)
+748:    ensure_confirmed(confirm, "replace-doc-text-safe")
+783:    replace_all_text(
+813:@app.command("verify-doc-text")
+814:def verify_doc_text(
+850:@app.command("export-doc")
+851:def export_doc(
+854:    export_format: str = "docx",
+876:    export_format = export_format.lower()
+877:    if export_format not in mime_map:
+878:        raise typer.BadParameter("export_format must be one of: docx, pdf, txt")
+880:    request = drive.files().export_media(
+882:        mimeType=mime_map[export_format],
+897:    print(f"Format: {export_format}")
+902:@app.command("upload-file-to-folder")
+903:def upload_file_to_folder(
+916:                "command": "upload-file-to-folder",
+925:    ensure_write_allowed("upload-file-to-folder", target=folder_name)
+926:    ensure_confirmed(confirm, "upload-file-to-folder")
+980:@app.command("move-file-with-log")
+981:def move_file_with_log(
+992:                "command": "move-file-with-log",
+1001:    ensure_write_allowed("move-file-with-log", target=target_folder_name)
+1002:    ensure_confirmed(confirm, "move-file-with-log")
+1020:    remove_parents = ",".join(old_parents) if old_parents else None
+1027:            removeParents=remove_parents,
+1067:def get_file(
+1081:def list_folder_by_id(
+1112:def read_sheet_header(
+1143:def get_sheet_rows_cmd(
+1165:def find_row_by_column(
+1204:def append_master_index_row(
+1256:def update_master_index_row(
+1344:def find_row_by_link_fragment(
+1383:def show_config_status():
+1409:def show_safety_mode():
+1430:def set_safety_mode(

@@ -1,0 +1,19 @@
+Remaining bounded surface review after master-index exhaustion
+
+Goal
+- identify the next smallest reviewable docs_agent_v2 surface
+- avoid repo-wide cleanup
+- avoid mixing unrelated refactors
+- stay audit-only unless a single bounded candidate is clearly established
+
+Review method
+- inspect docs_agent_v2 helpers adjacent to already exhausted replace/read/verify/export/file-operation/master-index lines
+- classify remaining helpers as:
+  - already aligned
+  - exhausted
+  - candidate for next bounded step
+  - not safely bounded / too orchestration-heavy
+
+Required conclusion
+- produce exactly one recommended next bounded target
+- if no safe target exists, explicitly record exhaustion and recommend another audit-only narrowing pass

@@ -1,0 +1,13 @@
+docs_agent_v2 remaining bounded surface inventory
+date: 2026-05-12
+
+Functions containing potentially relevant bounded surface names:
+- line 634: read_doc
+- line 673: replace_doc_text
+- line 725: replace_doc_text_safe
+- line 814: verify_doc_text
+- line 851: export_doc
+- line 903: upload_file_to_folder
+- line 981: move_file_with_log
+- line 1204: append_master_index_row
+- line 1256: update_master_index_row
