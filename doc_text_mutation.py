@@ -49,3 +49,38 @@ def replace_all_text(
         "occurrences_changed": occurrences_changed,
         "raw_response": response,
     }
+
+
+def insert_text_at_index(
+    *,
+    docs: Any,
+    document_id: str,
+    index: int,
+    text_to_insert: str,
+) -> dict[str, Any]:
+    response = (
+        docs.documents()
+        .batchUpdate(
+            documentId=document_id,
+            body={
+                "requests": [
+                    {
+                        "insertText": {
+                            "location": {"index": index},
+                            "text": text_to_insert,
+                        }
+                    }
+                ]
+            },
+        )
+        .execute()
+    )
+
+    return {
+        "ok": True,
+        "command": "insert-text-at-index",
+        "document_id": document_id,
+        "index": index,
+        "text_length": len(text_to_insert),
+        "raw_response": response,
+    }
