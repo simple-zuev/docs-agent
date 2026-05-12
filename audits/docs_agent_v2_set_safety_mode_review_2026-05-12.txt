@@ -1,0 +1,19 @@
+set_safety_mode audit review
+
+Goal
+- review set_safety_mode as the next bounded candidate after remaining-surface selection
+- confirm whether a narrow mutation is justified
+- avoid broader runtime_config or dispatch refactors
+
+Audit checks
+- command input contract
+- output behavior consistency
+- dry-run / confirmation / safety semantics if applicable
+- dependency surface on runtime_config helpers
+- adjacency to show_safety_mode / show_config_status
+- whether change can remain local to this command
+
+Required conclusion
+- either:
+  - safe narrow mutation candidate established
+  - audit-only / already aligned / exhausted at this level

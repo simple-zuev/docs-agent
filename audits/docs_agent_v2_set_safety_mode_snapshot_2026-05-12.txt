@@ -1,0 +1,41 @@
+1410-    """Show current safety mode from config."""
+1411-    print("SAFETY MODE OK")
+1412-    print(
+1413-        json.dumps(
+1414-            {
+1415-                "mode": get_safety_mode(),
+1416-                "default_dry_run": is_default_dry_run(),
+1417-                "forbid_master_index_write": config_get(
+1418-                    "safety.forbid_master_index_write", True
+1419-                ),
+1420-                "forbid_delete": config_get("safety.forbid_delete", True),
+1421-                "default_test_folder": get_default_test_folder_name(),
+1422-            },
+1423-            ensure_ascii=False,
+1424-            indent=2,
+1425-        )
+1426-    )
+1427-
+1428-
+1429-@app.command("set-safety-mode")
+1430:def set_safety_mode(
+1431-    mode: str,
+1432-):
+1433-    """Set safety mode in config: readonly or write."""
+1434-    old_mode = get_safety_mode()
+1435-    set_safety_mode_value(mode)
+1436-
+1437-    print("SET SAFETY MODE OK")
+1438-    print(
+1439-        json.dumps(
+1440-            {
+1441-                "old_mode": old_mode,
+1442-                "new_mode": mode,
+1443-                "config_path": str(CONFIG_PATH),
+1444-            },
+1445-            ensure_ascii=False,
+1446-            indent=2,
+1447-        )
+1448-    )
+1449-
+1450-
