@@ -1,0 +1,216 @@
+==== focused adjacent slices ====
+
+==== docs_agent_v2 replace_doc_text ====
+    print(text_content)
+    print("----- DOCUMENT CONTENT END -----")
+
+
+@app.command("replace-doc-text")
+def replace_doc_text(
+    document_id: str,
+    old_text: str,
+    new_text: str,
+):
+    """Replace exact text fragment in Google Doc and log operation."""
+    ensure_write_allowed("replace-doc-text", target=document_id)
+    s = services()
+    docs = s["docs"]
+    drive = s["drive"]
+    sheets = s["sheets"]
+
+    meta = (
+        drive.files()
+        .get(
+            fileId=document_id,
+            fields="id,name,mimeType,webViewLink,modifiedTime",
+            supportsAllDrives=True,
+        )
+        .execute()
+    )
+
+    replace_all_text(
+        docs=docs,
+        document_id=document_id,
+        old_text=old_text,
+        new_text=new_text,
+        match_case=True,
+    )
+
+    change_id, updated_range = append_log(
+        sheets=sheets,
+        action="Replace Text",
+        obj=meta["name"],
+        from_=old_text,
+        to=new_text,
+        reason="Точечная замена текста через Google Docs API",
+        impact="Low",
+        status="Done",
+        notes=f"Document ID: {document_id} | URL: {meta.get('webViewLink')}",
+    )
+
+    print("REPLACE DOC TEXT OK")
+    print(f"Document: {meta['name']}")
+    print(f"ID: {document_id}")
+    print(f"URL: {meta.get('webViewLink')}")
+    print(f"Old text: {old_text}")
+    print(f"New text: {new_text}")
+    print(f"Change Log: {change_id} | {updated_range}")
+
+
+@app.command("replace-doc-text-safe")
+
+==== docs_agent replace_doc_text ====
+    except Exception as exc:
+        emit_error(json_output, "read-doc", exc)
+
+
+@app.command("replace-doc-text")
+def replace_doc_text(
+    document_id: str,
+    old_text: str,
+    new_text: str,
+):
+    """Replace exact text fragment in Google Doc and log operation."""
+    ensure_write_allowed("replace-doc-text", target=document_id)
+    s = services()
+    docs = s["docs"]
+    drive = s["drive"]
+    sheets = s["sheets"]
+
+    meta = (
+        drive.files()
+        .get(
+            fileId=document_id,
+            fields="id,name,mimeType,webViewLink,modifiedTime",
+            supportsAllDrives=True,
+        )
+        .execute()
+    )
+
+    replace_all_text(
+        docs=docs,
+        document_id=document_id,
+        old_text=old_text,
+        new_text=new_text,
+        match_case=True,
+    )
+
+    change_id, updated_range = append_log(
+        sheets=sheets,
+        action="Replace Text",
+        obj=meta["name"],
+        from_=old_text,
+        to=new_text,
+        reason="Точечная замена текста через Google Docs API",
+        impact="Low",
+        status="Done",
+        notes=f"Document ID: {document_id} | URL: {meta.get('webViewLink')}",
+    )
+
+    print("REPLACE DOC TEXT OK")
+    print(f"Document: {meta['name']}")
+    print(f"ID: {document_id}")
+    print(f"URL: {meta.get('webViewLink')}")
+    print(f"Old text: {old_text}")
+    print(f"New text: {new_text}")
+    print(f"Change Log: {change_id} | {updated_range}")
+
+
+@app.command("replace-doc-text-safe")
+
+==== docs_agent_v2 emit_json / print_dry_run area ====
+import json
+from pathlib import Path
+
+
+import typer
+from datetime import datetime
+from typing import Optional
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
+from googleapiclient.http import MediaIoBaseDownload
+from doc_text_mutation import insert_text_at_index, replace_all_text
+from runtime_config import (
+    CONFIG_PATH,
+    config_get,
+    ensure_confirmed,
+    ensure_write_allowed,
+    get_change_log_id,
+    get_change_log_sheet,
+    get_default_test_folder_name,
+    get_master_index_id,
+    get_master_index_sheet,
+    get_safety_mode,
+    is_default_dry_run,
+    set_safety_mode_value,
+    should_dry_run,
+)
+
+app = typer.Typer()
+
+BASE = Path.home() / "AI" / "docs-agent"
+CLIENT_SECRET = BASE / "config" / "client_secret.json"
+TOKEN_FILE = BASE / "config" / "token.json"
+CACHE_DIR = BASE / "cache"
+REPORTS_DIR = BASE / "reports"
+
+SCOPES = [
+    "https://www.googleapis.com/auth/drive",
+    "https://www.googleapis.com/auth/documents",
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/presentations",
+]
+
+CHANGE_LOG_ID = "1-6F5MCJR2EkP74pROsYXsPMmu1zPwp82hl0mDi9U3EQ"
+
+
+def ensure_master_index_write_allowed():
+    if bool(config_get("safety.forbid_master_index_write", True)):
+        raise RuntimeError("Master Index write is forbidden by config")
+
+
+def print_dry_run(payload: dict):
+    print("DRY RUN OK")
+    print(json.dumps(payload, ensure_ascii=False, indent=2))
+
+
+def get_creds():
+    if TOKEN_FILE.exists():
+        return Credentials.from_authorized_user_file(str(TOKEN_FILE), SCOPES)
+    flow = InstalledAppFlow.from_client_secrets_file(str(CLIENT_SECRET), SCOPES)
+    creds = flow.run_local_server(port=0)
+    TOKEN_FILE.write_text(creds.to_json(), encoding="utf-8")
+    return creds
+
+
+def services():
+    creds = get_creds()
+    return {
+        "drive": build("drive", "v3", credentials=creds),
+        "docs": build("docs", "v1", credentials=creds),
+        "sheets": build("sheets", "v4", credentials=creds),
+    }
+
+
+def list_children(drive, folder_id, page_size=1000):
+    items = []
+    page_token = None
+    while True:
+        res = (
+            drive.files()
+            .list(
+                q=f"'{folder_id}' in parents and trashed = false",
+                fields="nextPageToken, files(id,name,mimeType,webViewLink,modifiedTime,createdTime)",
+                pageSize=page_size,
+                pageToken=page_token,
+                supportsAllDrives=True,
+                includeItemsFromAllDrives=True,
+            )
+            .execute()
+        )
+        items.extend(res.get("files", []))
+        page_token = res.get("nextPageToken")
+        if not page_token:
+            break
+    return sorted(items, key=lambda x: x["name"])

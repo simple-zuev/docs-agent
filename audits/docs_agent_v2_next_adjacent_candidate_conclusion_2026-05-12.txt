@@ -1,0 +1,18 @@
+Audit scope
+- post-PR41 adjacent candidate selection near replace/output parity surface only
+- avoid repo-wide discovery restart
+- avoid capability expansion
+
+Candidate preference order
+1. docs_agent_v2.py::replace_doc_text()
+2. docs_agent_v2.py::print_dry_run() normalization only
+3. no-go / stop if parity already sufficient or next step would widen scope
+
+Decision rule
+- choose only one existing adjacent function
+- prefer direct neighbor of replace_doc_text_safe()
+- prefer output-only or parity-only implementation
+- reject candidates that require command surface or multi-route migration
+
+Expected safe outcome
+- identify whether replace_doc_text() is the next narrow parity candidate after replace_doc_text_safe()

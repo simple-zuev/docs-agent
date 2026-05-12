@@ -1,0 +1,20 @@
+==== adjacent candidate audit around replace/output parity ====
+
+==== docs_agent_v2 key defs ====
+52:def print_dry_run(payload: dict):
+634:def read_doc(
+673:def replace_doc_text(
+725:def replace_doc_text_safe(
+814:def verify_doc_text(
+851:def export_doc(
+1256:def update_master_index_row(
+
+==== docs_agent reference defs ====
+65:def emit_json(payload: dict):
+159:def print_dry_run(payload: dict):
+1070:def read_doc(
+1131:def replace_doc_text(
+1183:def replace_doc_text_safe(
+1272:def verify_doc_text(
+1309:def export_doc(
+1749:def update_master_index_row(
