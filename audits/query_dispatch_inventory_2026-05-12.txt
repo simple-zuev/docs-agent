@@ -1,0 +1,15 @@
+==== query-family definitions ====
+1581:def cmd_find_doc_any(query: str, json_output: bool = False) -> int:
+1593:def cmd_open_doc_from_query(query: str, json_output: bool = False) -> int:
+1605:def cmd_read_doc_from_query(query: str, json_output: bool = False) -> int:
+2459:def cmd_ask(query: str, json_output: bool = False) -> int:
+
+==== query-family handlers ====
+2669:            return handle_query_command(argv, cmd_find_doc_any, allow_json_flag=True)
+2696:            return handle_query_command(argv, cmd_ask, allow_json_flag=True)
+
+==== query-family dispatch aliases ====
+2668:        if cmd in {"find-doc-any", "f"}:
+2671:        if cmd in {"open-doc-from-query", "o"}:
+2676:        if cmd in {"read-doc-from-query", "r"}:
+2695:        if cmd in {"ask", "q"}:

@@ -1,0 +1,25 @@
+Query dispatch closeout
+Date: 2026-05-12
+
+Scope reviewed
+- agent_cli.py
+- query-family command dispatch only
+
+Commands reviewed
+- find-doc-any / f
+- open-doc-from-query / o
+- read-doc-from-query / r
+- ask / q
+
+Findings
+- one clear command implementation was found for each reviewed query-family command
+- one clear alias dispatch branch was found for each reviewed alias pair
+- no duplicate or unreachable query-family dispatch branch was established from this audit
+
+Notes
+- handler grep for open-doc-from-query and read-doc-from-query was conservative and did not capture multiline handle_query_command formatting
+- this does not change the main conclusion because alias dispatch branches are present and singular
+
+Conclusion
+- no safe narrow code mutation candidate established
+- closeout remains audit-only

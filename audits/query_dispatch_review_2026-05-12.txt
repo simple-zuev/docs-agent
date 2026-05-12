@@ -1,0 +1,16 @@
+Query dispatch review
+Date: 2026-05-12
+
+cmd_find_doc_any: 2
+cmd_open_doc_from_query: 1
+cmd_read_doc_from_query: 1
+cmd_ask: 2
+{"find-doc-any", "f"}: 1
+{"open-doc-from-query", "o"}: 1
+{"read-doc-from-query", "r"}: 1
+{"ask", "q"}: 1
+
+Assessment target
+- each query-family command should have one clear command implementation
+- each alias pair should have one clear dispatch branch
+- any extra duplicate branch becomes a potential narrow cleanup candidate

@@ -1,0 +1,20 @@
+Query dispatch audit plan
+Date: 2026-05-12
+
+Scope
+- agent_cli.py only
+- query-family command dispatch only
+
+Target commands
+- find-doc-any / f
+- open-doc-from-query / o
+- read-doc-from-query / r
+- ask / q
+
+Goal
+- detect duplicate, unreachable, or asymmetric dispatch residue
+
+Constraints
+- audit-only
+- no code mutation
+- no repo-wide cleanup
