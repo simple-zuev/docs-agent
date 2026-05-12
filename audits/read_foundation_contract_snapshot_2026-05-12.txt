@@ -1,0 +1,684 @@
+Read foundation contract snapshot
+
+=== def handle_status_command\( ===
+NOT FOUND
+
+=== def handle_repo_state_command\( ===
+NOT FOUND
+
+=== def handle_doctor_command\( ===
+NOT FOUND
+
+=== def find_doc_id\( ===
+NOT FOUND
+
+=== def find_doc_name\( ===
+NOT FOUND
+
+=== def find_link\( ===
+NOT FOUND
+
+=== "status" ===
+00386:     if not isinstance(payload, dict):
+00387:         return None
+00388:     return payload.get("error_type")
+00389: 
+00390: 
+00391: def safe_error_message(payload: dict | None) -> str | None:
+00392:     if not isinstance(payload, dict):
+00393:         return None
+00394:     return payload.get("error_message")
+00395: 
+00396: 
+00397: def build_doctor_summary(
+00398:     *, env_ok: bool, status_ok: bool, master_index_ok: bool, smoke_ok: bool
+00399: ) -> str:
+00400:     if env_ok and status_ok and master_index_ok and smoke_ok:
+00401:         return "CLI выглядит работоспособным: окружение, status, доступ к MASTER_INDEX и smoke-проверка прошли успешно."
+00402:     failed = []
+00403:     if not env_ok:
+00404:         failed.append("окружение")
+00405:     if not status_ok:
+00406:         failed.append("status")
+00407:     if not master_index_ok:
+00408:         failed.append("MASTER_INDEX")
+00409:     if not smoke_ok:
+00410:         failed.append("smoke")
+00411:     failed_text = ", ".join(failed)
+00412:     return f"Обнаружены проблемы в следующих зонах: {failed_text}."
+00413: 
+00414: 
+00415: def diagnose_payload_failure(payload: dict | None) -> tuple[str, str, str]:
+00416:     if not isinstance(payload, dict):
+00417:         return (
+00418:             "unknown",
+00419:             "Не удалось интерпретировать результат проверки.",
+00420:             "Повтори команду и проверь целостность CLI-вывода.",
+00421:         )
+00422: 
+00423:     if payload_contains_quota_or_rate_limit(payload):
+00424:         return (
+00425:             "network",
+00426:             "Похоже на временную внешнюю проблему или превышение квоты Google API.",
+00427:             "Подожди 60-90 секунд, сократи quota-sensitive запросы и повтори doctor/smoke.",
+00428:         )
+00429: 
+00430:     error_type = str(payload.get("error_type") or "")
+00431:     error_message = str(payload.get("error_message") or "")
+00432:     auth_related = bool(payload.get("auth_related"))
+00433:     network_related = bool(payload.get("network_related"))
+00434:     retryable = bool(payload.get("retryable"))
+00435: 
+00436:     attempts = payload.get("attempts") or []
+00437:     nested_messages = []
+00438:     nested_types = []
+00439:     if isinstance(attempts, list):
+00440:         for item in attempts:
+00441:             if isinstance(item, dict):
+00442:                 et = str(item.get("error_type") or "")
+00443:                 em = str(item.get("error_message") or "")
+00444:                 if et:
+00445:                     nested_types.append(et)
+00446:                 if em:
+00447:                     nested_messages.append(em)
+00448: 
+00449:     joined_text = " | ".join(
+00450:         [error_type, error_message] + nested_types + nested_messages
+00451:     ).lower()
+00452: 
+00453:     if auth_related:
+00454:         return (
+00455:             "auth",
+00456:             "Похоже на проблему авторизации или доступа к Google/API.",
+00457:             "Проверь учетные данные, токены, scopes и доступ к целевым объектам.",
+00458:         )
+00459: 
+00460:     if (
+00461:         network_related
+00462:         or retryable
+00463:         or "ssl" in joined_text
+00464:         or "eof occurred in violation of protocol" in joined_text
+00465:     ):
+00466:         return (
+00467:             "network",
+00468:             "Похоже на временную сетевую проблему или нестабильность внешнего API.",
+00469:             "Подожди и повтори проверку; если повторяется, проверь сеть и лимиты API.",
+00470:         )
+00471: 
+00472:     if error_type in {"NotFound", "LinkParseError"}:
+00473:         return (
+00474:             "not_found",
+00475:             "Похоже, CLI не смог найти документ или корректно извлечь идентификатор из ссылки.",
+00476:             "Проверь точный query/Document ID/ссылку и сначала выполни find-doc-any.",
+00477:         )
+00478: 
+00479:     if error_type in {
+00480:         "EmptyOutput",
+00481:         "JSONDecodeError",
+00482:         "TimeoutExpired",
+00483:         "SmokeCheckFailed",
+00484:     }:
+00485:         return (
+00486:             "internal",
+00487:             "Похоже на внутренний сбой CLI или дочернего docs_agent.py.",
+00488:             "Проверь debug-вывод, timeout, stdout/stderr и отдельно запусти status/doctor --json.",
+00489:         )
+00490: 
+00491:     return (
+00492:         "internal",
+00493:         "Похоже на внутренний сбой без точной классификации.",
+00494:         "Проверь debug-вывод и повтори диагностику через doctor --json.",
+00495:     )
+00496: 
+00497: 
+00498: def build_doctor_next_step(
+00499:     *, env_ok: bool, status_ok: bool, master_index_ok: bool, smoke_ok: bool
+00500: ) -> str:
+00501:     if not env_ok:
+00502:         return "Проверь активацию venv и доступность python/agent_cli.py."
+00503:     if not status_ok:
+00504:         return "Сначала выполни python agent_cli.py status --json и проверь блоки safety/config."
+00505:     if not master_index_ok:
+00506:         return (
+00507:             "Проверь доступность MASTER_INDEX и повтори python agent_cli.py f DOC-0001."
+00508:         )
+00509:     if not smoke_ok:
+00510:         return "Запусти bash scripts/regression_smoke_quiet.sh отдельно и проверь, какой шаг падает."
+00511:     return "Можно начинать штатную работу."
+00512: 
+00513: 
+00514: def doctor_payload() -> dict:
+00515:     env = {
+00516:         "ok": bool(Path(PYTHON_BIN).exists() and DOCS_AGENT.exists() and BASE.exists()),
+00517:         "details": {
+00518:             "python_bin": str(PYTHON_BIN),
+00519:             "python_bin_source": PYTHON_BIN_SOURCE,
+00520:             "docs_agent_path": str(DOCS_AGENT),
+00521:             "base_path": str(BASE),
+00522:             "python_exists": Path(PYTHON_BIN).exists(),
+00523:             "docs_agent_exists": DOCS_AGENT.exists(),
+00524:             "base_exists": BASE.exists(),
+00525:         },
+
+=== "repo-state" ===
+01212: 
+01213: def cmd_status_payload() -> dict:
+01214:     safety = run_docs_agent_with_retry(["show-safety-mode"])
+01215:     config = run_docs_agent_with_retry(["show-config-status"])
+01216:     return {
+01217:         "ok": bool(safety.get("ok")) and bool(config.get("ok")),
+01218:         "command": "status",
+01219:         "safety": safety,
+01220:         "config": config,
+01221:     }
+01222: 
+01223: 
+01224: def repo_state_payload() -> dict:
+01225:     payload = branch_safety_snapshot(BASE)
+01226: 
+01227:     if payload.get("ok"):
+01228:         return payload
+01229: 
+01230:     return {
+01231:         "ok": False,
+01232:         "command": "repo-state",
+01233:         "error_type": payload.get("error_type", "RepoStateError"),
+01234:         "error_message": payload.get(
+01235:             "error_message", "Failed to build repo state snapshot."
+01236:         ),
+01237:         "retryable": bool(payload.get("retryable")),
+01238:         "auth_related": False,
+01239:         "network_related": False,
+01240:         "details": payload,
+01241:     }
+01242: 
+01243: 
+01244: def cmd_repo_state(json_output: bool = False) -> int:
+01245:     payload = repo_state_payload()
+01246:     if json_output:
+01247:         print_json(payload)
+01248:     else:
+01249:         if payload.get("ok"):
+01250:             print_compact_repo_state(payload)
+01251:         else:
+01252:             print_compact_error(payload)
+01253:     return resolve_command_exit_code(payload)
+01254: 
+01255: 
+01256: def cmd_status(json_output: bool = False) -> int:
+01257:     payload = cmd_status_payload()
+01258:     if json_output:
+01259:         print_json(payload)
+01260:     else:
+01261:         print_compact_status(payload)
+01262:     return resolve_command_exit_code(payload)
+01263: 
+01264: 
+01265: def cmd_doctor(json_output: bool = False) -> int:
+01266:     payload = doctor_payload()
+01267:     if json_output:
+01268:         print_json(payload)
+01269:     else:
+01270:         print_compact_doctor(payload)
+01271:     return resolve_command_exit_code(payload)
+01272: 
+01273: 
+01274: def cmd_find_doc_id(value: str) -> None:
+01275:     payload = run_docs_agent_with_retry(
+01276:         [
+01277:             "find-row-by-column",
+01278:             MASTER_INDEX_ID,
+01279:             MASTER_INDEX_SHEET,
+01280:             "Document ID",
+01281:             value,
+01282:         ]
+01283:     )
+01284:     print_json(payload)
+01285: 
+01286: 
+01287: def cmd_find_doc_name(value: str) -> None:
+01288:     payload = run_docs_agent_with_retry(
+01289:         [
+01290:             "find-row-by-column",
+01291:             MASTER_INDEX_ID,
+01292:             MASTER_INDEX_SHEET,
+01293:             "Document Name",
+01294:             value,
+01295:         ]
+01296:     )
+01297:     print_json(payload)
+01298: 
+01299: 
+01300: def cmd_find_link(value: str) -> None:
+01301:     payload = run_docs_agent_with_retry(
+01302:         [
+01303:             "find-row-by-link-fragment",
+01304:             MASTER_INDEX_ID,
+01305:             MASTER_INDEX_SHEET,
+01306:             value,
+01307:         ]
+01308:     )
+01309:     print_json(payload)
+01310: 
+01311: 
+01312: def cmd_get_file(file_id: str) -> None:
+01313:     payload = run_docs_agent_with_retry(
+01314:         [
+01315:             "get-file",
+01316:             file_id,
+01317:         ]
+01318:     )
+01319:     print_json(payload)
+01320: 
+01321: 
+01322: def cmd_read_doc(document_id: str) -> None:
+01323:     payload = run_docs_agent_with_retry(
+01324:         [
+01325:             "read-doc",
+01326:             document_id,
+01327:         ]
+01328:     )
+01329:     print_json(payload)
+01330: 
+01331: 
+01332: def _find_doc_any_payload_live_impl(query: str) -> dict:
+01333:     attempts = []
+01334: 
+01335:     by_id = run_docs_agent_with_retry(
+01336:         [
+01337:             "find-row-by-column",
+01338:             MASTER_INDEX_ID,
+01339:             MASTER_INDEX_SHEET,
+01340:             "Document ID",
+01341:             query,
+01342:         ]
+01343:     )
+01344:     attempts.append(summarize_attempt("Document ID", by_id))
+01345:     if by_id.get("ok") and by_id.get("matches_found", 0) > 0:
+01346:         return build_find_doc_success_payload(
+01347:             query=query,
+01348:             matched_by="Document ID",
+01349:             result=by_id,
+01350:             attempts=attempts,
+01351:         )
+
+=== "doctor" ===
+00524:             "base_exists": BASE.exists(),
+00525:         },
+00526:     }
+00527: 
+00528:     status = cmd_status_payload()
+00529:     master_index_lookup = find_doc_any_payload("DOC-0001")
+00530:     smoke_probe = run_smoke_explain_payload()
+00531: 
+00532:     checks = {
+00533:         "environment": env,
+00534:         "status": status,
+00535:         "master_index_lookup": master_index_lookup,
+00536:         "smoke_probe": smoke_probe,
+00537:     }
+00538: 
+00539:     failed = [k for k, v in checks.items() if not v.get("ok")]
+00540: 
+00541:     if not failed:
+00542:         return {
+00543:             "ok": True,
+00544:             "command": "doctor",
+00545:             "checks": checks,
+00546:             "summary": "CLI выглядит работоспособным: окружение, status, доступ к MASTER_INDEX и smoke-проверка прошли успешно.",
+00547:             "next_step": "Можно начинать штатную работу.",
+00548:             "diagnosis": "healthy",
+00549:             "likely_cause": "Проблем не обнаружено.",
+00550:             "recommended_action": "Можно начинать штатную работу.",
+00551:         }
+00552: 
+00553:     sample = checks[failed[0]]
+00554: 
+00555:     diagnosis = str(sample.get("diagnosis") or "internal")
+00556:     likely_cause = str(
+00557:         sample.get("likely_cause")
+00558:         or "Похоже на внутренний сбой CLI или дочернего docs_agent.py."
+00559:     )
+00560:     recommended_action = str(
+00561:         sample.get("recommended_action")
+00562:         or "Проверь debug-вывод и отдельно запусти doctor --json."
+00563:     )
+00564:     error_type = str(sample.get("error_type") or "DoctorCheckFailed")
+00565:     error_message = str(sample.get("error_message") or "doctor check failed")
+00566: 
+00567:     return {
+00568:         "ok": False,
+00569:         "command": "doctor",
+00570:         "checks": checks,
+00571:         "summary": f"Обнаружены проблемы в следующих зонах: {', '.join(failed)}.",
+00572:         "next_step": "Проверь diagnosis / likely_cause / recommended_action или запусти bash scripts/regression_smoke_explain.sh.",
+00573:         "diagnosis": diagnosis,
+00574:         "likely_cause": likely_cause,
+00575:         "recommended_action": recommended_action,
+00576:         "error_type": error_type,
+00577:         "error_message": error_message,
+00578:         "retryable": bool(sample.get("retryable")),
+00579:         "auth_related": bool(sample.get("auth_related")),
+00580:         "network_related": bool(sample.get("network_related")),
+00581:     }
+00582: 
+00583: 
+00584: def doctor_lite_payload() -> dict:
+00585:     env = {
+00586:         "ok": bool(Path(PYTHON_BIN).exists() and DOCS_AGENT.exists() and BASE.exists()),
+00587:         "details": {
+00588:             "python_bin": str(PYTHON_BIN),
+00589:             "python_bin_source": PYTHON_BIN_SOURCE,
+00590:             "docs_agent_path": str(DOCS_AGENT),
+00591:             "base_path": str(BASE),
+00592:             "python_exists": Path(PYTHON_BIN).exists(),
+00593:             "docs_agent_exists": DOCS_AGENT.exists(),
+00594:             "base_exists": BASE.exists(),
+00595:         },
+00596:     }
+00597: 
+00598:     status = cmd_status_payload()
+00599:     master_index_lookup = find_doc_any_payload("DOC-0001")
+00600: 
+00601:     checks = {
+00602:         "environment": env,
+00603:         "status": status,
+00604:         "master_index_lookup": master_index_lookup,
+00605:     }
+00606: 
+00607:     failed = [k for k, v in checks.items() if not v.get("ok")]
+00608: 
+00609:     if not failed:
+00610:         return {
+00611:             "ok": True,
+00612:             "command": "doctor-lite",
+00613:             "checks": checks,
+00614:             "summary": "CLI выглядит работоспособным для рутинного старта: окружение, status и доступ к MASTER_INDEX проверены.",
+00615:             "next_step": "Можно начинать штатную работу. Для углубленной проверки при необходимости запусти doctor.",
+00616:             "diagnosis": "healthy",
+00617:             "likely_cause": "Проблем не обнаружено.",
+00618:             "recommended_action": "Можно начинать штатную работу.",
+00619:         }
+00620: 
+00621:     sample = checks[failed[0]]
+00622:     diagnosis = "internal"
+00623:     likely_cause = "Похоже на внутренний сбой CLI или дочернего docs_agent.py."
+00624:     recommended_action = "Проверь debug-вывод и отдельно запусти doctor --json."
+00625: 
+00626:     if sample.get("auth_related"):
+00627:         diagnosis = "auth"
+00628:         likely_cause = (
+00629:             "Похоже на проблему доступа, авторизации или прав к внешним сервисам."
+00630:         )
+00631:         recommended_action = "Проверь credentials, доступы и авторизацию."
+00632:     elif sample.get("network_related") or sample.get("retryable"):
+00633:         diagnosis = "network"
+00634:         likely_cause = "Похоже на временную сетевую проблему или квоту внешнего API."
+00635:         recommended_action = "Подожди 60-90 секунд и повтори doctor-lite/doctor."
+00636:     elif str(sample.get("error_type") or "") in {"NotFound", "LinkParseError"}:
+00637:         diagnosis = "not_found"
+00638:         likely_cause = "Похоже, обязательный объект не найден."
+00639:         recommended_action = "Проверь MASTER_INDEX и доступность ожидаемых объектов."
+00640: 
+00641:     return {
+00642:         "ok": False,
+00643:         "command": "doctor-lite",
+00644:         "checks": checks,
+00645:         "summary": f"Обнаружены проблемы в следующих зонах: {', '.join(failed)}.",
+00646:         "next_step": "Запусти doctor --json для расширенной диагностики.",
+00647:         "diagnosis": diagnosis,
+00648:         "likely_cause": likely_cause,
+00649:         "recommended_action": recommended_action,
+00650:         "error_type": str(sample.get("error_type") or "DoctorLiteCheckFailed"),
+00651:         "error_message": str(sample.get("error_message") or "doctor-lite check failed"),
+00652:         "retryable": bool(sample.get("retryable")),
+00653:         "auth_related": bool(sample.get("auth_related")),
+00654:         "network_related": bool(sample.get("network_related")),
+00655:     }
+00656: 
+00657: 
+00658: def run_smoke_explain_payload() -> dict:
+00659:     script = BASE / "scripts" / "regression_smoke_explain.sh"
+00660:     if not script.exists():
+00661:         return build_error_payload(
+00662:             command="smoke-explain",
+00663:             error_type="ScriptNotFound",
+
+=== "find-doc-id" ===
+02635:                 args[5],
+02636:                 json_output=json_output,
+02637:             )
+02638: 
+02639:         if cmd == "artifact-state":
+02640:             json_output, args = parse_json_flag(argv)
+02641:             if len(args) != 2 or args[0] != "--file-id":
+02642:                 print_usage_error(
+02643:                     "artifact-state requires: --file-id <google_drive_file_id>"
+02644:                 )
+02645:                 return EXIT_USAGE_ERROR
+02646:             return cmd_artifact_state(args[1], json_output=json_output)
+02647: 
+02648:         if cmd in {"doctor", "diagnose"}:
+02649:             json_output, args = parse_json_flag(argv)
+02650:             if args:
+02651:                 print_usage_error("doctor does not accept positional arguments.")
+02652:                 return EXIT_USAGE_ERROR
+02653:             return cmd_doctor(json_output=json_output)
+02654: 
+02655:         if cmd == "find-doc-id":
+02656:             if len(argv) < 1:
+02657:                 print_usage_error("Missing DOC-XXXX argument.")
+02658:                 return EXIT_USAGE_ERROR
+02659:             cmd_find_doc_id(argv[0])
+02660:             return EXIT_OK
+02661: 
+02662:         if cmd == "find-doc-name":
+02663:             return handle_query_command(argv, cmd_find_doc_name)
+02664: 
+02665:         if cmd == "find-link":
+02666:             return handle_query_command(argv, cmd_find_link)
+02667: 
+02668:         if cmd in {"find-doc-any", "f"}:
+02669:             return handle_query_command(argv, cmd_find_doc_any, allow_json_flag=True)
+02670: 
+02671:         if cmd in {"open-doc-from-query", "o"}:
+02672:             return handle_query_command(
+02673:                 argv, cmd_open_doc_from_query, allow_json_flag=True
+02674:             )
+02675: 
+02676:         if cmd in {"read-doc-from-query", "r"}:
+02677:             return handle_query_command(
+02678:                 argv, cmd_read_doc_from_query, allow_json_flag=True
+02679:             )
+02680: 
+02681:         if cmd == "get-file":
+02682:             if len(argv) < 1:
+02683:                 print_usage_error("Missing google_drive_file_id argument.")
+02684:                 return EXIT_USAGE_ERROR
+02685:             cmd_get_file(argv[0])
+02686:             return EXIT_OK
+02687: 
+02688:         if cmd == "read-doc":
+02689:             if len(argv) < 1:
+02690:                 print_usage_error("Missing google_doc_id argument.")
+02691:                 return EXIT_USAGE_ERROR
+02692:             cmd_read_doc(argv[0])
+02693:             return EXIT_OK
+02694: 
+02695:         if cmd in {"ask", "q"}:
+02696:             return handle_query_command(argv, cmd_ask, allow_json_flag=True)
+02697: 
+02698:         print_usage_error(f"Unknown command: {cmd}")
+02699:         return EXIT_USAGE_ERROR
+02700: 
+02701:     except KeyboardInterrupt:
+02702:         print_json(
+02703:             {
+02704:                 "ok": False,
+02705:                 "command": cmd,
+02706:                 "error_type": "KeyboardInterrupt",
+02707:                 "error_message": "Interrupted by user",
+02708:                 "retryable": True,
+02709:                 "auth_related": False,
+02710:                 "network_related": False,
+02711:             }
+02712:         )
+02713:         return EXIT_INTERRUPTED
+02714: 
+02715: 
+02716: if __name__ == "__main__":
+02717:     raise SystemExit(main())
+
+=== "find-doc-name" ===
+02642:                 print_usage_error(
+02643:                     "artifact-state requires: --file-id <google_drive_file_id>"
+02644:                 )
+02645:                 return EXIT_USAGE_ERROR
+02646:             return cmd_artifact_state(args[1], json_output=json_output)
+02647: 
+02648:         if cmd in {"doctor", "diagnose"}:
+02649:             json_output, args = parse_json_flag(argv)
+02650:             if args:
+02651:                 print_usage_error("doctor does not accept positional arguments.")
+02652:                 return EXIT_USAGE_ERROR
+02653:             return cmd_doctor(json_output=json_output)
+02654: 
+02655:         if cmd == "find-doc-id":
+02656:             if len(argv) < 1:
+02657:                 print_usage_error("Missing DOC-XXXX argument.")
+02658:                 return EXIT_USAGE_ERROR
+02659:             cmd_find_doc_id(argv[0])
+02660:             return EXIT_OK
+02661: 
+02662:         if cmd == "find-doc-name":
+02663:             return handle_query_command(argv, cmd_find_doc_name)
+02664: 
+02665:         if cmd == "find-link":
+02666:             return handle_query_command(argv, cmd_find_link)
+02667: 
+02668:         if cmd in {"find-doc-any", "f"}:
+02669:             return handle_query_command(argv, cmd_find_doc_any, allow_json_flag=True)
+02670: 
+02671:         if cmd in {"open-doc-from-query", "o"}:
+02672:             return handle_query_command(
+02673:                 argv, cmd_open_doc_from_query, allow_json_flag=True
+02674:             )
+02675: 
+02676:         if cmd in {"read-doc-from-query", "r"}:
+02677:             return handle_query_command(
+02678:                 argv, cmd_read_doc_from_query, allow_json_flag=True
+02679:             )
+02680: 
+02681:         if cmd == "get-file":
+02682:             if len(argv) < 1:
+02683:                 print_usage_error("Missing google_drive_file_id argument.")
+02684:                 return EXIT_USAGE_ERROR
+02685:             cmd_get_file(argv[0])
+02686:             return EXIT_OK
+02687: 
+02688:         if cmd == "read-doc":
+02689:             if len(argv) < 1:
+02690:                 print_usage_error("Missing google_doc_id argument.")
+02691:                 return EXIT_USAGE_ERROR
+02692:             cmd_read_doc(argv[0])
+02693:             return EXIT_OK
+02694: 
+02695:         if cmd in {"ask", "q"}:
+02696:             return handle_query_command(argv, cmd_ask, allow_json_flag=True)
+02697: 
+02698:         print_usage_error(f"Unknown command: {cmd}")
+02699:         return EXIT_USAGE_ERROR
+02700: 
+02701:     except KeyboardInterrupt:
+02702:         print_json(
+02703:             {
+02704:                 "ok": False,
+02705:                 "command": cmd,
+02706:                 "error_type": "KeyboardInterrupt",
+02707:                 "error_message": "Interrupted by user",
+02708:                 "retryable": True,
+02709:                 "auth_related": False,
+02710:                 "network_related": False,
+02711:             }
+02712:         )
+02713:         return EXIT_INTERRUPTED
+02714: 
+02715: 
+02716: if __name__ == "__main__":
+02717:     raise SystemExit(main())
+
+=== "find-link" ===
+02645:                 return EXIT_USAGE_ERROR
+02646:             return cmd_artifact_state(args[1], json_output=json_output)
+02647: 
+02648:         if cmd in {"doctor", "diagnose"}:
+02649:             json_output, args = parse_json_flag(argv)
+02650:             if args:
+02651:                 print_usage_error("doctor does not accept positional arguments.")
+02652:                 return EXIT_USAGE_ERROR
+02653:             return cmd_doctor(json_output=json_output)
+02654: 
+02655:         if cmd == "find-doc-id":
+02656:             if len(argv) < 1:
+02657:                 print_usage_error("Missing DOC-XXXX argument.")
+02658:                 return EXIT_USAGE_ERROR
+02659:             cmd_find_doc_id(argv[0])
+02660:             return EXIT_OK
+02661: 
+02662:         if cmd == "find-doc-name":
+02663:             return handle_query_command(argv, cmd_find_doc_name)
+02664: 
+02665:         if cmd == "find-link":
+02666:             return handle_query_command(argv, cmd_find_link)
+02667: 
+02668:         if cmd in {"find-doc-any", "f"}:
+02669:             return handle_query_command(argv, cmd_find_doc_any, allow_json_flag=True)
+02670: 
+02671:         if cmd in {"open-doc-from-query", "o"}:
+02672:             return handle_query_command(
+02673:                 argv, cmd_open_doc_from_query, allow_json_flag=True
+02674:             )
+02675: 
+02676:         if cmd in {"read-doc-from-query", "r"}:
+02677:             return handle_query_command(
+02678:                 argv, cmd_read_doc_from_query, allow_json_flag=True
+02679:             )
+02680: 
+02681:         if cmd == "get-file":
+02682:             if len(argv) < 1:
+02683:                 print_usage_error("Missing google_drive_file_id argument.")
+02684:                 return EXIT_USAGE_ERROR
+02685:             cmd_get_file(argv[0])
+02686:             return EXIT_OK
+02687: 
+02688:         if cmd == "read-doc":
+02689:             if len(argv) < 1:
+02690:                 print_usage_error("Missing google_doc_id argument.")
+02691:                 return EXIT_USAGE_ERROR
+02692:             cmd_read_doc(argv[0])
+02693:             return EXIT_OK
+02694: 
+02695:         if cmd in {"ask", "q"}:
+02696:             return handle_query_command(argv, cmd_ask, allow_json_flag=True)
+02697: 
+02698:         print_usage_error(f"Unknown command: {cmd}")
+02699:         return EXIT_USAGE_ERROR
+02700: 
+02701:     except KeyboardInterrupt:
+02702:         print_json(
+02703:             {
+02704:                 "ok": False,
+02705:                 "command": cmd,
+02706:                 "error_type": "KeyboardInterrupt",
+02707:                 "error_message": "Interrupted by user",
+02708:                 "retryable": True,
+02709:                 "auth_related": False,
+02710:                 "network_related": False,
+02711:             }
+02712:         )
+02713:         return EXIT_INTERRUPTED
+02714: 
+02715: 
+02716: if __name__ == "__main__":
+02717:     raise SystemExit(main())
+

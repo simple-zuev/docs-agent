@@ -1,0 +1,69 @@
+==== lookup probes ====
+
+$ python3 /Users/zuevvladimir/AI/docs-agent/agent_cli.py find-doc-id DOC-0001
+{
+  "ok": true,
+  "command": "find-row-by-column",
+  "spreadsheet_id": "1hyWNNzsIHRLGJ65urOQUA0x_kOqCP61OkXcM3MMyedw",
+  "sheet_name": "MASTER_INDEX",
+  "column_name": "Document ID",
+  "match_value": "DOC-0001",
+  "header_row": 1,
+  "matches_found": 1,
+  "matches": [
+    {
+      "row_number": 2,
+      "row_values": [
+        "DOC-0001",
+        "00_MASTER_INDEX_АСТЦВ_v3",
+        "Реестр",
+        "YES",
+        "Базовый документ",
+        "Актуален",
+        "00_Управление_проектом",
+        "Project Owner",
+        "Управление проектным хранилищем",
+        "ADR-007",
+        "Monthly",
+        "2026-05-07",
+        "Critical",
+        "Основной утверждённый индекс проектного хранилища",
+        "https://docs.google.com/spreadsheets/d/1hyWNNzsIHRLGJ65urOQUA0x_kOqCP61OkXcM3MMyedw"
+      ]
+    }
+  ],
+  "_debug": {
+    "returncode": 0,
+    "stderr": "",
+    "cmd": [
+      "/Users/zuevvladimir/AI/docs-agent/venv312/bin/python",
+      "/Users/zuevvladimir/AI/docs-agent/docs_agent.py",
+      "find-row-by-column",
+      "1hyWNNzsIHRLGJ65urOQUA0x_kOqCP61OkXcM3MMyedw",
+      "MASTER_INDEX",
+      "Document ID",
+      "DOC-0001",
+      "--json-output"
+    ],
+    "timeout_sec": 60
+  },
+  "_retry": {
+    "used": false,
+    "attempt_count": 1,
+    "attempts": [
+      {
+        "attempt": 1,
+        "ok": true,
+        "error_type": null,
+        "error_message": null
+      }
+    ]
+  }
+}
+
+exit_code=0
+
+$ python3 /Users/zuevvladimir/AI/docs-agent/agent_cli.py find-doc-name "DOC-0001"
+Traceback (most recent call last):
+  File "/Users/zuevvladimir/AI/docs-agent/agent_cli.py", line 0, in <module>
+KeyboardInterrupt

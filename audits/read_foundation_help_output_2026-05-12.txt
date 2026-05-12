@@ -1,0 +1,229 @@
+==== help: status ====
+ok: False
+command: usage
+error_type: UsageError
+error_message: status does not accept positional arguments.
+
+Usage:
+  python agent_cli.py status [--json]
+  python agent_cli.py repo-state [--json]    | rs [--json]
+  python agent_cli.py doctor [--json]        | diagnose [--json]
+  python agent_cli.py assemble-context [--json] --profile <profile>
+  python agent_cli.py doc-body-only [--json] --profile <profile> --document-type <type> --title <title>
+  python agent_cli.py artifact-state [--json] --file-id <google_drive_file_id>
+  python agent_cli.py find-doc-id <DOC-XXXX>
+  python agent_cli.py find-doc-name <document name>
+  python agent_cli.py find-link <drive_id_or_url_fragment>
+  python agent_cli.py find-doc-any [--json] <query>        | f [--json] <query>
+  python agent_cli.py open-doc-from-query [--json] <query> | o [--json] <query>
+  python agent_cli.py read-doc-from-query [--json] <query> | r [--json] <query>
+  python agent_cli.py get-file <google_drive_file_id>
+  python agent_cli.py read-doc <google_doc_id>
+  python agent_cli.py ask [--json] <free text query>       | q [--json] <query>
+
+Examples:
+  python agent_cli.py status
+  python agent_cli.py status --json
+  python agent_cli.py repo-state
+  python agent_cli.py repo-state --json
+  python agent_cli.py f DOC-0001
+  python agent_cli.py o DOC-0002
+  python agent_cli.py r DOC-0002
+  python agent_cli.py r "00_PROJECT_AI_OPERATING_PROMPT_АСТЦВ"
+  python agent_cli.py q "прочитай DOC-0002"
+  python agent_cli.py q --json "прочитай 00_PROJECT_AI_OPERATING_PROMPT_АСТЦВ"
+  python agent_cli.py doctor
+  python agent_cli.py doctor --json
+
+
+==== help: repo-state ====
+ok: False
+command: usage
+error_type: UsageError
+error_message: repo-state does not accept positional arguments.
+
+Usage:
+  python agent_cli.py status [--json]
+  python agent_cli.py repo-state [--json]    | rs [--json]
+  python agent_cli.py doctor [--json]        | diagnose [--json]
+  python agent_cli.py assemble-context [--json] --profile <profile>
+  python agent_cli.py doc-body-only [--json] --profile <profile> --document-type <type> --title <title>
+  python agent_cli.py artifact-state [--json] --file-id <google_drive_file_id>
+  python agent_cli.py find-doc-id <DOC-XXXX>
+  python agent_cli.py find-doc-name <document name>
+  python agent_cli.py find-link <drive_id_or_url_fragment>
+  python agent_cli.py find-doc-any [--json] <query>        | f [--json] <query>
+  python agent_cli.py open-doc-from-query [--json] <query> | o [--json] <query>
+  python agent_cli.py read-doc-from-query [--json] <query> | r [--json] <query>
+  python agent_cli.py get-file <google_drive_file_id>
+  python agent_cli.py read-doc <google_doc_id>
+  python agent_cli.py ask [--json] <free text query>       | q [--json] <query>
+
+Examples:
+  python agent_cli.py status
+  python agent_cli.py status --json
+  python agent_cli.py repo-state
+  python agent_cli.py repo-state --json
+  python agent_cli.py f DOC-0001
+  python agent_cli.py o DOC-0002
+  python agent_cli.py r DOC-0002
+  python agent_cli.py r "00_PROJECT_AI_OPERATING_PROMPT_АСТЦВ"
+  python agent_cli.py q "прочитай DOC-0002"
+  python agent_cli.py q --json "прочитай 00_PROJECT_AI_OPERATING_PROMPT_АСТЦВ"
+  python agent_cli.py doctor
+  python agent_cli.py doctor --json
+
+
+==== help: doctor ====
+ok: False
+command: usage
+error_type: UsageError
+error_message: doctor does not accept positional arguments.
+
+Usage:
+  python agent_cli.py status [--json]
+  python agent_cli.py repo-state [--json]    | rs [--json]
+  python agent_cli.py doctor [--json]        | diagnose [--json]
+  python agent_cli.py assemble-context [--json] --profile <profile>
+  python agent_cli.py doc-body-only [--json] --profile <profile> --document-type <type> --title <title>
+  python agent_cli.py artifact-state [--json] --file-id <google_drive_file_id>
+  python agent_cli.py find-doc-id <DOC-XXXX>
+  python agent_cli.py find-doc-name <document name>
+  python agent_cli.py find-link <drive_id_or_url_fragment>
+  python agent_cli.py find-doc-any [--json] <query>        | f [--json] <query>
+  python agent_cli.py open-doc-from-query [--json] <query> | o [--json] <query>
+  python agent_cli.py read-doc-from-query [--json] <query> | r [--json] <query>
+  python agent_cli.py get-file <google_drive_file_id>
+  python agent_cli.py read-doc <google_doc_id>
+  python agent_cli.py ask [--json] <free text query>       | q [--json] <query>
+
+Examples:
+  python agent_cli.py status
+  python agent_cli.py status --json
+  python agent_cli.py repo-state
+  python agent_cli.py repo-state --json
+  python agent_cli.py f DOC-0001
+  python agent_cli.py o DOC-0002
+  python agent_cli.py r DOC-0002
+  python agent_cli.py r "00_PROJECT_AI_OPERATING_PROMPT_АСТЦВ"
+  python agent_cli.py q "прочитай DOC-0002"
+  python agent_cli.py q --json "прочитай 00_PROJECT_AI_OPERATING_PROMPT_АСТЦВ"
+  python agent_cli.py doctor
+  python agent_cli.py doctor --json
+
+
+==== help: find-doc-id ====
+{
+  "ok": false,
+  "command": "subprocess",
+  "error_type": "JSONDecodeError",
+  "error_message": "Failed to parse JSON output from docs_agent.py.",
+  "retryable": false,
+  "auth_related": false,
+  "network_related": false,
+  "_debug": {
+    "returncode": 0,
+    "stderr": "",
+    "stdout_preview": "Usage: docs_agent.py find-row-by-column [OPTIONS] SPREADSHEET_ID SHEET_NAME    \n                                         COLUMN_NAME MATCH_VALUE                \n                                                                                \n Find rows by exact column value match.                                         \n                                                                                \n╭─ Arguments ──────────────────────────────────────────────────────────────────╮\n│ *    spreadsheet_id      TEXT  [required]                                    │\n│ *    sheet_name          TEXT  [required]                                    │\n│ *    column_name         TEXT  [required]                                    │\n│ *    match_value         TEXT  [required]                                    │\n╰──────────────────────────────────────────────────────────────────────────────╯\n╭─ Options ────────────────────────────────────────────────────────────────────╮\n│ --header-row               ",
+    "cmd": [
+      "/Users/zuevvladimir/AI/docs-agent/venv312/bin/python",
+      "/Users/zuevvladimir/AI/docs-agent/docs_agent.py",
+      "find-row-by-column",
+      "1hyWNNzsIHRLGJ65urOQUA0x_kOqCP61OkXcM3MMyedw",
+      "MASTER_INDEX",
+      "Document ID",
+      "--help",
+      "--json-output"
+    ],
+    "timeout_sec": 60
+  },
+  "_retry": {
+    "used": false,
+    "attempt_count": 1,
+    "attempts": [
+      {
+        "attempt": 1,
+        "ok": false,
+        "error_type": "JSONDecodeError",
+        "error_message": "Failed to parse JSON output from docs_agent.py."
+      }
+    ]
+  }
+}
+
+==== help: find-doc-name ====
+{
+  "ok": false,
+  "command": "subprocess",
+  "error_type": "JSONDecodeError",
+  "error_message": "Failed to parse JSON output from docs_agent.py.",
+  "retryable": false,
+  "auth_related": false,
+  "network_related": false,
+  "_debug": {
+    "returncode": 0,
+    "stderr": "",
+    "stdout_preview": "Usage: docs_agent.py find-row-by-column [OPTIONS] SPREADSHEET_ID SHEET_NAME    \n                                         COLUMN_NAME MATCH_VALUE                \n                                                                                \n Find rows by exact column value match.                                         \n                                                                                \n╭─ Arguments ──────────────────────────────────────────────────────────────────╮\n│ *    spreadsheet_id      TEXT  [required]                                    │\n│ *    sheet_name          TEXT  [required]                                    │\n│ *    column_name         TEXT  [required]                                    │\n│ *    match_value         TEXT  [required]                                    │\n╰──────────────────────────────────────────────────────────────────────────────╯\n╭─ Options ────────────────────────────────────────────────────────────────────╮\n│ --header-row               ",
+    "cmd": [
+      "/Users/zuevvladimir/AI/docs-agent/venv312/bin/python",
+      "/Users/zuevvladimir/AI/docs-agent/docs_agent.py",
+      "find-row-by-column",
+      "1hyWNNzsIHRLGJ65urOQUA0x_kOqCP61OkXcM3MMyedw",
+      "MASTER_INDEX",
+      "Document Name",
+      "--help",
+      "--json-output"
+    ],
+    "timeout_sec": 60
+  },
+  "_retry": {
+    "used": false,
+    "attempt_count": 1,
+    "attempts": [
+      {
+        "attempt": 1,
+        "ok": false,
+        "error_type": "JSONDecodeError",
+        "error_message": "Failed to parse JSON output from docs_agent.py."
+      }
+    ]
+  }
+}
+
+==== help: find-link ====
+{
+  "ok": false,
+  "command": "subprocess",
+  "error_type": "JSONDecodeError",
+  "error_message": "Failed to parse JSON output from docs_agent.py.",
+  "retryable": false,
+  "auth_related": false,
+  "network_related": false,
+  "_debug": {
+    "returncode": 0,
+    "stderr": "",
+    "stdout_preview": "Usage: docs_agent.py find-row-by-link-fragment [OPTIONS] SPREADSHEET_ID        \n                                                SHEET_NAME FRAGMENT             \n                                                                                \n Find rows where link column contains a fragment, e.g. Drive file ID.           \n                                                                                \n╭─ Arguments ──────────────────────────────────────────────────────────────────╮\n│ *    spreadsheet_id      TEXT  [required]                                    │\n│ *    sheet_name          TEXT  [required]                                    │\n│ *    fragment            TEXT  [required]                                    │\n╰──────────────────────────────────────────────────────────────────────────────╯\n╭─ Options ────────────────────────────────────────────────────────────────────╮\n│ --link-column                        TEXT     [default: Link]                │\n│ --header-row               ",
+    "cmd": [
+      "/Users/zuevvladimir/AI/docs-agent/venv312/bin/python",
+      "/Users/zuevvladimir/AI/docs-agent/docs_agent.py",
+      "find-row-by-link-fragment",
+      "1hyWNNzsIHRLGJ65urOQUA0x_kOqCP61OkXcM3MMyedw",
+      "MASTER_INDEX",
+      "--help",
+      "--json-output"
+    ],
+    "timeout_sec": 60
+  },
+  "_retry": {
+    "used": false,
+    "attempt_count": 1,
+    "attempts": [
+      {
+        "attempt": 1,
+        "ok": false,
+        "error_type": "JSONDecodeError",
+        "error_message": "Failed to parse JSON output from docs_agent.py."
+      }
+    ]
+  }
+}

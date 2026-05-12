@@ -1,0 +1,110 @@
+==== json behavior ====
+
+$ python3 /Users/zuevvladimir/AI/docs-agent/agent_cli.py status --json
+{
+  "ok": true,
+  "command": "status",
+  "safety": {
+    "ok": true,
+    "command": "show-safety-mode",
+    "mode": "write",
+    "default_dry_run": false,
+    "forbid_master_index_write": true,
+    "forbid_delete": true,
+    "default_test_folder": "200_Офис",
+    "_debug": {
+      "returncode": 0,
+      "stderr": "",
+      "cmd": [
+        "/Users/zuevvladimir/AI/docs-agent/venv312/bin/python",
+        "/Users/zuevvladimir/AI/docs-agent/docs_agent.py",
+        "show-safety-mode",
+        "--json-output"
+      ],
+      "timeout_sec": 60
+    },
+    "_retry": {
+      "used": false,
+      "attempt_count": 1,
+      "attempts": [
+        {
+          "attempt": 1,
+          "ok": true,
+          "error_type": null,
+          "error_message": null
+        }
+      ]
+    }
+  },
+  "config": {
+    "ok": true,
+    "command": "show-config-status",
+    "safety_mode": "write",
+    "default_dry_run": false,
+    "forbid_master_index_write": true,
+    "forbid_delete": true,
+    "default_test_folder": "200_Офис",
+    "master_index_spreadsheet_id": "1hyWNNzsIHRLGJ65urOQUA0x_kOqCP61OkXcM3MMyedw",
+    "master_index_sheet_name": "MASTER_INDEX",
+    "change_log_spreadsheet_id": "1-6F5MCJR2EkP74pROsYXsPMmu1zPwp82hl0mDi9U3EQ",
+    "change_log_sheet_name": "Change Log Lite",
+    "identity_note": "registry identity != drive identity",
+    "_debug": {
+      "returncode": 0,
+      "stderr": "",
+      "cmd": [
+        "/Users/zuevvladimir/AI/docs-agent/venv312/bin/python",
+        "/Users/zuevvladimir/AI/docs-agent/docs_agent.py",
+        "show-config-status",
+        "--json-output"
+      ],
+      "timeout_sec": 60
+    },
+    "_retry": {
+      "used": false,
+      "attempt_count": 1,
+      "attempts": [
+        {
+          "attempt": 1,
+          "ok": true,
+          "error_type": null,
+          "error_message": null
+        }
+      ]
+    }
+  }
+}
+
+exit_code=0
+
+$ python3 /Users/zuevvladimir/AI/docs-agent/agent_cli.py repo-state --json
+{
+  "ok": true,
+  "command": "branch-safety-snapshot",
+  "repo_path": "/Users/zuevvladimir/AI/docs-agent",
+  "branch": "feature/read-foundation-audit-wave",
+  "is_main": false,
+  "working_tree_clean": false,
+  "local_equals_origin_main": true,
+  "safe_for_mutation": false,
+  "recommended_next_step": "Commit, stash, or inspect local changes before mutations.",
+  "head_sha": "4d3cbe14748c5c7194bd0fb78a6dd2f42e540000",
+  "origin_main_sha": "4d3cbe14748c5c7194bd0fb78a6dd2f42e540000",
+  "diff_name_status_entries": []
+}
+
+exit_code=0
+
+$ python3 /Users/zuevvladimir/AI/docs-agent/agent_cli.py doctor --json
+{
+  "ok": false,
+  "command": "doctor",
+  "error_type": "KeyboardInterrupt",
+  "error_message": "Interrupted by user",
+  "retryable": true,
+  "auth_related": false,
+  "network_related": false
+}
+
+exit_code=130
+

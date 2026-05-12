@@ -1,0 +1,25 @@
+Scope
+- audit-only review of the MVP read / inspect foundation for ChatGPT-agent readiness
+- commands reviewed: status, repo-state, doctor, find-doc-id, find-doc-name, find-link
+- no production code changes
+
+Review goals
+- verify live command presence
+- verify command contract and invocation behavior
+- verify help / error / exit-code consistency
+- verify json behavior for the status-style commands
+- verify lookup behavior for the direct lookup commands
+- identify the smallest high-value alignment opportunity, if any
+
+Checklist
+- command presence in current callable surface
+- help behavior consistency
+- missing-argument behavior consistency
+- stdout/stderr and result-shape consistency
+- exit-code consistency
+- json behavior consistency where applicable
+- lookup adjacency consistency
+- evidence for or against a safe narrow mutation
+
+Preliminary conclusion
+- fill after artifact review
