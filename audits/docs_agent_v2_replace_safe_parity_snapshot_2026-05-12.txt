@@ -1,0 +1,604 @@
+==== docs_agent_v2 candidate slice ====
+import json
+from pathlib import Path
+
+
+import typer
+from datetime import datetime
+from typing import Optional
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
+from googleapiclient.http import MediaIoBaseDownload
+from doc_text_mutation import insert_text_at_index, replace_all_text
+from runtime_config import (
+    CONFIG_PATH,
+    config_get,
+    ensure_confirmed,
+    ensure_write_allowed,
+    get_change_log_id,
+    get_change_log_sheet,
+    get_default_test_folder_name,
+    get_master_index_id,
+    get_master_index_sheet,
+    get_safety_mode,
+    is_default_dry_run,
+    set_safety_mode_value,
+    should_dry_run,
+)
+
+app = typer.Typer()
+
+BASE = Path.home() / "AI" / "docs-agent"
+CLIENT_SECRET = BASE / "config" / "client_secret.json"
+TOKEN_FILE = BASE / "config" / "token.json"
+CACHE_DIR = BASE / "cache"
+REPORTS_DIR = BASE / "reports"
+
+SCOPES = [
+    "https://www.googleapis.com/auth/drive",
+    "https://www.googleapis.com/auth/documents",
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/presentations",
+]
+
+CHANGE_LOG_ID = "1-6F5MCJR2EkP74pROsYXsPMmu1zPwp82hl0mDi9U3EQ"
+
+
+def ensure_master_index_write_allowed():
+    if bool(config_get("safety.forbid_master_index_write", True)):
+        raise RuntimeError("Master Index write is forbidden by config")
+
+
+def print_dry_run(payload: dict):
+    print("DRY RUN OK")
+    print(json.dumps(payload, ensure_ascii=False, indent=2))
+
+
+def get_creds():
+    if TOKEN_FILE.exists():
+        return Credentials.from_authorized_user_file(str(TOKEN_FILE), SCOPES)
+    flow = InstalledAppFlow.from_client_secrets_file(str(CLIENT_SECRET), SCOPES)
+    creds = flow.run_local_server(port=0)
+    TOKEN_FILE.write_text(creds.to_json(), encoding="utf-8")
+    return creds
+
+
+def services():
+    creds = get_creds()
+    return {
+        "drive": build("drive", "v3", credentials=creds),
+        "docs": build("docs", "v1", credentials=creds),
+        "sheets": build("sheets", "v4", credentials=creds),
+    }
+
+
+def list_children(drive, folder_id, page_size=1000):
+    items = []
+    page_token = None
+    while True:
+        res = (
+            drive.files()
+            .list(
+                q=f"'{folder_id}' in parents and trashed = false",
+                fields="nextPageToken, files(id,name,mimeType,webViewLink,modifiedTime,createdTime)",
+                pageSize=page_size,
+                pageToken=page_token,
+                supportsAllDrives=True,
+                includeItemsFromAllDrives=True,
+            )
+            .execute()
+        )
+        items.extend(res.get("files", []))
+        page_token = res.get("nextPageToken")
+        if not page_token:
+            break
+    return sorted(items, key=lambda x: x["name"])
+
+
+def find_folder(drive, name, parent_id: Optional[str] = None):
+    q = f"name = '{name}' and mimeType = 'application/vnd.google-apps.folder' and trashed = false"
+    if parent_id:
+        q += f" and '{parent_id}' in parents"
+    res = (
+        drive.files()
+        .list(
+            q=q,
+            fields="files(id,name,mimeType,webViewLink,modifiedTime,createdTime)",
+            pageSize=10,
+            supportsAllDrives=True,
+            includeItemsFromAllDrives=True,
+        )
+        .execute()
+    )
+    files = res.get("files", [])
+    if not files:
+        raise RuntimeError(f"Folder not found: {name}")
+    return files[0]
+
+
+def get_sheet_values(sheets, spreadsheet_id: str, range_a1: str):
+    return (
+
+==== docs_agent_v2 replace section ====
+        .execute()
+    )
+
+    doc = docs.documents().get(documentId=document_id).execute()
+
+    content = doc.get("body", {}).get("content", [])
+    text_content = extract_text(content)
+
+    if len(text_content) > max_chars:
+        text_content = text_content[:max_chars] + "\n\n...[TRUNCATED]..."
+
+    print("READ DOC OK")
+    print(f"Name: {meta['name']}")
+    print(f"ID: {meta['id']}")
+    print(f"Modified: {meta.get('modifiedTime')}")
+    print(f"URL: {meta.get('webViewLink')}")
+    print("")
+    print("----- DOCUMENT CONTENT BEGIN -----")
+    print(text_content)
+    print("----- DOCUMENT CONTENT END -----")
+
+
+@app.command("replace-doc-text")
+def replace_doc_text(
+    document_id: str,
+    old_text: str,
+    new_text: str,
+):
+    """Replace exact text fragment in Google Doc and log operation."""
+    ensure_write_allowed("replace-doc-text", target=document_id)
+    s = services()
+    docs = s["docs"]
+    drive = s["drive"]
+    sheets = s["sheets"]
+
+    meta = (
+        drive.files()
+        .get(
+            fileId=document_id,
+            fields="id,name,mimeType,webViewLink,modifiedTime",
+            supportsAllDrives=True,
+        )
+        .execute()
+    )
+
+    replace_all_text(
+        docs=docs,
+        document_id=document_id,
+        old_text=old_text,
+        new_text=new_text,
+        match_case=True,
+    )
+
+    change_id, updated_range = append_log(
+        sheets=sheets,
+        action="Replace Text",
+        obj=meta["name"],
+        from_=old_text,
+        to=new_text,
+        reason="Точечная замена текста через Google Docs API",
+        impact="Low",
+        status="Done",
+        notes=f"Document ID: {document_id} | URL: {meta.get('webViewLink')}",
+    )
+
+    print("REPLACE DOC TEXT OK")
+    print(f"Document: {meta['name']}")
+    print(f"ID: {document_id}")
+    print(f"URL: {meta.get('webViewLink')}")
+    print(f"Old text: {old_text}")
+    print(f"New text: {new_text}")
+    print(f"Change Log: {change_id} | {updated_range}")
+
+
+@app.command("replace-doc-text-safe")
+def replace_doc_text_safe(
+    document_id: str,
+    old_text: str,
+    new_text: str,
+    backup_folder: str = "13_Черновики_и_review",
+    dry_run: bool = False,
+    confirm: bool = False,
+):
+    """Backup document, then replace exact text fragment and log operation."""
+    if should_dry_run(dry_run):
+        print_dry_run(
+            {
+                "command": "replace-doc-text-safe",
+                "document_id": document_id,
+                "old_text": old_text,
+                "new_text": new_text,
+                "backup_folder": backup_folder,
+                "write_mode_required": True,
+            }
+        )
+        return
+
+    ensure_write_allowed("replace-doc-text-safe", target=document_id)
+    ensure_confirmed(confirm, "replace-doc-text-safe")
+    s = services()
+    docs = s["docs"]
+    drive = s["drive"]
+    sheets = s["sheets"]
+
+    cass = find_folder(drive, "Cass")
+    target = find_folder(drive, backup_folder, cass["id"])
+
+    meta = (
+        drive.files()
+        .get(
+            fileId=document_id,
+            fields="id,name,mimeType,webViewLink,modifiedTime",
+            supportsAllDrives=True,
+        )
+        .execute()
+    )
+
+    backup_name = f"BACKUP_BEFORE_REPLACE__{meta['name']}__{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+
+    backup = (
+        drive.files()
+        .copy(
+            fileId=document_id,
+            body={
+                "name": backup_name,
+                "parents": [target["id"]],
+            },
+            fields="id,name,webViewLink",
+            supportsAllDrives=True,
+        )
+        .execute()
+    )
+
+    replace_all_text(
+        docs=docs,
+        document_id=document_id,
+        old_text=old_text,
+        new_text=new_text,
+        match_case=True,
+    )
+
+    change_id, updated_range = append_log(
+        sheets=sheets,
+        action="Safe Replace Text",
+        obj=meta["name"],
+        from_=old_text,
+        to=new_text,
+        reason="Точечная замена текста с предварительным backup документа",
+        impact="Medium",
+        status="Done",
+        notes=f"Backup: {backup.get('webViewLink')} | Document: {meta.get('webViewLink')}",
+    )
+
+    print("SAFE REPLACE DOC TEXT OK")
+    print(f"Document: {meta['name']}")
+    print(f"Document ID: {document_id}")
+    print(f"Document URL: {meta.get('webViewLink')}")
+    print(f"Backup: {backup['name']}")
+    print(f"Backup ID: {backup['id']}")
+    print(f"Backup URL: {backup.get('webViewLink')}")
+    print(f"Change Log: {change_id} | {updated_range}")
+
+
+@app.command("verify-doc-text")
+def verify_doc_text(
+    document_id: str,
+    text_to_find: str,
+):
+    """Verify whether exact text fragment exists in Google Doc."""
+    s = services()
+    docs = s["docs"]
+
+==== doc_text_mutation helper slice ====
+from __future__ import annotations
+
+from typing import Any
+
+
+def replace_all_text(
+    *,
+    docs: Any,
+    document_id: str,
+    old_text: str,
+    new_text: str,
+    match_case: bool = True,
+) -> dict[str, Any]:
+    response = (
+        docs.documents()
+        .batchUpdate(
+            documentId=document_id,
+            body={
+                "requests": [
+                    {
+                        "replaceAllText": {
+                            "containsText": {
+                                "text": old_text,
+                                "matchCase": match_case,
+                            },
+                            "replaceText": new_text,
+                        }
+                    }
+                ]
+            },
+        )
+        .execute()
+    )
+
+    replies = response.get("replies", [])
+    occurrences_changed = 0
+    if replies and isinstance(replies[0], dict):
+        occurrences_changed = int(
+            replies[0].get("replaceAllText", {}).get("occurrencesChanged", 0) or 0
+        )
+
+    return {
+        "ok": True,
+        "command": "replace-all-text",
+        "document_id": document_id,
+        "old_text": old_text,
+        "new_text": new_text,
+        "match_case": match_case,
+        "occurrences_changed": occurrences_changed,
+        "raw_response": response,
+    }
+
+
+def insert_text_at_index(
+    *,
+    docs: Any,
+    document_id: str,
+    index: int,
+    text_to_insert: str,
+) -> dict[str, Any]:
+    response = (
+        docs.documents()
+        .batchUpdate(
+            documentId=document_id,
+            body={
+                "requests": [
+                    {
+                        "insertText": {
+                            "location": {"index": index},
+                            "text": text_to_insert,
+                        }
+                    }
+                ]
+            },
+        )
+        .execute()
+    )
+
+    return {
+        "ok": True,
+        "command": "insert-text-at-index",
+        "document_id": document_id,
+        "index": index,
+        "text_length": len(text_to_insert),
+        "raw_response": response,
+    }
+
+==== docs_agent reference output slice ====
+import json
+from pathlib import Path
+
+
+import typer
+from datetime import datetime
+from typing import Optional
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
+from googleapiclient.http import MediaIoBaseDownload
+from doc_text_mutation import insert_text_at_index, replace_all_text
+from runtime_config import (
+    CONFIG_PATH,
+    config_get,
+    ensure_confirmed,
+    ensure_write_allowed,
+    get_change_log_id,
+    get_change_log_sheet,
+    get_default_test_folder_name,
+    get_master_index_id,
+    get_master_index_sheet,
+    get_safety_mode,
+    is_default_dry_run,
+    set_safety_mode_value,
+    should_dry_run,
+)
+
+app = typer.Typer()
+
+BASE = Path.home() / "AI" / "docs-agent"
+CLIENT_SECRET = BASE / "config" / "client_secret.json"
+TOKEN_FILE = BASE / "config" / "token.json"
+CACHE_DIR = BASE / "cache"
+REPORTS_DIR = BASE / "reports"
+
+SCOPES = [
+    "https://www.googleapis.com/auth/drive",
+    "https://www.googleapis.com/auth/documents",
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/presentations",
+]
+
+CHANGE_LOG_ID = "1-6F5MCJR2EkP74pROsYXsPMmu1zPwp82hl0mDi9U3EQ"
+
+
+def ensure_master_index_write_allowed():
+    if bool(config_get("safety.forbid_master_index_write", True)):
+        raise RuntimeError("Master Index write is forbidden by config")
+
+
+def get_sheets_service():
+    return services()["sheets"]
+
+
+def normalize_jsonable(value):
+    if value is None:
+        return None
+    if isinstance(value, (str, int, float, bool, list, dict)):
+        return value
+    return str(value)
+
+
+def emit_json(payload: dict):
+    print(json.dumps(payload, ensure_ascii=False, indent=2))
+
+
+@app.command("read-sheet-values")
+def read_sheet_values(
+    spreadsheet_id: str,
+    sheet_name: str,
+    json_output: bool = typer.Option(False, "--json-output"),
+):
+    """
+    Read all values from a Google Sheet tab and optionally return JSON.
+    """
+    try:
+        service = get_sheets_service()
+        rng = f"'{sheet_name}'!A:ZZ"
+        result = (
+            service.spreadsheets()
+            .values()
+            .get(
+                spreadsheetId=spreadsheet_id,
+                range=rng,
+            )
+            .execute()
+        )
+        values = result.get("values", []) or []
+
+        payload = {
+            "ok": True,
+            "command": "read-sheet-values",
+            "spreadsheet_id": spreadsheet_id,
+            "sheet_name": sheet_name,
+            "range": rng,
+            "values": values,
+            "rows_count": len(values),
+        }
+
+        if json_output:
+            emit_json(payload)
+            return
+
+        print(f"ok: {payload['ok']}")
+        print(f"command: {payload['command']}")
+        print(f"spreadsheet_id: {spreadsheet_id}")
+        print(f"sheet_name: {sheet_name}")
+        print(f"rows_count: {len(values)}")
+
+    except Exception as exc:
+        payload = {
+            "ok": False,
+            "command": "read-sheet-values",
+            "spreadsheet_id": spreadsheet_id,
+            "sheet_name": sheet_name,
+            "error_type": exc.__class__.__name__,
+            "error_message": str(exc),
+        }
+
+        text_blob = f"{exc.__class__.__name__}: {exc}".lower()
+        if (
+            "429" in text_blob
+            or "quota exceeded" in text_blob
+            or "rate limit" in text_blob
+            or "rate_limit_exceeded" in text_blob
+            or "read requests per minute per user" in text_blob
+            or "too many requests" in text_blob
+        ):
+            payload["retryable"] = True
+            payload["network_related"] = True
+            payload["auth_related"] = False
+        elif (
+            "permission" in text_blob
+            or "forbidden" in text_blob
+            or "unauthorized" in text_blob
+            or "insufficient authentication scopes" in text_blob
+        ):
+            payload["retryable"] = False
+            payload["network_related"] = False
+            payload["auth_related"] = True
+        else:
+            payload["retryable"] = False
+            payload["network_related"] = False
+            payload["auth_related"] = False
+
+        if json_output:
+            emit_json(payload)
+            raise typer.Exit(code=1)
+
+        print(f"ok: {payload['ok']}")
+        print(f"command: {payload['command']}")
+        print(f"error_type: {payload['error_type']}")
+        print(f"error_message: {payload['error_message']}")
+        raise typer.Exit(code=1)
+
+
+def print_dry_run(payload: dict):
+    print("DRY RUN OK")
+    print(json.dumps(payload, ensure_ascii=False, indent=2))
+
+
+def emit_output(json_output: bool, payload: dict, human_lines=None):
+    if json_output:
+        print(json.dumps(payload, ensure_ascii=False, indent=2))
+        return
+
+    if human_lines:
+        for line in human_lines:
+            print(line)
+
+
+def classify_error(exc: Exception):
+    name = exc.__class__.__name__
+    msg = str(exc)
+
+    retryable = False
+    auth_related = False
+    network_related = False
+
+    if isinstance(exc, HttpError):
+        status = getattr(getattr(exc, "resp", None), "status", None)
+        if status in {408, 409, 425, 429, 500, 502, 503, 504}:
+            retryable = True
+        if status in {401, 403}:
+            auth_related = True
+
+    if name in {"SSLEOFError", "TimeoutError", "ConnectionResetError"}:
+        retryable = True
+        network_related = True
+
+    if "EOF occurred in violation of protocol" in msg:
+        retryable = True
+        network_related = True
+
+    if "refresh" in msg.lower() or "token" in msg.lower():
+        auth_related = True
+
+    return {
+        "error_type": name,
+        "error_message": msg,
+        "retryable": retryable,
+        "auth_related": auth_related,
+        "network_related": network_related,
+    }
+
+
+def emit_error(json_output: bool, command: str, exc: Exception):
+    payload = {
+        "ok": False,
+        "command": command,
+        **classify_error(exc),
+    }
+
+    if json_output:
+        print(json.dumps(payload, ensure_ascii=False, indent=2))
+        raise typer.Exit(code=1)
+
+    raise exc

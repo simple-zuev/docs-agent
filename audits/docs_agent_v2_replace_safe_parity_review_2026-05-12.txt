@@ -1,0 +1,25 @@
+Audit scope
+- docs_agent_v2.py replace_doc_text()
+- docs_agent_v2.py replace_doc_text_safe()
+- docs_agent_v2.py print_dry_run()
+- doc_text_mutation.py helper functions
+- docs_agent.py emit_json(payload) as legacy/reference output pattern
+
+Audit questions
+- does replace_doc_text_safe() already form a bounded mutation path with explicit preconditions
+- is dry-run behavior already structured enough to normalize without changing capability
+- does docs_agent.py provide an existing output pattern that can be mirrored narrowly
+- can one future implementation step improve output consistency for replace_doc_text_safe() only
+- can that step avoid new commands, new write paths, or repo-wide helper extraction
+
+Go criteria
+- existing mutation path only
+- one-function or one-call-site implementation
+- output-only normalization
+- no new external behavior except more structured success/error reporting
+
+No-go criteria
+- requires new command surface
+- requires multi-file architecture refactor
+- requires migration of many mutation paths at once
+- changes write semantics rather than output semantics

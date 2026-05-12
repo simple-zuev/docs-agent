@@ -1,0 +1,115 @@
+==== top-level python files ====
+/Users/zuevvladimir/AI/docs-agent/agent_cli.py
+/Users/zuevvladimir/AI/docs-agent/append_change_log_test.py
+/Users/zuevvladimir/AI/docs-agent/auth_and_scan.py
+/Users/zuevvladimir/AI/docs-agent/cass_audit.py
+/Users/zuevvladimir/AI/docs-agent/doc_text_mutation.py
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py
+/Users/zuevvladimir/AI/docs-agent/drive_api.py
+/Users/zuevvladimir/AI/docs-agent/drive_write_api.py
+/Users/zuevvladimir/AI/docs-agent/repo_state.py
+/Users/zuevvladimir/AI/docs-agent/runtime_config.py
+/Users/zuevvladimir/AI/docs-agent/write_test_in_cass.py
+/Users/zuevvladimir/AI/docs-agent/write_test.py
+
+==== candidate helper files ====
+/Users/zuevvladimir/AI/docs-agent/agent_cli.py:815:    print(f"default_dry_run: {safety.get('default_dry_run')}")
+/Users/zuevvladimir/AI/docs-agent/agent_cli.py:839:    print(f"safe_for_mutation: {payload.get('safe_for_mutation')}")
+/Users/zuevvladimir/AI/docs-agent/agent_cli.py:1895:        "default_dry_run": (
+/Users/zuevvladimir/AI/docs-agent/agent_cli.py:1896:            (status_payload.get("safety") or {}).get("default_dry_run")
+/Users/zuevvladimir/AI/docs-agent/agent_cli.py:1983:        "working_drafts_and_review_artifacts": [
+/Users/zuevvladimir/AI/docs-agent/agent_cli.py:2100:            "Use draft-doc when all critical sources are resolved; otherwise prefer doc-body-only and avoid direct mutation."
+/Users/zuevvladimir/AI/docs-agent/agent_cli.py:2250:        "Body is generated without direct mutation.",
+/Users/zuevvladimir/AI/docs-agent/agent_cli.py:2280:def artifact_state_payload(file_id: str) -> dict:
+/Users/zuevvladimir/AI/docs-agent/agent_cli.py:2284:            command="artifact-state",
+/Users/zuevvladimir/AI/docs-agent/agent_cli.py:2287:                "error_message", "Failed to read artifact metadata."
+/Users/zuevvladimir/AI/docs-agent/agent_cli.py:2292:            target_artifact={"file_id": file_id},
+/Users/zuevvladimir/AI/docs-agent/agent_cli.py:2319:    artifact_state = "Unknown"
+/Users/zuevvladimir/AI/docs-agent/agent_cli.py:2321:    next_safe_step = "Review artifact placement and classify before write actions."
+/Users/zuevvladimir/AI/docs-agent/agent_cli.py:2324:        artifact_state = "Historical reference"
+/Users/zuevvladimir/AI/docs-agent/agent_cli.py:2325:        review_status = "Not for direct mutation"
+/Users/zuevvladimir/AI/docs-agent/agent_cli.py:2328:        artifact_state = "Pending review"
+/Users/zuevvladimir/AI/docs-agent/agent_cli.py:2330:        next_safe_step = "Inspect staging artifact and decide whether body placement or review note is needed."
+/Users/zuevvladimir/AI/docs-agent/agent_cli.py:2332:        artifact_state = "Draft"
+/Users/zuevvladimir/AI/docs-agent/agent_cli.py:2338:        artifact_state = "Draft"
+/Users/zuevvladimir/AI/docs-agent/agent_cli.py:2340:        next_safe_step = "Validate whether this artifact should stay test-only or move into review workflow."
+/Users/zuevvladimir/AI/docs-agent/agent_cli.py:2342:        artifact_state = "Canonical or non-review artifact"
+/Users/zuevvladimir/AI/docs-agent/agent_cli.py:2345:            "Avoid bounded write until artifact scope is explicitly validated."
+/Users/zuevvladimir/AI/docs-agent/agent_cli.py:2350:        "command": "artifact-state",
+/Users/zuevvladimir/AI/docs-agent/agent_cli.py:2351:        "target_artifact": {
+/Users/zuevvladimir/AI/docs-agent/agent_cli.py:2357:        "artifact_state": artifact_state,
+/Users/zuevvladimir/AI/docs-agent/agent_cli.py:2373:    print(f"Default dry run: {payload['safety'].get('default_dry_run')}")
+/Users/zuevvladimir/AI/docs-agent/agent_cli.py:2431:def cmd_artifact_state(file_id: str, json_output: bool = False) -> int:
+/Users/zuevvladimir/AI/docs-agent/agent_cli.py:2432:    payload = artifact_state_payload(file_id)
+/Users/zuevvladimir/AI/docs-agent/agent_cli.py:2439:        print(f"File ID: {(payload.get('target_artifact') or {}).get('file_id')}")
+/Users/zuevvladimir/AI/docs-agent/agent_cli.py:2440:        print(f"Name: {(payload.get('target_artifact') or {}).get('name')}")
+/Users/zuevvladimir/AI/docs-agent/agent_cli.py:2441:        print(f"Artifact state: {payload.get('artifact_state')}")
+/Users/zuevvladimir/AI/docs-agent/agent_cli.py:2529:        "  python agent_cli.py artifact-state [--json] --file-id <google_drive_file_id>\n"
+/Users/zuevvladimir/AI/docs-agent/agent_cli.py:2639:        if cmd == "artifact-state":
+/Users/zuevvladimir/AI/docs-agent/agent_cli.py:2643:                    "artifact-state requires: --file-id <google_drive_file_id>"
+/Users/zuevvladimir/AI/docs-agent/agent_cli.py:2646:            return cmd_artifact_state(args[1], json_output=json_output)
+/Users/zuevvladimir/AI/docs-agent/runtime_config.py:31:def is_default_dry_run():
+/Users/zuevvladimir/AI/docs-agent/runtime_config.py:32:    return bool(config_get("safety.default_dry_run", True))
+/Users/zuevvladimir/AI/docs-agent/runtime_config.py:65:def should_dry_run(dry_run: bool = False):
+/Users/zuevvladimir/AI/docs-agent/runtime_config.py:66:    return dry_run or is_default_dry_run()
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:12:from doc_text_mutation import insert_text_at_index, replace_all_text
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:24:    is_default_dry_run,
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:26:    should_dry_run,
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:52:def print_dry_run(payload: dict):
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:389:    dry_run: bool = False,
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:394:    if should_dry_run(dry_run):
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:395:        print_dry_run(
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:519:    dry_run: bool = False,
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:523:    if should_dry_run(dry_run):
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:524:        print_dry_run(
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:730:    dry_run: bool = False,
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:734:    if should_dry_run(dry_run):
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:735:        print_dry_run(
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:907:    dry_run: bool = False,
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:913:    if should_dry_run(dry_run):
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:914:        print_dry_run(
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:985:    dry_run: bool = False,
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:989:    if should_dry_run(dry_run):
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:990:        print_dry_run(
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:1390:                "default_dry_run": config_get("safety.default_dry_run", True),
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:1416:                "default_dry_run": is_default_dry_run(),
+/Users/zuevvladimir/AI/docs-agent/repo_state.py:279:    safe_for_mutation = (not is_main) and working_tree_clean
+/Users/zuevvladimir/AI/docs-agent/repo_state.py:283:            "Create or switch to a non-main feature branch before mutations."
+/Users/zuevvladimir/AI/docs-agent/repo_state.py:287:            "Commit, stash, or inspect local changes before mutations."
+/Users/zuevvladimir/AI/docs-agent/repo_state.py:295:            "Review divergence against origin/main before mutations."
+/Users/zuevvladimir/AI/docs-agent/repo_state.py:306:        "safe_for_mutation": safe_for_mutation,
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:13:from doc_text_mutation import insert_text_at_index, replace_all_text
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:25:    is_default_dry_run,
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:27:    should_dry_run,
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:65:def emit_json(payload: dict):
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:103:            emit_json(payload)
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:149:            emit_json(payload)
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:159:def print_dry_run(payload: dict):
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:555:    dry_run: bool = False,
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:560:    if should_dry_run(dry_run):
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:561:        print_dry_run(
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:685:    dry_run: bool = False,
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:689:    if should_dry_run(dry_run):
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:690:        print_dry_run(
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:761:    dry_run: bool = False,
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:767:    if should_dry_run(dry_run):
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:768:        print_dry_run(
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:815:                            "Canonical artifacts were not modified.\n"
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:851:    dry_run: bool = False,
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:858:    if should_dry_run(dry_run):
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:859:        print_dry_run(
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:936:    dry_run: bool = False,
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:943:    if should_dry_run(dry_run):
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:944:        print_dry_run(
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:1188:    dry_run: bool = False,
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:1192:    if should_dry_run(dry_run):
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:1193:        print_dry_run(
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:1365:    dry_run: bool = False,
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:1371:    if should_dry_run(dry_run):
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:1372:        print_dry_run(
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:1443:    dry_run: bool = False,
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:1447:    if should_dry_run(dry_run):
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:1448:        print_dry_run(
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:1904:            "default_dry_run": config_get("safety.default_dry_run", True),
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:1938:            "default_dry_run": is_default_dry_run(),

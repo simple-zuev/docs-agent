@@ -1,0 +1,94 @@
+==== docs_agent_v2 bounded mutation surface audit ====
+
+==== candidate definitions ====
+47:def ensure_master_index_write_allowed():
+673:def replace_doc_text(
+725:def replace_doc_text_safe(
+1256:def update_master_index_row(
+
+==== output/helper usage ====
+12:from doc_text_mutation import insert_text_at_index, replace_all_text
+24:    is_default_dry_run,
+26:    should_dry_run,
+52:def print_dry_run(payload: dict):
+83:                fields="nextPageToken, files(id,name,mimeType,webViewLink,modifiedTime,createdTime)",
+106:            fields="files(id,name,mimeType,webViewLink,modifiedTime,createdTime)",
+230:    sheets, action, obj, from_, to, reason, impact="Low", status="Done", notes=""
+243:        status,
+258:    return change_id, result.get("updates", {}).get("updatedRange")
+315:    created = (
+331:        document_id=created["id"],
+340:    change_id, updated_range = append_log(
+348:        status="Done",
+349:        notes=f"URL: {created.get('webViewLink')}",
+353:    print(f"Name: {created['name']}")
+354:    print(f"ID: {created['id']}")
+355:    print(f"URL: {created.get('webViewLink')}")
+356:    print(f"Change Log: {change_id} | {updated_range}")
+369:    change_id, updated_range = append_log(
+377:        status="Done",
+382:    print(f"Updated range: {updated_range}")
+389:    dry_run: bool = False,
+394:    if should_dry_run(dry_run):
+395:        print_dry_run(
+441:    change_id, updated_range = append_log(
+449:        status="Done",
+460:    print(f"Change Log: {change_id} | {updated_range}")
+495:    change_id, updated_range = append_log(
+503:        status="Done",
+512:    print(f"Change Log: {change_id} | {updated_range}")
+519:    dry_run: bool = False,
+523:    if should_dry_run(dry_run):
+524:        print_dry_run(
+546:    created = (
+562:        document_id=created["id"],
+572:    change_id, updated_range = append_log(
+580:        status="Done",
+581:        notes=f"URL: {created.get('webViewLink')}",
+586:    print(f"Name: {created['name']}")
+587:    print(f"ID: {created['id']}")
+588:    print(f"URL: {created.get('webViewLink')}")
+589:    print(f"Change Log: {change_id} | {updated_range}")
+703:    change_id, updated_range = append_log(
+711:        status="Done",
+721:    print(f"Change Log: {change_id} | {updated_range}")
+730:    dry_run: bool = False,
+734:    if should_dry_run(dry_run):
+735:        print_dry_run(
+791:    change_id, updated_range = append_log(
+799:        status="Done",
+810:    print(f"Change Log: {change_id} | {updated_range}")
+907:    dry_run: bool = False,
+913:    if should_dry_run(dry_run):
+914:        print_dry_run(
+943:    created = (
+957:    change_id, updated_range = append_log(
+960:        obj=created["name"],
+965:        status="Done",
+966:        notes=f"File ID: {created['id']} | URL: {created.get('webViewLink')}",
+971:    print(f"Uploaded name: {created['name']}")
+972:    print(f"File ID: {created['id']}")
+975:    print(f"Created parents: {created.get('parents', [])}")
+976:    print(f"URL: {created.get('webViewLink')}")
+977:    print(f"Change Log: {change_id} | {updated_range}")
+985:    dry_run: bool = False,
+989:    if should_dry_run(dry_run):
+990:        print_dry_run(
+1022:    updated = (
+1042:    change_id, updated_range = append_log(
+1045:        obj=updated["name"],
+1050:        status="Done",
+1051:        notes=f"File ID: {updated['id']} | URL: {updated.get('webViewLink')} | Cass folder: {target_folder_name}",
+1055:    print(f"File: {updated['name']}")
+1056:    print(f"File ID: {updated['id']}")
+1058:    print(f"New parents (update response): {updated.get('parents', [])}")
+1062:    print(f"URL: {updated.get('webViewLink')}")
+1063:    print(f"Change Log: {change_id} | {updated_range}")
+1251:    print(f"Updated range: {result.get('updates', {}).get('updatedRange')}")
+1252:    print(f"Updated rows: {result.get('updates', {}).get('updatedRows')}")
+1339:    print(f"Updated range: {result.get('updatedRange')}")
+1340:    print(f"Updated cells: {result.get('updatedCells')}")
+1382:@app.command("show-config-status")
+1383:def show_config_status():
+1390:                "default_dry_run": config_get("safety.default_dry_run", True),
+1416:                "default_dry_run": is_default_dry_run(),

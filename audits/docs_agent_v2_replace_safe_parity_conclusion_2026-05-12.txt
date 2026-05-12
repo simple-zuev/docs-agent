@@ -1,0 +1,21 @@
+Parity audit conclusion
+- docs_agent_v2.py contains an existing bounded mutation route: replace_doc_text_safe()
+- docs_agent.py contains the same bounded mutation route and also exposes emit_json(payload)
+- doc_text_mutation.py already provides the shared write helper replace_all_text()
+- this establishes a real narrow future implementation candidate without capability expansion
+
+Selected future implementation candidate
+- docs_agent_v2.py::replace_doc_text_safe()
+
+Implementation shape allowed by this audit
+- output-only normalization or parity alignment
+- optionally mirror existing structured output pattern from docs_agent.py
+- no new command surface
+- no new mutation capability
+- no repo-wide helper extraction
+
+Rejected implementation shapes
+- new commands
+- multi-route migration
+- cross-repo cleanup
+- write-semantics changes

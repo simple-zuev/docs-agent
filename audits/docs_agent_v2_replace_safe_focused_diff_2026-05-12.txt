@@ -1,0 +1,223 @@
+==== docs_agent_v2 replace_safe focused slice ====
+    print(f"New text: {new_text}")
+    print(f"Change Log: {change_id} | {updated_range}")
+
+
+@app.command("replace-doc-text-safe")
+def replace_doc_text_safe(
+    document_id: str,
+    old_text: str,
+    new_text: str,
+    backup_folder: str = "13_Черновики_и_review",
+    dry_run: bool = False,
+    confirm: bool = False,
+):
+    """Backup document, then replace exact text fragment and log operation."""
+    if should_dry_run(dry_run):
+        print_dry_run(
+            {
+                "command": "replace-doc-text-safe",
+                "document_id": document_id,
+                "old_text": old_text,
+                "new_text": new_text,
+                "backup_folder": backup_folder,
+                "write_mode_required": True,
+            }
+        )
+        return
+
+    ensure_write_allowed("replace-doc-text-safe", target=document_id)
+    ensure_confirmed(confirm, "replace-doc-text-safe")
+    s = services()
+    docs = s["docs"]
+    drive = s["drive"]
+    sheets = s["sheets"]
+
+    cass = find_folder(drive, "Cass")
+    target = find_folder(drive, backup_folder, cass["id"])
+
+    meta = (
+        drive.files()
+        .get(
+            fileId=document_id,
+            fields="id,name,mimeType,webViewLink,modifiedTime",
+            supportsAllDrives=True,
+        )
+        .execute()
+    )
+
+    backup_name = f"BACKUP_BEFORE_REPLACE__{meta['name']}__{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+
+    backup = (
+        drive.files()
+        .copy(
+            fileId=document_id,
+            body={
+                "name": backup_name,
+                "parents": [target["id"]],
+            },
+            fields="id,name,webViewLink",
+            supportsAllDrives=True,
+        )
+        .execute()
+    )
+
+    replace_all_text(
+        docs=docs,
+        document_id=document_id,
+        old_text=old_text,
+        new_text=new_text,
+        match_case=True,
+    )
+
+    change_id, updated_range = append_log(
+        sheets=sheets,
+        action="Safe Replace Text",
+        obj=meta["name"],
+        from_=old_text,
+        to=new_text,
+        reason="Точечная замена текста с предварительным backup документа",
+        impact="Medium",
+        status="Done",
+        notes=f"Backup: {backup.get('webViewLink')} | Document: {meta.get('webViewLink')}",
+    )
+
+    print("SAFE REPLACE DOC TEXT OK")
+    print(f"Document: {meta['name']}")
+    print(f"Document ID: {document_id}")
+    print(f"Document URL: {meta.get('webViewLink')}")
+    print(f"Backup: {backup['name']}")
+    print(f"Backup ID: {backup['id']}")
+    print(f"Backup URL: {backup.get('webViewLink')}")
+    print(f"Change Log: {change_id} | {updated_range}")
+
+==== docs_agent replace_safe focused slice ====
+    print(f"New text: {new_text}")
+    print(f"Change Log: {change_id} | {updated_range}")
+
+
+@app.command("replace-doc-text-safe")
+def replace_doc_text_safe(
+    document_id: str,
+    old_text: str,
+    new_text: str,
+    backup_folder: str = "13_Черновики_и_review",
+    dry_run: bool = False,
+    confirm: bool = False,
+):
+    """Backup document, then replace exact text fragment and log operation."""
+    if should_dry_run(dry_run):
+        print_dry_run(
+            {
+                "command": "replace-doc-text-safe",
+                "document_id": document_id,
+                "old_text": old_text,
+                "new_text": new_text,
+                "backup_folder": backup_folder,
+                "write_mode_required": True,
+            }
+        )
+        return
+
+    ensure_write_allowed("replace-doc-text-safe", target=document_id)
+    ensure_confirmed(confirm, "replace-doc-text-safe")
+    s = services()
+    docs = s["docs"]
+    drive = s["drive"]
+    sheets = s["sheets"]
+
+    cass = find_folder(drive, "Cass")
+    target = find_folder(drive, backup_folder, cass["id"])
+
+    meta = (
+        drive.files()
+        .get(
+            fileId=document_id,
+            fields="id,name,mimeType,webViewLink,modifiedTime",
+            supportsAllDrives=True,
+        )
+        .execute()
+    )
+
+    backup_name = f"BACKUP_BEFORE_REPLACE__{meta['name']}__{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+
+    backup = (
+        drive.files()
+        .copy(
+            fileId=document_id,
+            body={
+                "name": backup_name,
+                "parents": [target["id"]],
+            },
+            fields="id,name,webViewLink",
+            supportsAllDrives=True,
+        )
+        .execute()
+    )
+
+    replace_all_text(
+        docs=docs,
+        document_id=document_id,
+        old_text=old_text,
+        new_text=new_text,
+        match_case=True,
+    )
+
+    change_id, updated_range = append_log(
+        sheets=sheets,
+        action="Safe Replace Text",
+        obj=meta["name"],
+        from_=old_text,
+        to=new_text,
+        reason="Точечная замена текста с предварительным backup документа",
+        impact="Medium",
+        status="Done",
+        notes=f"Backup: {backup.get('webViewLink')} | Document: {meta.get('webViewLink')}",
+    )
+
+    print("SAFE REPLACE DOC TEXT OK")
+    print(f"Document: {meta['name']}")
+    print(f"Document ID: {document_id}")
+    print(f"Document URL: {meta.get('webViewLink')}")
+    print(f"Backup: {backup['name']}")
+    print(f"Backup ID: {backup['id']}")
+    print(f"Backup URL: {backup.get('webViewLink')}")
+    print(f"Change Log: {change_id} | {updated_range}")
+
+==== docs_agent emit_json slice ====
+    if isinstance(value, (str, int, float, bool, list, dict)):
+        return value
+    return str(value)
+
+
+def emit_json(payload: dict):
+    print(json.dumps(payload, ensure_ascii=False, indent=2))
+
+
+@app.command("read-sheet-values")
+def read_sheet_values(
+    spreadsheet_id: str,
+    sheet_name: str,
+    json_output: bool = typer.Option(False, "--json-output"),
+):
+    """
+    Read all values from a Google Sheet tab and optionally return JSON.
+    """
+    try:
+        service = get_sheets_service()
+        rng = f"'{sheet_name}'!A:ZZ"
+        result = (
+            service.spreadsheets()
+            .values()
+            .get(
+                spreadsheetId=spreadsheet_id,
+                range=rng,
+            )
+            .execute()
+        )
+        values = result.get("values", []) or []
+
+        payload = {
+            "ok": True,
+            "command": "read-sheet-values",
+            "spreadsheet_id": spreadsheet_id,

@@ -1,0 +1,17 @@
+Audit conclusion
+- next bounded mutation candidate outside agent_cli.py is in docs_agent_v2.py
+- preferred candidate function: replace_doc_text_safe()
+- supporting real helper file: doc_text_mutation.py
+- output-pattern reference file: docs_agent.py via existing emit_json(payload)
+- runtime_config.py is configuration/dry-run support only, not a bounded mutation candidate
+- safest next step remains audit-only parity review before any implementation
+
+Why this candidate
+- existing bounded document mutation path already present
+- no new command surface required
+- local narrow diff likely possible
+- future implementation can stay output-only or helper-call normalization only
+
+Rejected candidates
+- docs_agent_output.py: not present
+- agent_cli.py: already exhausted for safe next bounded write candidate in current iteration
