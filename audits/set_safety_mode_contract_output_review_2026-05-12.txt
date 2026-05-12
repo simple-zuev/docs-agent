@@ -1,0 +1,22 @@
+Scope
+- audit-only review of safety/runtime-control command surface around set_safety_mode
+- bounded adjacency reviewed: set_safety_mode, show_safety_mode, show_config_status
+- no production code changes
+
+Review goals
+- verify current command contract
+- verify exact output and exit-code behavior
+- compare setter vs adjacent read-only surfaces
+- determine whether a narrow mutation candidate is justified
+
+Checklist
+- command naming consistency
+- argument contract clarity
+- stdout/stderr placement consistency
+- exit-code consistency
+- json / non-json behavior consistency if applicable
+- adjacency drift between write/read safety surfaces
+- evidence for or against a safe narrow mutation
+
+Preliminary conclusion
+- fill after reviewing artifacts
