@@ -2614,6 +2614,15 @@ def main() -> int:
             return cmd_assemble_context(args[1], json_output=json_output)
 
         if cmd == "doc-body-only":
+            if argv in (["--help"], ["-h"]):
+                print(
+                    "Usage:\n"
+                    "  python agent_cli.py doc-body-only [--json] --profile <profile> --document-type <type> --title <title>\n\n"
+                    "Examples:\n"
+                    '  python agent_cli.py doc-body-only --profile director --document-type memo --title "Test title"\n'
+                    '  python agent_cli.py doc-body-only --json --profile director --document-type memo --title "Test title"'
+                )
+                return EXIT_OK
             json_output, args = parse_json_flag(argv)
             if len(args) != 6:
                 print_usage_error(
@@ -2637,6 +2646,15 @@ def main() -> int:
             )
 
         if cmd == "artifact-state":
+            if argv in (["--help"], ["-h"]):
+                print(
+                    "Usage:\n"
+                    "  python agent_cli.py artifact-state [--json] --file-id <google_drive_file_id>\n\n"
+                    "Examples:\n"
+                    "  python agent_cli.py artifact-state --file-id 1hyWNNzsIHRLGJ65urOQUA0x_kOqCP61OkXcM3MMyedw\n"
+                    "  python agent_cli.py artifact-state --json --file-id 1hyWNNzsIHRLGJ65urOQUA0x_kOqCP61OkXcM3MMyedw"
+                )
+                return EXIT_OK
             json_output, args = parse_json_flag(argv)
             if len(args) != 2 or args[0] != "--file-id":
                 print_usage_error(
