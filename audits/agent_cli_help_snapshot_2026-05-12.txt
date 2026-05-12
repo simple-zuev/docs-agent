@@ -1,0 +1,36 @@
+ok: False
+command: usage
+error_type: UsageError
+error_message: Unknown command: --help
+
+Usage:
+  python agent_cli.py status [--json]
+  python agent_cli.py repo-state [--json]    | rs [--json]
+  python agent_cli.py doctor [--json]        | diagnose [--json]
+  python agent_cli.py assemble-context [--json] --profile <profile>
+  python agent_cli.py doc-body-only [--json] --profile <profile> --document-type <type> --title <title>
+  python agent_cli.py artifact-state [--json] --file-id <google_drive_file_id>
+  python agent_cli.py find-doc-id <DOC-XXXX>
+  python agent_cli.py find-doc-name <document name>
+  python agent_cli.py find-link <drive_id_or_url_fragment>
+  python agent_cli.py find-doc-any [--json] <query>        | f [--json] <query>
+  python agent_cli.py open-doc-from-query [--json] <query> | o [--json] <query>
+  python agent_cli.py read-doc-from-query [--json] <query> | r [--json] <query>
+  python agent_cli.py get-file <google_drive_file_id>
+  python agent_cli.py read-doc <google_doc_id>
+  python agent_cli.py ask [--json] <free text query>       | q [--json] <query>
+
+Examples:
+  python agent_cli.py status
+  python agent_cli.py status --json
+  python agent_cli.py repo-state
+  python agent_cli.py repo-state --json
+  python agent_cli.py f DOC-0001
+  python agent_cli.py o DOC-0002
+  python agent_cli.py r DOC-0002
+  python agent_cli.py r "00_PROJECT_AI_OPERATING_PROMPT_АСТЦВ"
+  python agent_cli.py q "прочитай DOC-0002"
+  python agent_cli.py q --json "прочитай 00_PROJECT_AI_OPERATING_PROMPT_АСТЦВ"
+  python agent_cli.py doctor
+  python agent_cli.py doctor --json
+

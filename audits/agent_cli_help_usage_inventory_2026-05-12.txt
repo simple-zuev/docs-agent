@@ -1,0 +1,57 @@
+agent_cli.py help/usage inventory
+file: /Users/zuevvladimir/AI/docs-agent/agent_cli.py
+
+[usage_lines] count=41
+[help_literals] count=3
+[commands_literal_sets] count=17
+[sys_argv_mentions] count=3
+[print_calls] count=107
+[exit_calls] count=0
+
+candidate lines containing help/usage/error surface
+36: EXIT_USAGE_ERROR = 1
+1470: def print_usage_error(message: str) -> None:
+1472:     print("command: usage")
+1473:     print("error_type: UsageError")
+1476:     usage()
+1877:     registry_and_sheet_helpers = [
+1879:         "read-sheet-header",
+1938:             "registry_and_sheet_helpers": registry_and_sheet_helpers,
+1952:             error_type="UnsupportedProfile",
+1953:             error_message=f"Unsupported context profile: {profile}",
+2500:         print_usage_error("Missing query argument.")
+2501:         return EXIT_USAGE_ERROR
+2515:         usage()
+2522: def usage() -> None:
+2524:         "Usage:\n"
+2557:         usage()
+2567:         print_usage_error("Missing command.")
+2568:         return EXIT_USAGE_ERROR
+2577:                 print_usage_error("status does not accept positional arguments.")
+2578:                 return EXIT_USAGE_ERROR
+2584:                 print_usage_error("repo-state does not accept positional arguments.")
+2585:                 return EXIT_USAGE_ERROR
+2591:                 print_usage_error("doctor-lite does not accept positional arguments.")
+2592:                 return EXIT_USAGE_ERROR
+2598:                 print_usage_error("capabilities does not accept positional arguments.")
+2599:                 return EXIT_USAGE_ERROR
+2605:                 print_usage_error("doctor does not accept positional arguments.")
+2606:                 return EXIT_USAGE_ERROR
+2612:                 print_usage_error("assemble-context requires: --profile <profile>")
+2613:                 return EXIT_USAGE_ERROR
+2619:                 print_usage_error(
+2622:                 return EXIT_USAGE_ERROR
+2628:                 print_usage_error(
+2631:                 return EXIT_USAGE_ERROR
+2642:                 print_usage_error(
+2645:                 return EXIT_USAGE_ERROR
+2651:                 print_usage_error("doctor does not accept positional arguments.")
+2652:                 return EXIT_USAGE_ERROR
+2657:                 print_usage_error("Missing DOC-XXXX argument.")
+2658:                 return EXIT_USAGE_ERROR
+2683:                 print_usage_error("Missing google_drive_file_id argument.")
+2684:                 return EXIT_USAGE_ERROR
+2690:                 print_usage_error("Missing google_doc_id argument.")
+2691:                 return EXIT_USAGE_ERROR
+2698:         print_usage_error(f"Unknown command: {cmd}")
+2699:         return EXIT_USAGE_ERROR

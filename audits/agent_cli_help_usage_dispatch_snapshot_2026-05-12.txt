@@ -1,0 +1,21 @@
+explicit dispatch alias snapshot
+file: /Users/zuevvladimir/AI/docs-agent/agent_cli.py
+
+472:     if error_type in {"NotFound", "LinkParseError"}:
+636:     elif str(sample.get("error_type") or "") in {"NotFound", "LinkParseError"}:
+1415:     if error_type in {"NotFound", "LinkParseError"}:
+1418:     if error_type in {"EmptyOutput", "JSONDecodeError", "TimeoutExpired"}:
+1727:     if routed in {"find-doc-any", "get-file"}:
+2015:             if item in {"status", "capabilities"}:
+2581:         if cmd in {"repo-state", "rs"}:
+2588:         if cmd in {"doctor-lite", "diagnose-lite"}:
+2602:         if cmd in {"doctor", "diagnose"}:
+2648:         if cmd in {"doctor", "diagnose"}:
+2668:         if cmd in {"find-doc-any", "f"}:
+2671:         if cmd in {"open-doc-from-query", "o"}:
+2676:         if cmd in {"read-doc-from-query", "r"}:
+2695:         if cmd in {"ask", "q"}:
+
+candidate help/usage function defs
+1470: def print_usage_error(message: str) -> None:
+2522: def usage() -> None:

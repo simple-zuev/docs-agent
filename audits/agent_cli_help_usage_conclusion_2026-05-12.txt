@@ -1,0 +1,28 @@
+agent_cli help / usage consistency audit conclusion
+
+Scope
+- audit-only
+- target file: agent_cli.py
+- artifact-first
+- no mutation in this iteration
+
+Required decision rule
+- mutate only if artifacts prove one narrow, isolated, reviewable inconsistency
+- otherwise stop and preserve code state unchanged
+
+Stop conditions
+- if help/usage surface is partially delegated and not fully attributable from current artifacts
+- if resolving inconsistency would require command-surface redesign
+- if any candidate fix would touch multiple unrelated branches
+- if issue is documentation-style rather than executable inconsistency
+
+Deliverables
+- help snapshot
+- help/usage inventory
+- dispatch snapshot
+- review note
+
+Next-step gate
+- only after reviewing artifacts, decide whether:
+  1) no-op closeout is justified, or
+  2) a single narrow cleanup candidate exists

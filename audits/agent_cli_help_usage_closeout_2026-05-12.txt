@@ -1,0 +1,16 @@
+agent_cli help / usage audit closeout
+
+Result
+- audit-only iteration completed without code mutation
+
+Confirmed observations
+- usage/help surface exists and is printed through usage()
+- invoking agent_cli.py --help currently routes to usage error path:
+  Unknown command: --help
+- invoking explicit help is therefore not supported as a first-class entrypoint
+- this is a narrow executable inconsistency candidate for a future clean refactor
+- duplicate doctor/diagnose dispatch observed in this branch snapshot is baseline-derived from main and is not part of this audit scope because PR #24 is not merged into main yet
+
+Decision
+- stop before mutation in this iteration
+- next safe iteration may target only explicit --help / -h handling

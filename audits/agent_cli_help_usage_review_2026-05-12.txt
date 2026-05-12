@@ -1,0 +1,67 @@
+agent_cli help / usage consistency review
+file: /Users/zuevvladimir/AI/docs-agent/agent_cli.py
+
+1. explicit alias sets found in dispatch
+- line 2581: ('repo-state', 'rs')
+- line 2588: ('diagnose-lite', 'doctor-lite')
+- line 2602: ('diagnose', 'doctor')
+- line 2648: ('diagnose', 'doctor')
+- line 2668: ('f', 'find-doc-any')
+- line 2671: ('o', 'open-doc-from-query')
+- line 2676: ('r', 'read-doc-from-query')
+- line 2695: ('ask', 'q')
+
+2. help/usage/error-guidance lines
+- line 36: EXIT_USAGE_ERROR = 1
+- line 1470: def print_usage_error(message: str) -> None:
+- line 1472:     print("command: usage")
+- line 1473:     print("error_type: UsageError")
+- line 1476:     usage()
+- line 2500:         print_usage_error("Missing query argument.")
+- line 2501:         return EXIT_USAGE_ERROR
+- line 2515:         usage()
+- line 2522: def usage() -> None:
+- line 2524:         "Usage:\n"
+- line 2557:         usage()
+- line 2567:         print_usage_error("Missing command.")
+- line 2568:         return EXIT_USAGE_ERROR
+- line 2577:                 print_usage_error("status does not accept positional arguments.")
+- line 2578:                 return EXIT_USAGE_ERROR
+- line 2584:                 print_usage_error("repo-state does not accept positional arguments.")
+- line 2585:                 return EXIT_USAGE_ERROR
+- line 2591:                 print_usage_error("doctor-lite does not accept positional arguments.")
+- line 2592:                 return EXIT_USAGE_ERROR
+- line 2598:                 print_usage_error("capabilities does not accept positional arguments.")
+- line 2599:                 return EXIT_USAGE_ERROR
+- line 2605:                 print_usage_error("doctor does not accept positional arguments.")
+- line 2606:                 return EXIT_USAGE_ERROR
+- line 2612:                 print_usage_error("assemble-context requires: --profile <profile>")
+- line 2613:                 return EXIT_USAGE_ERROR
+- line 2619:                 print_usage_error(
+- line 2622:                 return EXIT_USAGE_ERROR
+- line 2628:                 print_usage_error(
+- line 2631:                 return EXIT_USAGE_ERROR
+- line 2642:                 print_usage_error(
+- line 2645:                 return EXIT_USAGE_ERROR
+- line 2651:                 print_usage_error("doctor does not accept positional arguments.")
+- line 2652:                 return EXIT_USAGE_ERROR
+- line 2657:                 print_usage_error("Missing DOC-XXXX argument.")
+- line 2658:                 return EXIT_USAGE_ERROR
+- line 2683:                 print_usage_error("Missing google_drive_file_id argument.")
+- line 2684:                 return EXIT_USAGE_ERROR
+- line 2690:                 print_usage_error("Missing google_doc_id argument.")
+- line 2691:                 return EXIT_USAGE_ERROR
+- line 2698:         print_usage_error(f"Unknown command: {cmd}")
+- line 2699:         return EXIT_USAGE_ERROR
+
+3. preliminary findings
+- Detected 41 help/usage/error-guidance candidate lines for manual review.
+- Explicit dispatch alias count: 14
+- Alias inventory: ['ask', 'diagnose', 'diagnose-lite', 'doctor', 'doctor-lite', 'f', 'find-doc-any', 'o', 'open-doc-from-query', 'q', 'r', 'read-doc-from-query', 'repo-state', 'rs']
+
+4. manual review checklist
+- Check whether every user-facing command shown by --help has a reachable explicit branch.
+- Check whether every reachable explicit branch is documented in --help or delegated help.
+- Check whether aliases are described consistently: canonical name vs shorthand vs synonym.
+- Check whether invalid-command path points users to the same usage/help contract.
+- Stop before mutation unless a single narrow contradiction is proven from artifacts.
