@@ -1,0 +1,35 @@
+Next bounded candidate inventory after set_safety_mode audit
+
+Context
+- PR #56 selected set_safety_mode as a bounded candidate
+- PR #57 added audit-only groundwork for set_safety_mode
+- PR #58 verified current contract/output adjacency attempt
+- PR #58 finding: set_safety_mode / show_safety_mode / show_config_status are absent from current agent_cli.py baseline as callable command surface
+
+Implication
+- no safe mutation is justified on the absent set_safety_mode line
+- next candidate must be selected only from commands present in current usage/help surface
+
+Live command catalog from current usage
+- status
+- repo-state / rs
+- doctor / diagnose
+- assemble-context
+- doc-body-only
+- artifact-state
+- find-doc-id
+- find-doc-name
+- find-link
+- find-doc-any / f
+- open-doc-from-query / o
+- read-doc-from-query / r
+- get-file
+- read-doc
+- ask / q
+
+Selection criteria
+- bounded
+- reviewable
+- preferably read-only
+- avoid orchestration-heavy surfaces
+- avoid already exhausted lines

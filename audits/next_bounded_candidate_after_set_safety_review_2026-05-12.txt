@@ -1,0 +1,34 @@
+Review purpose
+- select the next safe bounded candidate after the set_safety_mode line was found absent from the current baseline
+
+Selection constraints
+- no repo-wide cleanup
+- no unrelated refactors
+- small and reviewable next step
+- candidate must exist in current command surface
+- prefer read-only and locally understandable behavior
+
+Assessment
+- exclude absent commands/surfaces from mutation consideration
+- exclude already exhausted lines from repeated review
+- prioritize small lookup-style commands over orchestration-heavy flows
+
+Recommended next candidate
+- find-link
+
+Rationale
+- appears to be a narrow lookup-style surface
+- likely smaller than query/orchestration commands
+- likely easier to validate for contract/output parity
+- remains reviewable without expanding into broader docs-agent runtime concerns
+
+Alternative candidates
+- find-doc-name
+- find-doc-id
+
+Not recommended yet
+- ask
+- assemble-context
+- doc-body-only
+- read-doc-from-query
+- open-doc-from-query
