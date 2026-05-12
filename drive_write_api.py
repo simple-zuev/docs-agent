@@ -221,6 +221,94 @@ def create_doc_in_folder_writeonly(
         )
 
 
+def move_file_with_log_writeonly(
+    *,
+    file_id: str,
+    target_folder_name: str,
+    reason: str,
+) -> dict[str, Any]:
+    services_payload = get_write_services()
+    if not services_payload.get("ok"):
+        return services_payload
+
+    try:
+        drive = services_payload["services"]["drive"]
+
+        if not reason.strip():
+            raise ValueError("Reason must not be empty")
+
+        cass = docs_agent.find_folder(drive, "Cass")
+        target = docs_agent.find_folder(drive, target_folder_name, cass["id"])
+
+        meta_before = docs_agent.get_file_meta(drive, file_id)
+        old_parents = meta_before.get("parents", [])
+        remove_parents = ",".join(old_parents) if old_parents else None
+
+        updated = (
+            drive.files()
+            .update(
+                fileId=file_id,
+                addParents=target["id"],
+                removeParents=remove_parents,
+                fields="id,name,mimeType,webViewLink,parents",
+                supportsAllDrives=True,
+            )
+            .execute()
+        )
+
+        meta_after = docs_agent.get_file_meta(drive, file_id)
+        parents_after = meta_after.get("parents", [])
+
+        if target["id"] not in parents_after:
+            raise RuntimeError(
+                f"Move verification failed: target folder {target['id']} not found in parents {parents_after}"
+            )
+
+        log_payload = append_change_log_entry(
+            action="Move File",
+            obj=updated["name"],
+            from_=",".join(old_parents) if old_parents else "",
+            to=target["id"],
+            reason=reason,
+            impact="Medium",
+            status="Done",
+            notes=f"File ID: {updated['id']} | URL: {updated.get('webViewLink')} | Cass folder: {target_folder_name}",
+        )
+        if not log_payload.get("ok"):
+            return log_payload
+
+        return _ok(
+            "move-file-with-log-writeonly",
+            file_id=file_id,
+            target_folder_name=target_folder_name,
+            reason=reason,
+            target=target,
+            meta_before=meta_before,
+            updated=updated,
+            meta_after=meta_after,
+            old_parents=old_parents,
+            parents_after=parents_after,
+            change_log=log_payload,
+        )
+    except Exception as exc:
+        error_type, retryable, auth_related, network_related = (
+            docs_agent.classify_error(exc)
+        )
+        return _error(
+            "move-file-with-log-writeonly",
+            error_type,
+            str(exc),
+            retryable=retryable,
+            auth_related=auth_related,
+            network_related=network_related,
+            details={
+                "file_id": file_id,
+                "target_folder_name": target_folder_name,
+                "reason": reason,
+            },
+        )
+
+
 def append_change_log_entry(
     *,
     action: str,
