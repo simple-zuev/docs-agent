@@ -1,0 +1,111 @@
+        )
+        return _error(
+            "create-staging-copy-writeonly",
+            error_type,
+            str(exc),
+            retryable=retryable,
+            auth_related=auth_related,
+            network_related=network_related,
+            details={
+                "file_id": file_id,
+                "target_folder": target_folder,
+            },
+        )
+
+
+def create_doc_in_folder_writeonly(
+    *,
+    target_folder: str,
+    title_prefix: str = "ASTCV_DOCS_AGENT_OFFICE_TEST",
+) -> dict[str, Any]:
+    services_payload = get_write_services()
+    if not services_payload.get("ok"):
+        return services_payload
+
+    try:
+        drive = services_payload["services"]["drive"]
+        docs = services_payload["services"]["docs"]
+
+        cass = docs_agent.find_folder(drive, "Cass")
+        target = docs_agent.find_folder(drive, target_folder, cass["id"])
+        title = f"{title_prefix}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+
+        created = (
+            drive.files()
+            .create(
+                body={
+                    "name": title,
+                    "mimeType": "application/vnd.google-apps.document",
+                    "parents": [target["id"]],
+                },
+                fields="id,name,webViewLink,parents",
+                supportsAllDrives=True,
+            )
+            .execute()
+        )
+
+        docs.documents().batchUpdate(
+            documentId=created["id"],
+            body={
+                "requests": [
+                    {
+                        "insertText": {
+                            "location": {"index": 1},
+                            "text": (
+                                "Тестовый документ ASTCV Docs Agent.\n"
+                                f"Папка: Cass / {target_folder}.\n"
+                                "Назначение: проверка создания файлов в выбранной папке Cass.\n"
+                                "Canonical-документы не изменялись.\n"
+                            ),
+                        }
+                    }
+                ]
+            },
+        ).execute()
+
+        log_payload = append_change_log_entry(
+            action="Create",
+            obj=title,
+            from_="Local docs-agent",
+            to=f"Cass / {target_folder}",
+            reason="Проверка создания документа в выбранной папке Cass через controlled write helper",
+            impact="Low",
+            status="Done",
+            notes=f"URL: {created.get('webViewLink')}",
+        )
+        if not log_payload.get("ok"):
+            return log_payload
+
+        return _ok(
+            "create-doc-in-folder-writeonly",
+            target_folder=target_folder,
+            title_prefix=title_prefix,
+            created=created,
+            title=title,
+            change_log=log_payload,
+        )
+    except Exception as exc:
+        error_type, retryable, auth_related, network_related = (
+            docs_agent.classify_error(exc)
+        )
+        return _error(
+            "create-doc-in-folder-writeonly",
+            error_type,
+            str(exc),
+            retryable=retryable,
+            auth_related=auth_related,
+            network_related=network_related,
+            details={
+                "target_folder": target_folder,
+                "title_prefix": title_prefix,
+            },
+        )
+
+
+def move_file_with_log_writeonly(
+    *,
+    file_id: str,
+    target_folder_name: str,
+    reason: str,
+) -> dict[str, Any]:
+    services_payload = get_write_services()

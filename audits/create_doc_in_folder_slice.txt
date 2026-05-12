@@ -1,0 +1,111 @@
+        reason="Тестовая правка staging-документа через Google Docs API",
+        impact="Low",
+        status="Done",
+        notes=f"Document ID: {document_id}",
+    )
+
+    print("PATCH DOC OK")
+    print(f"Document: {meta['name']}")
+    print(f"ID: {document_id}")
+    print(f"URL: {meta.get('webViewLink')}")
+    print(f"Inserted chars: {len(text_to_insert)}")
+    print(f"Change Log: {change_id} | {updated_range}")
+
+
+@app.command("create-doc-in-folder")
+def create_doc_in_folder(
+    target_folder: str,
+    title_prefix: str = "ASTCV_DOCS_AGENT_OFFICE_TEST",
+    dry_run: bool = False,
+    confirm: bool = False,
+):
+    """Create Google Doc in selected top-level Cass folder and log it."""
+    if should_dry_run(dry_run):
+        print_dry_run(
+            {
+                "command": "create-doc-in-folder",
+                "target_folder": target_folder,
+                "title_prefix": title_prefix,
+                "write_mode_required": True,
+            }
+        )
+        return
+
+    ensure_write_allowed("create-doc-in-folder", target=target_folder)
+    ensure_confirmed(confirm, "create-doc-in-folder")
+    s = services()
+    drive = s["drive"]
+    docs = s["docs"]
+    sheets = s["sheets"]
+
+    cass = find_folder(drive, "Cass")
+    target = find_folder(drive, target_folder, cass["id"])
+
+    title = f"{title_prefix}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+
+    created = (
+        drive.files()
+        .create(
+            body={
+                "name": title,
+                "mimeType": "application/vnd.google-apps.document",
+                "parents": [target["id"]],
+            },
+            fields="id,name,webViewLink,parents",
+            supportsAllDrives=True,
+        )
+        .execute()
+    )
+
+    docs.documents().batchUpdate(
+        documentId=created["id"],
+        body={
+            "requests": [
+                {
+                    "insertText": {
+                        "location": {"index": 1},
+                        "text": (
+                            "Тестовый документ ASTCV Docs Agent.\n"
+                            f"Папка: Cass / {target_folder}.\n"
+                            "Назначение: проверка создания файлов в выбранной папке Cass.\n"
+                            "Canonical-документы не изменялись.\n"
+                        ),
+                    }
+                }
+            ]
+        },
+    ).execute()
+
+    change_id, updated_range = append_log(
+        sheets=sheets,
+        action="Create",
+        obj=title,
+        from_="Local docs-agent",
+        to=f"Cass / {target_folder}",
+        reason="Проверка создания документа в выбранной папке Cass через CLI docs_agent.py",
+        impact="Low",
+        status="Done",
+        notes=f"URL: {created.get('webViewLink')}",
+    )
+
+    print("CREATE DOC IN FOLDER OK")
+    print(f"Folder: Cass / {target_folder}")
+    print(f"Name: {created['name']}")
+    print(f"ID: {created['id']}")
+    print(f"URL: {created.get('webViewLink')}")
+    print(f"Change Log: {change_id} | {updated_range}")
+
+
+@app.command("list-folder")
+def list_folder_cmd(
+    folder_name: str,
+):
+    """List items in selected top-level Cass folder."""
+    s = services()
+    drive = s["drive"]
+
+    cass = find_folder(drive, "Cass")
+    target = find_folder(drive, folder_name, cass["id"])
+    items = list_children(drive, target["id"])
+
+    print("LIST FOLDER OK")

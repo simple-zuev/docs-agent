@@ -775,6 +775,95 @@ def create_doc_in_folder(
     print(f"Change Log: {change_id} | {updated_range}")
 
 
+@app.command("create-draft-doc")
+def create_draft_doc(
+    title: str,
+    dry_run: bool = False,
+    confirm: bool = False,
+):
+    """Create a new draft Google Doc in Cass / 13_Черновики_и_review and log it."""
+    target_folder = "13_Черновики_и_review"
+
+    if should_dry_run(dry_run):
+        print_dry_run(
+            {
+                "command": "create-draft-doc",
+                "target_folder": target_folder,
+                "title": title,
+                "write_mode_required": True,
+            }
+        )
+        return
+
+    ensure_write_allowed("create-draft-doc", target=target_folder)
+    ensure_confirmed(confirm, "create-draft-doc")
+    s = services()
+    drive = s["drive"]
+    docs = s["docs"]
+    sheets = s["sheets"]
+
+    cass = find_folder(drive, "Cass")
+    target = find_folder(drive, target_folder, cass["id"])
+
+    created = (
+        drive.files()
+        .create(
+            body={
+                "name": title,
+                "mimeType": "application/vnd.google-apps.document",
+                "parents": [target["id"]],
+            },
+            fields="id,name,webViewLink,parents",
+            supportsAllDrives=True,
+        )
+        .execute()
+    )
+
+    docs.documents().batchUpdate(
+        documentId=created["id"],
+        body={
+            "requests": [
+                {
+                    "insertText": {
+                        "location": {"index": 1},
+                        "text": (
+                            "DRAFT DOCUMENT\n"
+                            f"Title: {title}\n"
+                            "Scope: Cass / 13_Черновики_и_review\n"
+                            "Status: Draft\n"
+                            "Purpose: bounded review-scoped draft creation via docs-agent\n"
+                            "Canonical artifacts were not modified.\n"
+                        ),
+                    }
+                }
+            ]
+        },
+    ).execute()
+
+    change_id, updated_range = append_log(
+        sheets=sheets,
+        action="Create Draft",
+        obj=title,
+        from_="Local docs-agent",
+        to="Cass / 13_Черновики_и_review",
+        reason="Создание review-scoped draft document через CLI docs_agent.py",
+        impact="Low",
+        status="Done",
+        notes=f"URL: {created.get('webViewLink')}",
+    )
+
+    print("CREATE DRAFT DOC OK")
+    print(f"Folder: Cass / {target_folder}")
+    print(f"Title: {created['name']}")
+    print(f"ID: {created['id']}")
+    print(f"URL: {created.get('webViewLink')}")
+    print("Artifact state: Draft")
+    print(
+        "Next safe step: Prepare or place reviewed body content into this draft through bounded workflow."
+    )
+    print(f"Change Log: {change_id} | {updated_range}")
+
+
 @app.command("list-folder")
 def list_folder_cmd(
     folder_name: str,
