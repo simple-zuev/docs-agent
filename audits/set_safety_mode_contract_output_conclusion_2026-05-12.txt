@@ -1,7 +1,20 @@
 Conclusion
-- pending artifact review
+- fill with final conclusion after artifact review
 
-Decision options
-1. bounded mutation candidate confirmed
-2. audit confirms current line is already aligned enough and no safe mutation is justified
-3. more audit needed, but only inside immediate safety-status adjacency
+Recommended disposition
+- choose exactly one:
+  1. bounded mutation candidate confirmed for a narrow contract/output alignment change
+  2. current safety/runtime-control line is sufficiently aligned; no safe mutation justified
+  3. one more audit-only pass is warranted, limited strictly to immediate safety-status adjacency
+
+Rationale
+- summarize the specific evidence from:
+  - command contract snapshot
+  - help output
+  - direct invocation / exit behavior
+
+Guardrails for any next step
+- keep scope bounded to set_safety_mode and immediate adjacent read-only safety/status commands
+- avoid repo-wide cleanup
+- avoid unrelated refactors
+- if mutation is proposed, keep it reviewable and behaviorally narrow
