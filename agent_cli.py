@@ -2653,6 +2653,14 @@ def main() -> int:
             return cmd_doctor(json_output=json_output)
 
         if cmd == "find-doc-id":
+            if argv in (["--help"], ["-h"]):
+                print(
+                    "Usage:\n"
+                    "  python agent_cli.py find-doc-id <DOC-XXXX>\n\n"
+                    "Examples:\n"
+                    "  python agent_cli.py find-doc-id DOC-0001"
+                )
+                return EXIT_OK
             if len(argv) < 1:
                 print_usage_error("Missing DOC-XXXX argument.")
                 return EXIT_USAGE_ERROR
@@ -2660,9 +2668,25 @@ def main() -> int:
             return EXIT_OK
 
         if cmd == "find-doc-name":
+            if argv in (["--help"], ["-h"]):
+                print(
+                    "Usage:\n"
+                    "  python agent_cli.py find-doc-name <document name>\n\n"
+                    "Examples:\n"
+                    '  python agent_cli.py find-doc-name "00_MASTER_INDEX_АСТЦВ_v3"'
+                )
+                return EXIT_OK
             return handle_query_command(argv, cmd_find_doc_name)
 
         if cmd == "find-link":
+            if argv in (["--help"], ["-h"]):
+                print(
+                    "Usage:\n"
+                    "  python agent_cli.py find-link <drive_id_or_url_fragment>\n\n"
+                    "Examples:\n"
+                    "  python agent_cli.py find-link 1hyWNNzsIHRLGJ65urOQUA0x_kOqCP61OkXcM3MMyedw"
+                )
+                return EXIT_OK
             return handle_query_command(argv, cmd_find_link)
 
         if cmd in {"find-doc-any", "f"}:
