@@ -8,6 +8,12 @@
 
 cd ~/AI/docs-agent
 source venv312/bin/activate
+
+Важно:
+- основной операторский интерфейс репозитория — `python agent_cli.py ...`
+- внутренние скрипты `docs_agent.py` и `docs_agent_v2.py` не являются основным пользовательским entrypoint
+- для штатной работы используйте project venv / project interpreter, а не system `python3`
+
 bash scripts/operator_start.sh
 
 Ожидаемый результат:
