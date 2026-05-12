@@ -33,16 +33,13 @@ find
 
 open
 - python agent_cli.py o "DOC-0002"
-- python agent_cli.py open-doc-from-query "DOC-0002"
 
 read
 - python agent_cli.py r "DOC-0002"
-- python agent_cli.py read-doc-from-query "DOC-0002"
 - python agent_cli.py r "00_PROJECT_AI_OPERATING_PROMPT_АСТЦВ"
 
 ask
 - python agent_cli.py q "прочитай DOC-0002"
-- python agent_cli.py ask "прочитай DOC-0002"
 
 ## Exit codes
 

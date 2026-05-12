@@ -1,0 +1,238 @@
+==== agent_cli.py command surface scan ====
+108:def _build_find_doc_any_success_from_cache(query, row, row_number, header):
+116:    q = normalize_cell(query)
+130:        "command": "find-doc-any",
+131:        "query": q,
+167:def _build_find_doc_any_not_found_from_cache(query):
+170:        "command": "find-doc-any",
+171:        "query": normalize_cell(query),
+178:        "next_step": "Проверь точное Document ID, точное имя документа или сначала выполни find-doc-any.",
+318:def find_doc_any_payload_from_cache(query):
+326:    q = normalize_cell(query)
+397:def build_doctor_summary(
+398:    *, env_ok: bool, status_ok: bool, master_index_ok: bool, smoke_ok: bool
+400:    if env_ok and status_ok and master_index_ok and smoke_ok:
+401:        return "CLI выглядит работоспособным: окружение, status, доступ к MASTER_INDEX и smoke-проверка прошли успешно."
+405:    if not status_ok:
+406:        failed.append("status")
+427:            "Подожди 60-90 секунд, сократи quota-sensitive запросы и повтори doctor/smoke.",
+476:            "Проверь точный query/Document ID/ссылку и сначала выполни find-doc-any.",
+488:            "Проверь debug-вывод, timeout, stdout/stderr и отдельно запусти status/doctor --json.",
+494:        "Проверь debug-вывод и повтори диагностику через doctor --json.",
+498:def build_doctor_next_step(
+499:    *, env_ok: bool, status_ok: bool, master_index_ok: bool, smoke_ok: bool
+503:    if not status_ok:
+504:        return "Сначала выполни python agent_cli.py status --json и проверь блоки safety/config."
+514:def doctor_payload() -> dict:
+528:    status = cmd_status_payload()
+534:        "status": status,
+544:            "command": "doctor",
+546:            "summary": "CLI выглядит работоспособным: окружение, status, доступ к MASTER_INDEX и smoke-проверка прошли успешно.",
+562:        or "Проверь debug-вывод и отдельно запусти doctor --json."
+565:    error_message = str(sample.get("error_message") or "doctor check failed")
+569:        "command": "doctor",
+584:def doctor_lite_payload() -> dict:
+598:    status = cmd_status_payload()
+603:        "status": status,
+612:            "command": "doctor-lite",
+614:            "summary": "CLI выглядит работоспособным для рутинного старта: окружение, status и доступ к MASTER_INDEX проверены.",
+615:            "next_step": "Можно начинать штатную работу. Для углубленной проверки при необходимости запусти doctor.",
+624:    recommended_action = "Проверь debug-вывод и отдельно запусти doctor --json."
+635:        recommended_action = "Подожди 60-90 секунд и повтори doctor-lite/doctor."
+643:        "command": "doctor-lite",
+646:        "next_step": "Запусти doctor --json для расширенной диагностики.",
+651:        "error_message": str(sample.get("error_message") or "doctor-lite check failed"),
+699:    blob = f"{stdout}\n{stderr}".lower()
+720:            recommended_action = "Подожди 60-90 секунд и повтори doctor/smoke."
+764:    print("route: find-doc-any")
+765:    print(f"query: {payload.get('query')}")
+775:    print("route: open-doc-from-query")
+776:    print(f"query: {payload.get('query')}")
+787:    print("route: read-doc-from-query")
+788:    print(f"query: {payload.get('query')}")
+807:def print_compact_status(payload: dict):
+809:    print("route: status")
+843:    entries = payload.get("diff_name_status_entries") or []
+845:        print("diff_name_status_entries:")
+852:def print_compact_doctor_lite(payload: dict):
+854:    print("route: doctor-lite")
+858:    print(f"status_ok: {(payload.get('checks') or {}).get('status', {}).get('ok')}")
+872:def print_compact_doctor(payload: dict):
+874:    print("route: doctor")
+878:    status_check = checks.get("status") or {}
+883:    print(f"status_ok: {status_check.get('ok')}")
+1068:    query = payload.get("query")
+1077:    if query is not None:
+1078:        lines.append(f"query: {query}")
+1090:        next_step = "Проверь точное Document ID, точное имя документа или сначала выполни find-doc-any."
+1121:        next_step = "Проверь _debug, stderr и повтори сценарий через status / smoke / точечный вызов команды."
+1183:def normalize_query_for_lookup(query: str) -> str:
+1184:    q = query.strip()
+1213:def cmd_status_payload() -> dict:
+1215:    config = run_docs_agent_with_retry(["show-config-status"])
+1218:        "command": "status",
+1256:def cmd_status(json_output: bool = False) -> int:
+1257:    payload = cmd_status_payload()
+1261:        print_compact_status(payload)
+1265:def cmd_doctor(json_output: bool = False) -> int:
+1266:    payload = doctor_payload()
+1270:        print_compact_doctor(payload)
+1332:def _find_doc_any_payload_live_impl(query: str) -> dict:
+1341:            query,
+1347:            query=query,
+1359:            query,
+1365:            query=query,
+1376:            query,
+1382:            query=query,
+1389:        command="find-doc-any",
+1390:        query=query,
+1424:def find_doc_any_payload_live(query):
+1425:    return _find_doc_any_payload_live_impl(query)
+1428:def find_doc_any_payload(query):
+1429:    cached = find_doc_any_payload_from_cache(query)
+1435:        cached = find_doc_any_payload_from_cache(query)
+1439:    live = find_doc_any_payload_live(query)
+1482:    query: str | None = None,
+1499:    if query is not None:
+1500:        payload["query"] = query
+1515:    query: str,
+1522:        "command": "find-doc-any",
+1523:        "query": query,
+1531:def open_doc_from_query_payload(query: str) -> dict:
+1532:    found = find_doc_any_payload(query)
+1541:        "command": "open-doc-from-query",
+1542:        "query": query,
+1550:def read_doc_from_query_payload(query: str) -> dict:
+1551:    found = find_doc_any_payload(query)
+1560:            command="read-doc-from-query",
+1561:            query=query,
+1571:        "command": "read-doc-from-query",
+1572:        "query": query,
+1581:def cmd_find_doc_any(query: str, json_output: bool = False) -> int:
+1582:    payload = find_doc_any_payload(query)
+1593:def cmd_open_doc_from_query(query: str, json_output: bool = False) -> int:
+1594:    payload = open_doc_from_query_payload(query)
+1605:def cmd_read_doc_from_query(query: str, json_output: bool = False) -> int:
+1606:    payload = read_doc_from_query_payload(query)
+1617:def is_status_query(query_lower: str) -> bool:
+1619:        x in query_lower
+1621:            "status",
+1632:def is_read_query(query_lower: str) -> bool:
+1634:        x in query_lower
+1646:def build_ask_result(query: str, routed_to: str, result: dict, **extra) -> dict:
+1650:        "query": query,
+1658:def ask_status_payload(query: str) -> dict:
+1659:    result = cmd_status_payload()
+1660:    return build_ask_result(query, "status", result)
+1663:def ask_read_payload(query: str, lookup_query: str) -> dict:
+1664:    result = read_doc_from_query_payload(lookup_query)
+1665:    return build_ask_result(query, "read-doc-from-query", result)
+1668:def ask_google_id_payload(query: str, lookup_query: str) -> dict:
+1669:    found = find_doc_any_payload(lookup_query)
+1671:        return build_ask_result(query, "find-doc-any", found)
+1673:    file_result = run_docs_agent_with_retry(["get-file", lookup_query])
+1677:        "query": query,
+1684:def ask_find_payload(query: str, lookup_query: str) -> dict:
+1685:    found = find_doc_any_payload(lookup_query)
+1686:    return build_ask_result(query, "find-doc-any", found)
+1689:def ask_payload(query: str) -> dict:
+1690:    q = query.strip()
+1692:    lookup_query = normalize_query_for_lookup(q)
+1694:    if is_status_query(ql):
+1695:        return ask_status_payload(query)
+1697:    if is_read_query(ql):
+1698:        return ask_read_payload(query, lookup_query)
+1700:    if looks_like_google_id(lookup_query):
+1701:        return ask_google_id_payload(query, lookup_query)
+1703:    return ask_find_payload(query, lookup_query)
+1710:    query = payload.get("query", "")
+1714:    lines.append(f"query: {query}")
+1716:    if routed == "status":
+1727:    if routed in {"find-doc-any", "get-file"}:
+1738:                    "next_step: Уточни идентификатор, имя документа или сначала выполни find-doc-any."
+1744:                lines.append("next_step: Повтори команду или проверь status --json.")
+1752:        if result.get("command") == "find-doc-any":
+1767:    if routed == "read-doc-from-query":
+1784:                next_step = "Проверь точное имя/Document ID или сначала выполни python agent_cli.py f <query>."
+1815:                next_step = "Проверь _debug и повтори сценарий через status и точечный read-doc вызов."
+1854:    status_payload = cmd_status_payload()
+1857:        "status",
+1858:        "doctor-lite",
+1859:        "doctor",
+1864:        "find-doc-any",
+1865:        "open-doc-from-query",
+1866:        "read-doc-from-query",
+1888:        "show-config-status",
+1894:        "mode": ((status_payload.get("safety") or {}).get("mode")),
+1896:            (status_payload.get("safety") or {}).get("default_dry_run")
+1899:            (status_payload.get("safety") or {}).get("forbid_master_index_write")
+1901:        "forbid_delete": ((status_payload.get("safety") or {}).get("forbid_delete")),
+1903:            (status_payload.get("safety") or {}).get("default_test_folder")
+1943:        "status_snapshot_ok": bool(status_payload.get("ok")),
+1961:    status_payload = cmd_status_payload()
+1980:            "status",
+1999:                            "query": item,
+2008:                            "query": item,
+2015:            if item in {"status", "capabilities"}:
+2019:                        "query": item,
+2030:                        "query": item,
+2035:                                (status_payload.get("config") or {}).get(
+2040:                                (status_payload.get("config") or {}).get(
+2053:                        "query": item,
+2065:                        "query": item,
+2074:                        "query": item,
+2092:        "safety_snapshot": status_payload,
+2244:        item.get("query")
+2246:        if item.get("query")
+2301:        (cmd_status_payload().get("safety") or {}).get("default_test_folder")
+2320:    review_status = "Needs classification"
+2325:        review_status = "Not for direct mutation"
+2329:        review_status = "Review required"
+2333:        review_status = "In review scope"
+2339:        review_status = "In default test scope"
+2343:        review_status = "Outside review scope"
+2358:        "review_status": review_status,
+2442:        print(f"Review status: {payload.get('review_status')}")
+2450:def cmd_doctor_lite(json_output: bool = False) -> int:
+2451:    payload = doctor_lite_payload()
+2455:        print_compact_doctor_lite(payload)
+2459:def cmd_ask(query: str, json_output: bool = False) -> int:
+2460:    payload = ask_payload(query)
+2477:def require_query_args(
+2488:def handle_query_command(
+2500:        print_usage_error("Missing query argument.")
+2509:def run_query_command(
+2525:        "  python agent_cli.py status [--json]\n  python agent_cli.py repo-state [--json]    | rs [--json]\n"
+2526:        "  python agent_cli.py doctor [--json]        | diagnose [--json]\n"
+2533:        "  python agent_cli.py find-doc-any [--json] <query>        | f [--json] <query>\n"
+2534:        "  python agent_cli.py open-doc-from-query [--json] <query> | o [--json] <query>\n"
+2535:        "  python agent_cli.py read-doc-from-query [--json] <query> | r [--json] <query>\n"
+2538:        "  python agent_cli.py ask [--json] <free text query>       | q [--json] <query>\n"
+2541:        "  python agent_cli.py status\n"
+2542:        "  python agent_cli.py status --json\n  python agent_cli.py repo-state\n  python agent_cli.py repo-state --json\n"
+2549:        "  python agent_cli.py doctor\n"
+2550:        "  python agent_cli.py doctor --json\n"
+2554:def run_query_handler(argv: list[str], handler) -> int:
+2574:        if cmd == "status":
+2577:                print_usage_error("status does not accept positional arguments.")
+2579:            return cmd_status(json_output=json_output)
+2588:        if cmd in {"doctor-lite", "diagnose-lite"}:
+2591:                print_usage_error("doctor-lite does not accept positional arguments.")
+2593:            return cmd_doctor_lite(json_output=json_output)
+2602:        if cmd in {"doctor", "diagnose"}:
+2605:                print_usage_error("doctor does not accept positional arguments.")
+2607:            return cmd_doctor(json_output=json_output)
+2648:        if cmd in {"doctor", "diagnose"}:
+2651:                print_usage_error("doctor does not accept positional arguments.")
+2653:            return cmd_doctor(json_output=json_output)
+2663:            return handle_query_command(argv, cmd_find_doc_name)
+2666:            return handle_query_command(argv, cmd_find_link)
+2668:        if cmd in {"find-doc-any", "f"}:
+2669:            return handle_query_command(argv, cmd_find_doc_any, allow_json_flag=True)
+2671:        if cmd in {"open-doc-from-query", "o"}:
+2672:            return handle_query_command(
+2673:                argv, cmd_open_doc_from_query, allow_json_flag=True
+2676:        if cmd in {"read-doc-from-query", "r"}:
+2677:            return handle_query_command(
+2678:                argv, cmd_read_doc_from_query, allow_json_flag=True
+2696:            return handle_query_command(argv, cmd_ask, allow_json_flag=True)

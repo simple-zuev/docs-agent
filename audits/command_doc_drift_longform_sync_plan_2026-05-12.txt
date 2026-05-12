@@ -1,0 +1,22 @@
+Command doc drift longform sync plan
+Date: 2026-05-12
+
+Target
+- docs/COMMAND_REFERENCE.md only
+
+Goal
+- make short-form and long-form query/open/read/ask command examples symmetric
+
+Planned change
+- keep existing short alias examples
+- keep existing find-doc-any long-form example
+- add missing long-form examples for:
+  - open-doc-from-query
+  - read-doc-from-query
+  - ask
+
+Non-goals
+- no code change
+- no README change
+- no HUMAN_OPERATOR_GUIDE.md change
+- no INSTALLATION.md change

@@ -1,0 +1,13 @@
+Command documentation drift review
+Date: 2026-05-12
+
+README.md: 12 matched lines
+docs/COMMAND_REFERENCE.md: 15 matched lines
+docs/HUMAN_OPERATOR_GUIDE.md: 14 matched lines
+docs/INSTALLATION.md: 3 matched lines
+
+Assessment target
+- compare human-facing command examples across README and docs
+- identify missing or inconsistent command examples
+- identify places where short aliases and long-form commands drift apart
+- establish whether any doc-only follow-up candidate is narrow and safe

@@ -1,0 +1,17 @@
+Command documentation drift audit plan
+Date: 2026-05-12
+
+Scope
+- README.md
+- docs/COMMAND_REFERENCE.md
+- docs/HUMAN_OPERATOR_GUIDE.md
+- docs/INSTALLATION.md
+
+Goal
+- detect human-facing command documentation drift against the current agent_cli.py command surface
+
+Constraints
+- audit-only
+- no code mutation
+- no documentation mutation
+- keep scope limited to command examples and command naming consistency

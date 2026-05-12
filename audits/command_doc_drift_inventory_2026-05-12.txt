@@ -1,0 +1,51 @@
+==== README.md ====
+35:- python agent_cli.py doctor-lite
+36:- python agent_cli.py doctor-lite --json
+39:- python agent_cli.py doctor
+40:- python agent_cli.py doctor --json
+45:- python agent_cli.py status
+46:- python agent_cli.py status --json
+47:- python agent_cli.py f "DOC-0001"
+48:- python agent_cli.py o "DOC-0002"
+49:- python agent_cli.py r "DOC-0002"
+50:- python agent_cli.py q "прочитай DOC-0002"
+54:- doctor-lite — основной ежедневный entrypoint
+55:- doctor — углубленная диагностика
+
+==== docs/COMMAND_REFERENCE.md ====
+11:doctor-lite
+12:- python agent_cli.py doctor-lite
+13:- python agent_cli.py doctor-lite --json
+17:doctor
+18:- python agent_cli.py doctor
+19:- python agent_cli.py doctor --json
+26:status
+27:- python agent_cli.py status
+28:- python agent_cli.py status --json
+31:- python agent_cli.py f "DOC-0001"
+32:- python agent_cli.py find-doc-any "DOC-0001"
+35:- python agent_cli.py o "DOC-0002"
+38:- python agent_cli.py r "DOC-0002"
+39:- python agent_cli.py r "00_PROJECT_AI_OPERATING_PROMPT_АСТЦВ"
+42:- python agent_cli.py q "прочитай DOC-0002"
+
+==== docs/HUMAN_OPERATOR_GUIDE.md ====
+14:- doctor-lite возвращает healthy
+24:- python agent_cli.py status
+25:- python agent_cli.py status --json
+28:- python agent_cli.py f "DOC-0001"
+31:- python agent_cli.py o "DOC-0002"
+34:- python agent_cli.py r "DOC-0002"
+35:- python agent_cli.py q "прочитай DOC-0002"
+40:- python agent_cli.py doctor-lite
+41:- python agent_cli.py doctor-lite --json
+44:- python agent_cli.py doctor
+45:- python agent_cli.py doctor --json
+52:1. Для ежедневной работы использовать только doctor-lite.
+53:2. doctor запускать, когда нужна углубленная диагностика.
+75:- audits/ — результаты проверок, snapshots, status notes
+
+==== docs/INSTALLATION.md ====
+44:- doctor-lite возвращает healthy
+49:python agent_cli.py status
+50:python agent_cli.py f "DOC-0001"

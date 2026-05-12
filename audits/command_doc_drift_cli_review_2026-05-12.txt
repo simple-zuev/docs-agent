@@ -1,0 +1,19 @@
+Command documentation drift CLI review
+Date: 2026-05-12
+
+doctor-lite: docs=11, cli=8
+doctor: docs=20, cli=43
+status: docs=9, cli=69
+agent_cli.py f : docs=4, cli=1
+find-doc-any: docs=1, cli=16
+agent_cli.py o : docs=3, cli=0
+open-doc-any: docs=0, cli=0
+agent_cli.py r : docs=4, cli=0
+read-doc-any: docs=0, cli=0
+agent_cli.py q : docs=3, cli=0
+query: docs=0, cli=118
+
+Assessment target
+- verify that documented commands/aliases are grounded in agent_cli.py
+- identify whether docs under-document long-form aliases or over-document unsupported names
+- establish whether any follow-up should remain audit-only or become a narrow doc-only cleanup

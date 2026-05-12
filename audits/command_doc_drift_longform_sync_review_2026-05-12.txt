@@ -1,0 +1,23 @@
+Command doc drift longform sync review
+Date: 2026-05-12
+
+Changed file
+- docs/COMMAND_REFERENCE.md
+
+What changed
+- retained short alias examples for f/o/r/q
+- retained existing long-form example for find-doc-any
+- added missing long-form examples for:
+  - open-doc-from-query
+  - read-doc-from-query
+  - ask
+
+Why
+- align command reference with actual agent_cli.py command surface
+- improve symmetry of command documentation
+- keep mutation limited to the dedicated command reference document
+
+Scope control
+- no code mutation
+- no CLI behavior change
+- no README/HUMAN_OPERATOR_GUIDE/INSTALLATION changes
