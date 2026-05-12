@@ -1,0 +1,28 @@
+AGENT CLI MAIN DISPATCH INVENTORY AUDIT
+
+Source: /Users/zuevvladimir/AI/docs-agent/agent_cli.py
+
+1. MAIN() BRANCH HEADS
+No branch heads found matching 'if/elif command ...'
+
+2. NAMED COMMAND/ALIAS SET CONSTANTS
+L2494: ASK_COMMANDS = ['ask', 'q']
+L2490: DOCTOR_COMMANDS = ['diagnose', 'doctor']
+L2489: DOCTOR_LITE_COMMANDS = ['diagnose-lite', 'doctor-lite']
+L2491: FIND_DOC_ANY_COMMANDS = ['f', 'find-doc-any']
+L2492: OPEN_DOC_FROM_QUERY_COMMANDS = ['o', 'open-doc-from-query']
+L2493: READ_DOC_FROM_QUERY_COMMANDS = ['r', 'read-doc-from-query']
+L2488: REPO_STATE_COMMANDS = ['repo-state', 'rs']
+
+3. DUPLICATED ALIASES ACROSS CONSTANTS
+No duplicated aliases found across named constants
+
+4. INTERSECTIONS BETWEEN CONSTANTS
+No intersections found between named constants
+
+5. MANUAL REVIEW CHECKLIST
+- Verify branch order in main() does not shadow later branches
+- Verify thin wrapper branches do not only forward without behavior
+- Verify no direct duplicated literal alias checks remain beside named constants
+- Verify help/error/exit behavior is unchanged
+- Verify no dead branches remain after prior cleanup

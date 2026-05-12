@@ -1,0 +1,44 @@
+AGENT CLI REMAINING DISPATCH AUDIT REVIEW
+Date: 2026-05-12
+
+Scope
+- post-cleanup review of remaining main() dispatch artifacts
+- no behavioral changes
+- focus on possible dead / duplicated / overly-thin dispatch branches
+
+Confirmed from audit snapshots
+- named alias-set constants show no duplicate aliases
+- named alias-set constants show no intersections
+- main() dispatch remains explicit and readable
+- handle_query_command has 6 call sites, all from main()
+- no additional dead handle_* functions identified
+
+Observed remaining query-dispatch shape
+- explicit single-command branches:
+  - find-doc-name
+  - find-link
+- membership-based query branches:
+  - FIND_DOC_ANY_COMMANDS
+  - OPEN_DOC_FROM_QUERY_COMMANDS
+  - READ_DOC_FROM_QUERY_COMMANDS
+  - ASK_COMMANDS
+
+Assessment
+- find-doc-name and find-link are thin wrapper dispatch branches
+- however, they are not proven dead
+- they may be intentional explicit leaves of the CLI contract
+- no safe removal is justified yet without checking whether they duplicate a broader command-family contract or are intentionally preserved for discoverability/explicitness
+
+Safe conclusion
+- no cleanup applied at this stage
+- next safe investigation, if needed:
+  1. inspect cmd_find_doc_name and cmd_find_link contract/behavior symmetry
+  2. verify whether explicit single-command branches differ from family-style query commands only by target callable
+  3. only then decide whether a narrow non-behavioral consolidation is justified
+
+Non-goals reaffirmed
+- no main() decomposition
+- no helper extraction
+- no docs_agent adapter extraction
+- no help redesign
+- no output/exit redesign

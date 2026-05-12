@@ -1,0 +1,7 @@
+AGENT CLI HANDLE_* INVENTORY
+
+Source: /Users/zuevvladimir/AI/docs-agent/agent_cli.py
+
+handle_query_command defined at L2497
+  call sites: [2641, 2644, 2647, 2650, 2655, 2674]
+

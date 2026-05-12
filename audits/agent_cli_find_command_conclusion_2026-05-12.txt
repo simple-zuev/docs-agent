@@ -1,0 +1,42 @@
+AGENT CLI FIND COMMAND CONCLUSION
+Date: 2026-05-12
+
+Scope
+- audit-only comparison of cmd_find_doc_name and cmd_find_link
+- objective: determine whether remaining explicit single-command query branches justify narrow non-behavioral cleanup
+
+Evidence reviewed
+- agent_cli_main_dispatch_snapshot_2026-05-12.txt
+- agent_cli_handle_inventory_2026-05-12.txt
+- agent_cli_find_command_contract_snapshot_2026-05-12.txt
+- agent_cli_find_command_contract_review_2026-05-12.txt
+- agent_cli_remaining_dispatch_audit_review_2026-05-12.txt
+
+Confirmed
+- cmd_find_doc_name and cmd_find_link are structurally symmetric
+- both are thin command functions:
+  - payload assignment via run_docs_agent_with_retry(...)
+  - print_json(payload)
+- both are reached through handle_query_command from explicit single-command branches in main()
+- both differ by underlying docs-agent operation / argument list, not by wrapper structure
+
+Assessment
+- the two commands are thin explicit CLI leaves
+- however, they are not proven dead
+- they are not proven duplicated at the contract level
+- consolidating them would likely require additional abstraction/helper extraction or command-family redesign
+- that would exceed the current narrow safe cleanup scope
+
+Conclusion
+- no further cleanup justified at this stage
+- preserve explicit branches:
+  - find-doc-name
+  - find-link
+- current branch can be closed as audit-complete for remaining main() dispatch artifacts, unless a new independently justified narrow target is selected
+
+Reaffirmed non-goals
+- no main() decomposition
+- no helper extraction
+- no docs_agent adapter extraction
+- no help redesign
+- no output/exit redesign

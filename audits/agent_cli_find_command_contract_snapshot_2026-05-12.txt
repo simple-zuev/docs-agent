@@ -1,0 +1,35 @@
+AGENT CLI COMMAND CONTRACT SNAPSHOT
+
+Source: /Users/zuevvladimir/AI/docs-agent/agent_cli.py
+
+cmd_find_doc_name  L1287-L1297
+
+L1287: def cmd_find_doc_name(value: str) -> None:
+L1288:     payload = run_docs_agent_with_retry(
+L1289:         [
+L1290:             "find-row-by-column",
+L1291:             MASTER_INDEX_ID,
+L1292:             MASTER_INDEX_SHEET,
+L1293:             "Document Name",
+L1294:             value,
+L1295:         ]
+L1296:     )
+L1297:     print_json(payload)
+
+--------------------------------------------------------------------------------
+
+cmd_find_link  L1300-L1309
+
+L1300: def cmd_find_link(value: str) -> None:
+L1301:     payload = run_docs_agent_with_retry(
+L1302:         [
+L1303:             "find-row-by-link-fragment",
+L1304:             MASTER_INDEX_ID,
+L1305:             MASTER_INDEX_SHEET,
+L1306:             value,
+L1307:         ]
+L1308:     )
+L1309:     print_json(payload)
+
+--------------------------------------------------------------------------------
+

@@ -1,0 +1,22 @@
+AGENT CLI FIND COMMAND CONTRACT REVIEW
+
+Source: /Users/zuevvladimir/AI/docs-agent/agent_cli.py
+
+cmd_find_doc_name
+- lines: L1287-L1297
+- top-level body nodes: ['Assign', 'Expr']
+- return count: 0
+- call targets: ['print_json', 'run_docs_agent_with_retry']
+
+cmd_find_link
+- lines: L1300-L1309
+- top-level body nodes: ['Assign', 'Expr']
+- return count: 0
+- call targets: ['print_json', 'run_docs_agent_with_retry']
+
+Review prompts
+- Compare whether both commands differ only by target callable / message text
+- Check whether argument contract is symmetric
+- Check whether output/exit behavior is symmetric
+- Decide whether explicit separate branches are contract-significant or only dispatch-explicit
+
