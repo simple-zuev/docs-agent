@@ -4,6 +4,7 @@ import re
 import subprocess
 import sys
 from pathlib import Path
+from repo_state import branch_safety_snapshot
 
 BASE = Path.home() / "AI" / "docs-agent"
 DOCS_AGENT = BASE / "docs_agent.py"
@@ -821,6 +822,33 @@ def print_compact_status(payload: dict):
     print(f"change_log_id: {config.get('change_log_spreadsheet_id')}")
 
 
+def print_compact_repo_state(payload: dict):
+    print(f"ok: {payload.get('ok')}")
+    print("route: repo-state")
+
+    if not payload.get("ok"):
+        print(f"error_type: {payload.get('error_type')}")
+        print(f"error_message: {payload.get('error_message')}")
+        return
+
+    print(f"repo_path: {payload.get('repo_path')}")
+    print(f"branch: {payload.get('branch')}")
+    print(f"is_main: {payload.get('is_main')}")
+    print(f"working_tree_clean: {payload.get('working_tree_clean')}")
+    print(f"local_equals_origin_main: {payload.get('local_equals_origin_main')}")
+    print(f"safe_for_mutation: {payload.get('safe_for_mutation')}")
+    print(f"head_sha: {payload.get('head_sha')}")
+    print(f"origin_main_sha: {payload.get('origin_main_sha')}")
+
+    entries = payload.get("diff_name_status_entries") or []
+    if entries:
+        print("diff_name_status_entries:")
+        for entry in entries:
+            print(f"  - {entry}")
+
+    print(f"recommended_next_step: {payload.get('recommended_next_step')}")
+
+
 def print_compact_doctor_lite(payload: dict):
     print(f"ok: {payload.get('ok')}")
     print("route: doctor-lite")
@@ -1191,6 +1219,38 @@ def cmd_status_payload() -> dict:
         "safety": safety,
         "config": config,
     }
+
+
+def repo_state_payload() -> dict:
+    payload = branch_safety_snapshot(BASE)
+
+    if payload.get("ok"):
+        return payload
+
+    return {
+        "ok": False,
+        "command": "repo-state",
+        "error_type": payload.get("error_type", "RepoStateError"),
+        "error_message": payload.get(
+            "error_message", "Failed to build repo state snapshot."
+        ),
+        "retryable": bool(payload.get("retryable")),
+        "auth_related": False,
+        "network_related": False,
+        "details": payload,
+    }
+
+
+def cmd_repo_state(json_output: bool = False) -> int:
+    payload = repo_state_payload()
+    if json_output:
+        print_json(payload)
+    else:
+        if payload.get("ok"):
+            print_compact_repo_state(payload)
+        else:
+            print_compact_error(payload)
+    return resolve_command_exit_code(payload)
 
 
 def cmd_status(json_output: bool = False) -> int:
@@ -1865,7 +1925,7 @@ def run_query_command(
 def usage() -> None:
     print(
         "Usage:\n"
-        "  python agent_cli.py status [--json]\n"
+        "  python agent_cli.py status [--json]\n  python agent_cli.py repo-state [--json]    | rs [--json]\n"
         "  python agent_cli.py doctor [--json]        | diagnose [--json]\n"
         "  python agent_cli.py find-doc-id <DOC-XXXX>\n"
         "  python agent_cli.py find-doc-name <document name>\n"
@@ -1879,7 +1939,7 @@ def usage() -> None:
         "\n"
         "Examples:\n"
         "  python agent_cli.py status\n"
-        "  python agent_cli.py status --json\n"
+        "  python agent_cli.py status --json\n  python agent_cli.py repo-state\n  python agent_cli.py repo-state --json\n"
         "  python agent_cli.py f DOC-0001\n"
         "  python agent_cli.py o DOC-0002\n"
         "  python agent_cli.py r DOC-0002\n"
@@ -1917,6 +1977,13 @@ def main() -> int:
                 print_usage_error("status does not accept positional arguments.")
                 return EXIT_USAGE_ERROR
             return cmd_status(json_output=json_output)
+
+        if cmd in {"repo-state", "rs"}:
+            json_output, args = parse_json_flag(argv)
+            if args:
+                print_usage_error("repo-state does not accept positional arguments.")
+                return EXIT_USAGE_ERROR
+            return cmd_repo_state(json_output=json_output)
 
         if cmd in {"doctor-lite", "diagnose-lite"}:
             json_output, args = parse_json_flag(argv)
