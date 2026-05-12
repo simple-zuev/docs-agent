@@ -1,0 +1,361 @@
+        impact="Low",
+        status="Done",
+        notes=f"Source: {source['name']} | Copy URL: {copied.get('webViewLink')}",
+    )
+
+    print("CREATE STAGING COPY OK")
+    print(f"Source name: {source['name']}")
+    print(f"Source ID: {source['id']}")
+    print(f"Copy name: {copied['name']}")
+    print(f"Copy ID: {copied['id']}")
+    print(f"Copy URL: {copied.get('webViewLink')}")
+    print(f"Target folder: Cass / {target_folder}")
+    print(f"Change Log: {change_id} | {updated_range}")
+
+
+@app.command("patch-doc")
+def patch_doc(
+    document_id: str,
+    text_to_insert: str = "\n\n[PATCH TEST] Тестовое изменение staging-документа через Google Docs API.\n",
+):
+    """Append text to a Google Doc and log the operation. Use only for staging/review docs."""
+    ensure_write_allowed("patch-doc", target=document_id)
+    s = services()
+    docs = s["docs"]
+    drive = s["drive"]
+    sheets = s["sheets"]
+
+    meta = (
+        drive.files()
+        .get(
+            fileId=document_id,
+            fields="id,name,mimeType,webViewLink,parents",
+            supportsAllDrives=True,
+        )
+        .execute()
+    )
+
+    doc = docs.documents().get(documentId=document_id).execute()
+    end_index = doc["body"]["content"][-1]["endIndex"] - 1
+
+    docs.documents().batchUpdate(
+        documentId=document_id,
+        body={
+            "requests": [
+                {
+                    "insertText": {
+                        "location": {"index": end_index},
+                        "text": text_to_insert,
+                    }
+                }
+            ]
+        },
+    ).execute()
+
+    change_id, updated_range = append_log(
+        sheets=sheets,
+        action="Patch",
+        obj=meta["name"],
+        from_="Local docs-agent",
+        to=meta.get("webViewLink", document_id),
+        reason="Тестовая правка staging-документа через Google Docs API",
+        impact="Low",
+        status="Done",
+        notes=f"Document ID: {document_id}",
+    )
+
+    print("PATCH DOC OK")
+    print(f"Document: {meta['name']}")
+    print(f"ID: {document_id}")
+    print(f"URL: {meta.get('webViewLink')}")
+    print(f"Inserted chars: {len(text_to_insert)}")
+    print(f"Change Log: {change_id} | {updated_range}")
+
+
+@app.command("create-doc-in-folder")
+def create_doc_in_folder(
+    target_folder: str,
+    title_prefix: str = "ASTCV_DOCS_AGENT_OFFICE_TEST",
+    dry_run: bool = False,
+    confirm: bool = False,
+):
+    """Create Google Doc in selected top-level Cass folder and log it."""
+    if should_dry_run(dry_run):
+        print_dry_run(
+            {
+                "command": "create-doc-in-folder",
+                "target_folder": target_folder,
+                "title_prefix": title_prefix,
+                "write_mode_required": True,
+            }
+        )
+        return
+
+    ensure_write_allowed("create-doc-in-folder", target=target_folder)
+    ensure_confirmed(confirm, "create-doc-in-folder")
+    s = services()
+    drive = s["drive"]
+    docs = s["docs"]
+    sheets = s["sheets"]
+
+    cass = find_folder(drive, "Cass")
+    target = find_folder(drive, target_folder, cass["id"])
+
+    title = f"{title_prefix}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+
+    created = (
+        drive.files()
+        .create(
+            body={
+                "name": title,
+                "mimeType": "application/vnd.google-apps.document",
+                "parents": [target["id"]],
+            },
+            fields="id,name,webViewLink,parents",
+            supportsAllDrives=True,
+        )
+        .execute()
+    )
+
+    docs.documents().batchUpdate(
+        documentId=created["id"],
+        body={
+            "requests": [
+                {
+                    "insertText": {
+                        "location": {"index": 1},
+                        "text": (
+                            "Тестовый документ ASTCV Docs Agent.\n"
+                            f"Папка: Cass / {target_folder}.\n"
+                            "Назначение: проверка создания файлов в выбранной папке Cass.\n"
+                            "Canonical-документы не изменялись.\n"
+                        ),
+                    }
+                }
+            ]
+        },
+    ).execute()
+
+    change_id, updated_range = append_log(
+        sheets=sheets,
+        action="Create",
+        obj=title,
+        from_="Local docs-agent",
+        to=f"Cass / {target_folder}",
+        reason="Проверка создания документа в выбранной папке Cass через CLI docs_agent.py",
+        impact="Low",
+        status="Done",
+        notes=f"URL: {created.get('webViewLink')}",
+    )
+
+    print("CREATE DOC IN FOLDER OK")
+    print(f"Folder: Cass / {target_folder}")
+    print(f"Name: {created['name']}")
+    print(f"ID: {created['id']}")
+    print(f"URL: {created.get('webViewLink')}")
+    print(f"Change Log: {change_id} | {updated_range}")
+
+
+@app.command("list-folder")
+def list_folder_cmd(
+    folder_name: str,
+):
+    """List items in selected top-level Cass folder."""
+    s = services()
+    drive = s["drive"]
+
+    cass = find_folder(drive, "Cass")
+    target = find_folder(drive, folder_name, cass["id"])
+    items = list_children(drive, target["id"])
+
+    print("LIST FOLDER OK")
+    print(f"Folder: Cass / {folder_name}")
+    print(f"Folder ID: {target['id']}")
+    print("")
+    if not items:
+        print("- empty")
+        return
+
+    for item in items:
+        print(
+            f"- {item['name']} | {item['mimeType']} | {item['id']} | {item.get('webViewLink', '')}"
+        )
+
+
+def extract_text(elements):
+    out = []
+    for value in elements:
+        para = value.get("paragraph")
+        if not para:
+            continue
+
+        for elem in para.get("elements", []):
+            text_run = elem.get("textRun")
+            if text_run and "content" in text_run:
+                out.append(text_run["content"])
+
+    return "".join(out)
+
+
+@app.command("read-doc")
+def read_doc(
+    document_id: str,
+    max_chars: int = 4000,
+    json_output: bool = False,
+):
+    """Read Google Doc text content."""
+    try:
+        s = services()
+        docs = s["docs"]
+        drive = s["drive"]
+
+        meta = (
+            drive.files()
+            .get(
+                fileId=document_id,
+                fields="id,name,mimeType,webViewLink,modifiedTime",
+                supportsAllDrives=True,
+            )
+            .execute()
+        )
+
+        doc = docs.documents().get(documentId=document_id).execute()
+
+        content = doc.get("body", {}).get("content", [])
+        text_content = extract_text(content)
+
+        truncated = False
+        if len(text_content) > max_chars:
+            text_content = text_content[:max_chars] + "\n\n...[TRUNCATED]..."
+            truncated = True
+
+        payload = {
+            "ok": True,
+            "command": "read-doc",
+            "document_id": document_id,
+            "meta": meta,
+            "content": text_content,
+            "truncated": truncated,
+            "max_chars": max_chars,
+        }
+
+        emit_output(
+            json_output,
+            payload,
+            human_lines=[
+                "READ DOC OK",
+                f"Name: {meta['name']}",
+                f"ID: {meta['id']}",
+                f"Modified: {meta.get('modifiedTime')}",
+                f"URL: {meta.get('webViewLink')}",
+                "",
+                "----- DOCUMENT CONTENT BEGIN -----",
+                text_content,
+                "----- DOCUMENT CONTENT END -----",
+            ],
+        )
+    except Exception as exc:
+        emit_error(json_output, "read-doc", exc)
+
+
+@app.command("replace-doc-text")
+def replace_doc_text(
+    document_id: str,
+    old_text: str,
+    new_text: str,
+):
+    """Replace exact text fragment in Google Doc and log operation."""
+    ensure_write_allowed("replace-doc-text", target=document_id)
+    s = services()
+    docs = s["docs"]
+    drive = s["drive"]
+    sheets = s["sheets"]
+
+    meta = (
+        drive.files()
+        .get(
+            fileId=document_id,
+            fields="id,name,mimeType,webViewLink,modifiedTime",
+            supportsAllDrives=True,
+        )
+        .execute()
+    )
+
+    docs.documents().batchUpdate(
+        documentId=document_id,
+        body={
+            "requests": [
+                {
+                    "replaceAllText": {
+                        "containsText": {
+                            "text": old_text,
+                            "matchCase": True,
+                        },
+                        "replaceText": new_text,
+                    }
+                }
+            ]
+        },
+    ).execute()
+
+    change_id, updated_range = append_log(
+        sheets=sheets,
+        action="Replace Text",
+        obj=meta["name"],
+        from_=old_text,
+        to=new_text,
+        reason="Точечная замена текста через Google Docs API",
+        impact="Low",
+        status="Done",
+        notes=f"Document ID: {document_id} | URL: {meta.get('webViewLink')}",
+    )
+
+    print("REPLACE DOC TEXT OK")
+    print(f"Document: {meta['name']}")
+    print(f"ID: {document_id}")
+    print(f"URL: {meta.get('webViewLink')}")
+    print(f"Old text: {old_text}")
+    print(f"New text: {new_text}")
+    print(f"Change Log: {change_id} | {updated_range}")
+
+
+@app.command("replace-doc-text-safe")
+def replace_doc_text_safe(
+    document_id: str,
+    old_text: str,
+    new_text: str,
+    backup_folder: str = "13_Черновики_и_review",
+    dry_run: bool = False,
+    confirm: bool = False,
+):
+    """Backup document, then replace exact text fragment and log operation."""
+    if should_dry_run(dry_run):
+        print_dry_run(
+            {
+                "command": "replace-doc-text-safe",
+                "document_id": document_id,
+                "old_text": old_text,
+                "new_text": new_text,
+                "backup_folder": backup_folder,
+                "write_mode_required": True,
+            }
+        )
+        return
+
+    ensure_write_allowed("replace-doc-text-safe", target=document_id)
+    ensure_confirmed(confirm, "replace-doc-text-safe")
+    s = services()
+    docs = s["docs"]
+    drive = s["drive"]
+    sheets = s["sheets"]
+
+    cass = find_folder(drive, "Cass")
+    target = find_folder(drive, backup_folder, cass["id"])
+
+    meta = (
+        drive.files()
+        .get(
+            fileId=document_id,
+            fields="id,name,mimeType,webViewLink,modifiedTime",
+            supportsAllDrives=True,
+        )

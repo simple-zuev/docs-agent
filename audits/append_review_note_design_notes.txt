@@ -1,0 +1,4 @@
+Stage: bounded append-review-note
+Goal: safely append review note to an existing review-scoped draft only
+Constraints: no canonical mutation, no master index mutation, no hidden target assumptions, explicit target validation required
+Scope: existing draft in 13_Черновики_и_review only, explicit confirm, append-only note placement
