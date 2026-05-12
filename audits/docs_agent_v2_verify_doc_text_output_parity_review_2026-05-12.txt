@@ -1,0 +1,11 @@
+Verify-doc-text parity implementation review
+- source block: docs_agent.py @app.command("verify-doc-text")
+- target block: docs_agent_v2.py @app.command("verify-doc-text")
+- helper expectation: reuse already-present read-doc parity helpers in docs_agent_v2.py
+- replacement mode: replace only verify-doc-text command block
+
+Source verify_doc_text references:
+  - missing: emit_output
+  - missing: emit_error
+  - extract_text
+  - services
