@@ -1,4 +1,5 @@
 import json
+import os
 import re
 import subprocess
 import sys
@@ -6,7 +7,27 @@ from pathlib import Path
 
 BASE = Path.home() / "AI" / "docs-agent"
 DOCS_AGENT = BASE / "docs_agent.py"
-PYTHON_BIN = sys.executable
+
+
+def resolve_python_bin() -> tuple[Path, str]:
+    env_python = os.environ.get("DOCS_AGENT_PYTHON")
+    if env_python:
+        return Path(env_python).expanduser(), "env:DOCS_AGENT_PYTHON"
+
+    candidates = [
+        (BASE / "venv312" / "bin" / "python", "project:venv312"),
+        (BASE / ".venv" / "bin" / "python", "project:.venv"),
+        (BASE / "venv" / "bin" / "python", "project:venv"),
+    ]
+
+    for candidate, source in candidates:
+        if candidate.exists():
+            return candidate, source
+
+    return Path(sys.executable), "fallback:sys.executable"
+
+
+PYTHON_BIN, PYTHON_BIN_SOURCE = resolve_python_bin()
 MASTER_INDEX_ID = "1hyWNNzsIHRLGJ65urOQUA0x_kOqCP61OkXcM3MMyedw"
 MASTER_INDEX_SHEET = "MASTER_INDEX"
 
@@ -494,6 +515,7 @@ def doctor_payload() -> dict:
         "ok": bool(Path(PYTHON_BIN).exists() and DOCS_AGENT.exists() and BASE.exists()),
         "details": {
             "python_bin": str(PYTHON_BIN),
+            "python_bin_source": PYTHON_BIN_SOURCE,
             "docs_agent_path": str(DOCS_AGENT),
             "base_path": str(BASE),
             "python_exists": Path(PYTHON_BIN).exists(),
@@ -563,6 +585,7 @@ def doctor_lite_payload() -> dict:
         "ok": bool(Path(PYTHON_BIN).exists() and DOCS_AGENT.exists() and BASE.exists()),
         "details": {
             "python_bin": str(PYTHON_BIN),
+            "python_bin_source": PYTHON_BIN_SOURCE,
             "docs_agent_path": str(DOCS_AGENT),
             "base_path": str(BASE),
             "python_exists": Path(PYTHON_BIN).exists(),
