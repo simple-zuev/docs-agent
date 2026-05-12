@@ -1,0 +1,4 @@
+Check: drive-read-layer refresh against current main
+Result: no effective diff
+Outcome: refresh branch redundant; current main already contains effective read-only facade surface
+Status: pre-commit passed, py_compile passed, drive_api import passed
