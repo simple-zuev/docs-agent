@@ -10,6 +10,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from googleapiclient.http import MediaIoBaseDownload
+from doc_text_mutation import replace_all_text
 from runtime_config import (
     CONFIG_PATH,
     config_get,
@@ -1170,22 +1171,13 @@ def replace_doc_text(
         .execute()
     )
 
-    docs.documents().batchUpdate(
-        documentId=document_id,
-        body={
-            "requests": [
-                {
-                    "replaceAllText": {
-                        "containsText": {
-                            "text": old_text,
-                            "matchCase": True,
-                        },
-                        "replaceText": new_text,
-                    }
-                }
-            ]
-        },
-    ).execute()
+    replace_all_text(
+        docs=docs,
+        document_id=document_id,
+        old_text=old_text,
+        new_text=new_text,
+        match_case=True,
+    )
 
     change_id, updated_range = append_log(
         sheets=sheets,
@@ -1267,22 +1259,13 @@ def replace_doc_text_safe(
         .execute()
     )
 
-    docs.documents().batchUpdate(
-        documentId=document_id,
-        body={
-            "requests": [
-                {
-                    "replaceAllText": {
-                        "containsText": {
-                            "text": old_text,
-                            "matchCase": True,
-                        },
-                        "replaceText": new_text,
-                    }
-                }
-            ]
-        },
-    ).execute()
+    replace_all_text(
+        docs=docs,
+        document_id=document_id,
+        old_text=old_text,
+        new_text=new_text,
+        match_case=True,
+    )
 
     change_id, updated_range = append_log(
         sheets=sheets,
