@@ -1,0 +1,5 @@
+Check: design drive/diagram implementation packet against current main
+Result: packet is useful but baseline-specific and materially outdated
+Outdated areas: implementation overview, runtime/query map, phases/acceptance, risks/guardrails
+Potentially reusable with refresh: drive interaction model, artifact state model, diagram engineering mode embedding
+Outcome: do not merge packet as-is; salvage only refreshed conceptual docs in a new narrow branch
