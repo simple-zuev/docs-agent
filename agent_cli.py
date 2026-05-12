@@ -2666,6 +2666,18 @@ def main() -> int:
             return handle_query_command(argv, cmd_find_link)
 
         if cmd in {"find-doc-any", "f"}:
+            if argv in (["--help"], ["-h"]):
+                print(
+                    "Usage:\n"
+                    "  python agent_cli.py find-doc-any [--json] <query>\n"
+                    "  python agent_cli.py f [--json] <query>\n\n"
+                    "Examples:\n"
+                    "  python agent_cli.py find-doc-any DOC-0001\n"
+                    "  python agent_cli.py find-doc-any --json DOC-0001\n"
+                    "  python agent_cli.py f DOC-0001\n"
+                    "  python agent_cli.py f --json DOC-0001"
+                )
+                return EXIT_OK
             return handle_query_command(argv, cmd_find_doc_any, allow_json_flag=True)
 
         if cmd in {"open-doc-from-query", "o"}:
