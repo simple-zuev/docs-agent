@@ -416,7 +416,7 @@ def create_temp_doc():
                         "location": {"index": 1},
                         "text": (
                             "ASTCV Docs Agent temporary staging document.\n"
-                            "Файл создан внутри Cass / 98_Временное.\n"
+                            f"Файл создан внутри Cass / {get_default_test_folder_name()}.\n"
                             "Canonical-документы не изменялись.\n"
                         ),
                     }
@@ -430,7 +430,7 @@ def create_temp_doc():
         action="Create",
         obj=title,
         from_="Local docs-agent",
-        to="Cass / 98_Временное",
+        to=f"Cass / {get_default_test_folder_name()}",
         reason="Проверка CLI create-temp-doc и автоматической записи Change Log Lite",
         impact="Low",
         status="Done",
@@ -778,7 +778,6 @@ def replace_doc_text(
     new_text: str,
 ):
     """Replace exact text fragment in Google Doc and log operation."""
-    ensure_write_allowed("replace-doc-text", target=document_id)
     ensure_write_allowed("replace-doc-text", target=document_id)
     s = services()
     docs = s["docs"]
