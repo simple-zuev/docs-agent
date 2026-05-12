@@ -1,0 +1,26 @@
+==== README.md ====
+35:- python agent_cli.py doctor-lite
+36:- python agent_cli.py doctor-lite --json
+39:- python agent_cli.py doctor
+40:- python agent_cli.py doctor --json
+45:- python agent_cli.py status
+46:- python agent_cli.py status --json
+
+==== docs/HUMAN_OPERATOR_GUIDE.md ====
+24:- python agent_cli.py status
+25:- python agent_cli.py status --json
+40:- python agent_cli.py doctor-lite
+41:- python agent_cli.py doctor-lite --json
+44:- python agent_cli.py doctor
+45:- python agent_cli.py doctor --json
+
+==== docs/COMMAND_REFERENCE.md ====
+12:- python agent_cli.py doctor-lite
+13:- python agent_cli.py doctor-lite --json
+18:- python agent_cli.py doctor
+19:- python agent_cli.py doctor --json
+27:- python agent_cli.py status
+28:- python agent_cli.py status --json
+
+==== docs/INSTALLATION.md ====
+49:python agent_cli.py status

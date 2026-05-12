@@ -1,0 +1,20 @@
+Status / repo-state doc sync review
+Date: 2026-05-12
+
+Changed file
+- docs/COMMAND_REFERENCE.md
+
+What changed
+- retained existing status examples
+- added repo-state examples
+- added rs alias examples
+
+Why
+- align command reference with current agent_cli.py command surface
+- close under-documentation gap for operational health/status commands
+- keep mutation limited to the dedicated command reference document
+
+Scope control
+- no code mutation
+- no CLI behavior change
+- no README/HUMAN_OPERATOR_GUIDE/INSTALLATION changes

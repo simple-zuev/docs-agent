@@ -1,0 +1,23 @@
+Status / repo-state documentation audit plan
+Date: 2026-05-12
+
+Scope
+- README.md
+- docs/HUMAN_OPERATOR_GUIDE.md
+- docs/COMMAND_REFERENCE.md
+- docs/INSTALLATION.md
+
+Focus
+- status
+- repo-state
+- rs
+- doctor-lite
+- doctor
+
+Goal
+- detect human-facing documentation drift for operational health/status commands
+
+Constraints
+- audit-only
+- no code mutation
+- no documentation mutation

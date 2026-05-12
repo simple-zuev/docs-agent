@@ -27,12 +27,6 @@ status
 - python agent_cli.py status
 - python agent_cli.py status --json
 
-repo-state
-- python agent_cli.py repo-state
-- python agent_cli.py repo-state --json
-- python agent_cli.py rs
-- python agent_cli.py rs --json
-
 find
 - python agent_cli.py f "DOC-0001"
 - python agent_cli.py find-doc-any "DOC-0001"

@@ -1,0 +1,154 @@
+==== agent_cli.py status/repo-state surface ====
+52:    markers = [
+62:    return any(marker in s for marker in markers)
+232:def _parse_master_index_rows_from_live_result(live_result):
+250:    row = _parse_master_index_rows_from_live_result(seed)
+254:            error_type="CacheSeedParseError",
+255:            error_message="Could not parse initial MASTER_INDEX cache seed.",
+302:    row = _parse_master_index_rows_from_live_result(payload)
+397:def build_doctor_summary(
+398:    *, env_ok: bool, status_ok: bool, master_index_ok: bool, smoke_ok: bool
+400:    if env_ok and status_ok and master_index_ok and smoke_ok:
+401:        return "CLI выглядит работоспособным: окружение, status, доступ к MASTER_INDEX и smoke-проверка прошли успешно."
+405:    if not status_ok:
+406:        failed.append("status")
+427:            "Подожди 60-90 секунд, сократи quota-sensitive запросы и повтори doctor/smoke.",
+472:    if error_type in {"NotFound", "LinkParseError"}:
+488:            "Проверь debug-вывод, timeout, stdout/stderr и отдельно запусти status/doctor --json.",
+494:        "Проверь debug-вывод и повтори диагностику через doctor --json.",
+498:def build_doctor_next_step(
+499:    *, env_ok: bool, status_ok: bool, master_index_ok: bool, smoke_ok: bool
+503:    if not status_ok:
+504:        return "Сначала выполни python agent_cli.py status --json и проверь блоки safety/config."
+514:def doctor_payload() -> dict:
+528:    status = cmd_status_payload()
+534:        "status": status,
+544:            "command": "doctor",
+546:            "summary": "CLI выглядит работоспособным: окружение, status, доступ к MASTER_INDEX и smoke-проверка прошли успешно.",
+562:        or "Проверь debug-вывод и отдельно запусти doctor --json."
+565:    error_message = str(sample.get("error_message") or "doctor check failed")
+569:        "command": "doctor",
+584:def doctor_lite_payload() -> dict:
+598:    status = cmd_status_payload()
+603:        "status": status,
+612:            "command": "doctor-lite",
+614:            "summary": "CLI выглядит работоспособным для рутинного старта: окружение, status и доступ к MASTER_INDEX проверены.",
+615:            "next_step": "Можно начинать штатную работу. Для углубленной проверки при необходимости запусти doctor.",
+624:    recommended_action = "Проверь debug-вывод и отдельно запусти doctor --json."
+635:        recommended_action = "Подожди 60-90 секунд и повтори doctor-lite/doctor."
+636:    elif str(sample.get("error_type") or "") in {"NotFound", "LinkParseError"}:
+643:        "command": "doctor-lite",
+646:        "next_step": "Запусти doctor --json для расширенной диагностики.",
+651:        "error_message": str(sample.get("error_message") or "doctor-lite check failed"),
+720:            recommended_action = "Подожди 60-90 секунд и повтори doctor/smoke."
+807:def print_compact_status(payload: dict):
+809:    print("route: status")
+827:    print("route: repo-state")
+843:    entries = payload.get("diff_name_status_entries") or []
+845:        print("diff_name_status_entries:")
+852:def print_compact_doctor_lite(payload: dict):
+854:    print("route: doctor-lite")
+858:    print(f"status_ok: {(payload.get('checks') or {}).get('status', {}).get('ok')}")
+872:def print_compact_doctor(payload: dict):
+874:    print("route: doctor")
+878:    status_check = checks.get("status") or {}
+883:    print(f"status_ok: {status_check.get('ok')}")
+1035:            error_message="Failed to parse JSON output from docs_agent.py.",
+1091:    elif error_type == "LinkParseError":
+1121:        next_step = "Проверь _debug, stderr и повтори сценарий через status / smoke / точечный вызов команды."
+1137:def extract_first_match_value(payload: dict, idx: int):
+1166:        r"/folders/([a-zA-Z0-9_-]+)",
+1213:def cmd_status_payload() -> dict:
+1215:    config = run_docs_agent_with_retry(["show-config-status"])
+1218:        "command": "status",
+1232:        "command": "repo-state",
+1256:def cmd_status(json_output: bool = False) -> int:
+1257:    payload = cmd_status_payload()
+1261:        print_compact_status(payload)
+1265:def cmd_doctor(json_output: bool = False) -> int:
+1266:    payload = doctor_payload()
+1270:        print_compact_doctor(payload)
+1415:    if error_type in {"NotFound", "LinkParseError"}:
+1507:        "document_id": extract_first_match_value(result, COL_DOCUMENT_ID),
+1508:        "document_name": extract_first_match_value(result, COL_DOCUMENT_NAME),
+1509:        "link": extract_first_match_value(result, COL_LINK),
+1562:            error_type="LinkParseError",
+1617:def is_status_query(query_lower: str) -> bool:
+1621:            "status",
+1658:def ask_status_payload(query: str) -> dict:
+1659:    result = cmd_status_payload()
+1660:    return build_ask_result(query, "status", result)
+1694:    if is_status_query(ql):
+1695:        return ask_status_payload(query)
+1716:    if routed == "status":
+1744:                lines.append("next_step: Повтори команду или проверь status --json.")
+1785:            elif error_type == "LinkParseError":
+1815:                next_step = "Проверь _debug и повтори сценарий через status и точечный read-doc вызов."
+1854:    status_payload = cmd_status_payload()
+1857:        "status",
+1858:        "doctor-lite",
+1859:        "doctor",
+1860:        "repo-state",
+1877:    registry_and_sheet_helpers = [
+1888:        "show-config-status",
+1894:        "mode": ((status_payload.get("safety") or {}).get("mode")),
+1896:            (status_payload.get("safety") or {}).get("default_dry_run")
+1899:            (status_payload.get("safety") or {}).get("forbid_master_index_write")
+1901:        "forbid_delete": ((status_payload.get("safety") or {}).get("forbid_delete")),
+1903:            (status_payload.get("safety") or {}).get("default_test_folder")
+1911:        "can_list_folders": True,
+1926:        "Safe autonomous mode should prefer read-only, draft-first, create-staging-copy, and replace-doc-text-safe.",
+1938:            "registry_and_sheet_helpers": registry_and_sheet_helpers,
+1943:        "status_snapshot_ok": bool(status_payload.get("ok")),
+1961:    status_payload = cmd_status_payload()
+1980:            "status",
+2015:            if item in {"status", "capabilities"}:
+2035:                                (status_payload.get("config") or {}).get(
+2040:                                (status_payload.get("config") or {}).get(
+2092:        "safety_snapshot": status_payload,
+2301:        (cmd_status_payload().get("safety") or {}).get("default_test_folder")
+2320:    review_status = "Needs classification"
+2325:        review_status = "Not for direct mutation"
+2329:        review_status = "Review required"
+2333:        review_status = "In review scope"
+2339:        review_status = "In default test scope"
+2343:        review_status = "Outside review scope"
+2358:        "review_status": review_status,
+2442:        print(f"Review status: {payload.get('review_status')}")
+2450:def cmd_doctor_lite(json_output: bool = False) -> int:
+2451:    payload = doctor_lite_payload()
+2455:        print_compact_doctor_lite(payload)
+2468:def parse_json_flag(argv: list[str]) -> tuple[bool, list[str]]:
+2482:        _, args = parse_json_flag(args)
+2495:        json_output, args = parse_json_flag(argv)
+2513:    json_output, args = parse_json_flag(argv)
+2525:        "  python agent_cli.py status [--json]\n  python agent_cli.py repo-state [--json]    | rs [--json]\n"
+2526:        "  python agent_cli.py doctor [--json]        | diagnose [--json]\n"
+2541:        "  python agent_cli.py status\n"
+2542:        "  python agent_cli.py status --json\n  python agent_cli.py repo-state\n  python agent_cli.py repo-state --json\n"
+2549:        "  python agent_cli.py doctor\n"
+2550:        "  python agent_cli.py doctor --json\n"
+2555:    json_output, args = parse_json_flag(argv)
+2574:        if cmd == "status":
+2575:            json_output, args = parse_json_flag(argv)
+2577:                print_usage_error("status does not accept positional arguments.")
+2579:            return cmd_status(json_output=json_output)
+2581:        if cmd in {"repo-state", "rs"}:
+2582:            json_output, args = parse_json_flag(argv)
+2584:                print_usage_error("repo-state does not accept positional arguments.")
+2588:        if cmd in {"doctor-lite", "diagnose-lite"}:
+2589:            json_output, args = parse_json_flag(argv)
+2591:                print_usage_error("doctor-lite does not accept positional arguments.")
+2593:            return cmd_doctor_lite(json_output=json_output)
+2596:            json_output, args = parse_json_flag(argv)
+2602:        if cmd in {"doctor", "diagnose"}:
+2603:            json_output, args = parse_json_flag(argv)
+2605:                print_usage_error("doctor does not accept positional arguments.")
+2607:            return cmd_doctor(json_output=json_output)
+2610:            json_output, args = parse_json_flag(argv)
+2617:            json_output, args = parse_json_flag(argv)
+2640:            json_output, args = parse_json_flag(argv)
+2648:        if cmd in {"doctor", "diagnose"}:
+2649:            json_output, args = parse_json_flag(argv)
+2651:                print_usage_error("doctor does not accept positional arguments.")
+2653:            return cmd_doctor(json_output=json_output)

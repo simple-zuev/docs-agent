@@ -1,0 +1,18 @@
+Status / repo-state doc sync plan
+Date: 2026-05-12
+
+Target
+- docs/COMMAND_REFERENCE.md only
+
+Goal
+- document repo-state / rs in the dedicated command reference
+
+Planned change
+- add repo-state examples
+- add rs alias examples
+
+Non-goals
+- no code change
+- no README change
+- no HUMAN_OPERATOR_GUIDE.md change
+- no INSTALLATION.md change
