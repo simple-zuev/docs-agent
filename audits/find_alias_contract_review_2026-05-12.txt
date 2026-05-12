@@ -1,0 +1,12 @@
+Scope
+- audit-only review of short alias `f` for `find-doc-any`
+- no production code changes
+
+Review goals
+- inspect dispatch path for alias `f`
+- inspect handle_query_command and parse_json_flag interaction
+- compare alias behavior with long-form `find-doc-any`
+- determine whether the defect is a narrow alias contract drift
+
+Preliminary conclusion
+- fill after artifact review

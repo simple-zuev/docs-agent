@@ -1,0 +1,13 @@
+Find alias contract audit inventory
+
+Scope
+- audit-only review of short alias `f` for `find-doc-any`
+
+Known confirmed symptoms
+- `f DOC-0001` works
+- `f DOC-0001 --json` treats `--json` as part of the query
+- `f --help` treats `--help` as query
+
+Audit goal
+- isolate where alias `f` loses `--json` and `--help` handling
+- determine whether a narrow alias contract fix is justified

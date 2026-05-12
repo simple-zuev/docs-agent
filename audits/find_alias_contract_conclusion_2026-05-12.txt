@@ -1,0 +1,7 @@
+Conclusion
+- pending artifact review
+
+Decision options
+1. narrow alias parsing drift confirmed and ready for production fix
+2. more bounded audit needed before mutation
+3. alias behavior is broader than expected and should not be fixed yet

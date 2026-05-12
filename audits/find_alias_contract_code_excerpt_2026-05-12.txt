@@ -1,0 +1,226 @@
+    args = argv[:]
+    if allow_json_flag:
+        _, args = parse_json_flag(args)
+    if not args:
+        return None
+    return True, args
+
+
+def handle_query_command(
+    argv: list[str],
+    handler,
+    *,
+    allow_json_flag: bool = False,
+) -> int:
+    if allow_json_flag:
+        json_output, args = parse_json_flag(argv)
+    else:
+        json_output, args = False, argv[:]
+
+    if not args:
+        print_usage_error("Missing query argument.")
+        return EXIT_USAGE_ERROR
+
+    value = " ".join(args)
+    if allow_json_flag:
+        return handler(value, json_output=json_output)
+    return handler(value)
+
+
+def run_query_command(
+    argv: list[str],
+    handler,
+) -> int:
+    json_output, args = parse_json_flag(argv)
+    if not args:
+        usage()
+        return 1
+    value = " ".join(args)
+    handler(value, json_output=json_output)
+    return 0
+
+
+def usage() -> None:
+    print(
+        "Usage:\n"
+        "  python agent_cli.py status [--json]\n  python agent_cli.py repo-state [--json]    | rs [--json]\n"
+        "  python agent_cli.py doctor [--json]        | diagnose [--json]\n"
+        "  python agent_cli.py assemble-context [--json] --profile <profile>\n"
+        "  python agent_cli.py doc-body-only [--json] --profile <profile> --document-type <type> --title <title>\n"
+        "  python agent_cli.py artifact-state [--json] --file-id <google_drive_file_id>\n"
+        "  python agent_cli.py find-doc-id <DOC-XXXX>\n"
+        "  python agent_cli.py find-doc-name <document name>\n"
+        "  python agent_cli.py find-link <drive_id_or_url_fragment>\n"
+        "  python agent_cli.py find-doc-any [--json] <query>        | f [--json] <query>\n"
+        "  python agent_cli.py open-doc-from-query [--json] <query> | o [--json] <query>\n"
+        "  python agent_cli.py read-doc-from-query [--json] <query> | r [--json] <query>\n"
+        "  python agent_cli.py get-file <google_drive_file_id>\n"
+        "  python agent_cli.py read-doc <google_doc_id>\n"
+        "  python agent_cli.py ask [--json] <free text query>       | q [--json] <query>\n"
+        "\n"
+        "Examples:\n"
+        "  python agent_cli.py status\n"
+        "  python agent_cli.py status --json\n  python agent_cli.py repo-state\n  python agent_cli.py repo-state --json\n"
+        "  python agent_cli.py f DOC-0001\n"
+        "  python agent_cli.py o DOC-0002\n"
+        "  python agent_cli.py r DOC-0002\n"
+        '  python agent_cli.py r "00_PROJECT_AI_OPERATING_PROMPT_АСТЦВ"\n'
+        '  python agent_cli.py q "прочитай DOC-0002"\n'
+        '  python agent_cli.py q --json "прочитай 00_PROJECT_AI_OPERATING_PROMPT_АСТЦВ"\n'
+        "  python agent_cli.py doctor\n"
+        "  python agent_cli.py doctor --json\n"
+    )
+
+
+def run_query_handler(argv: list[str], handler) -> int:
+    json_output, args = parse_json_flag(argv)
+    if not args:
+        usage()
+        return 1
+
+    value = " ".join(args)
+    handler(value, json_output=json_output)
+    return 0
+
+
+def main() -> int:
+    if len(sys.argv) < 2:
+        print_usage_error("Missing command.")
+        return EXIT_USAGE_ERROR
+
+    cmd = sys.argv[1]
+    argv = sys.argv[2:]
+
+    try:
+        if cmd == "status":
+            json_output, args = parse_json_flag(argv)
+            if args:
+                print_usage_error("status does not accept positional arguments.")
+                return EXIT_USAGE_ERROR
+            return cmd_status(json_output=json_output)
+
+        if cmd in {"repo-state", "rs"}:
+            json_output, args = parse_json_flag(argv)
+            if args:
+                print_usage_error("repo-state does not accept positional arguments.")
+                return EXIT_USAGE_ERROR
+            return cmd_repo_state(json_output=json_output)
+
+        if cmd in {"doctor-lite", "diagnose-lite"}:
+            json_output, args = parse_json_flag(argv)
+            if args:
+                print_usage_error("doctor-lite does not accept positional arguments.")
+                return EXIT_USAGE_ERROR
+            return cmd_doctor_lite(json_output=json_output)
+
+        if cmd == "capabilities":
+            json_output, args = parse_json_flag(argv)
+            if args:
+                print_usage_error("capabilities does not accept positional arguments.")
+                return EXIT_USAGE_ERROR
+            return cmd_capabilities(json_output=json_output)
+
+        if cmd in {"doctor", "diagnose"}:
+            json_output, args = parse_json_flag(argv)
+            if args:
+                print_usage_error("doctor does not accept positional arguments.")
+                return EXIT_USAGE_ERROR
+            return cmd_doctor(json_output=json_output)
+
+        if cmd == "assemble-context":
+            json_output, args = parse_json_flag(argv)
+            if len(args) != 2 or args[0] != "--profile":
+                print_usage_error("assemble-context requires: --profile <profile>")
+                return EXIT_USAGE_ERROR
+            return cmd_assemble_context(args[1], json_output=json_output)
+
+        if cmd == "doc-body-only":
+            json_output, args = parse_json_flag(argv)
+            if len(args) != 6:
+                print_usage_error(
+                    "doc-body-only requires: --profile <profile> --document-type <type> --title <title>"
+                )
+                return EXIT_USAGE_ERROR
+            if (
+                args[0] != "--profile"
+                or args[2] != "--document-type"
+                or args[4] != "--title"
+            ):
+                print_usage_error(
+                    "doc-body-only requires: --profile <profile> --document-type <type> --title <title>"
+                )
+                return EXIT_USAGE_ERROR
+            return cmd_doc_body_only(
+                args[1],
+                args[3],
+                args[5],
+                json_output=json_output,
+            )
+
+        if cmd == "artifact-state":
+            json_output, args = parse_json_flag(argv)
+            if len(args) != 2 or args[0] != "--file-id":
+                print_usage_error(
+                    "artifact-state requires: --file-id <google_drive_file_id>"
+                )
+                return EXIT_USAGE_ERROR
+            return cmd_artifact_state(args[1], json_output=json_output)
+
+        if cmd in {"doctor", "diagnose"}:
+            json_output, args = parse_json_flag(argv)
+            if args:
+                print_usage_error("doctor does not accept positional arguments.")
+                return EXIT_USAGE_ERROR
+            return cmd_doctor(json_output=json_output)
+
+        if cmd == "find-doc-id":
+            if len(argv) < 1:
+                print_usage_error("Missing DOC-XXXX argument.")
+                return EXIT_USAGE_ERROR
+            cmd_find_doc_id(argv[0])
+            return EXIT_OK
+
+        if cmd == "find-doc-name":
+            return handle_query_command(argv, cmd_find_doc_name)
+
+        if cmd == "find-link":
+            return handle_query_command(argv, cmd_find_link)
+
+        if cmd in {"find-doc-any", "f"}:
+            return handle_query_command(argv, cmd_find_doc_any, allow_json_flag=True)
+
+        if cmd in {"open-doc-from-query", "o"}:
+            return handle_query_command(
+                argv, cmd_open_doc_from_query, allow_json_flag=True
+            )
+
+        if cmd in {"read-doc-from-query", "r"}:
+            return handle_query_command(
+                argv, cmd_read_doc_from_query, allow_json_flag=True
+            )
+
+        if cmd == "get-file":
+            if len(argv) < 1:
+                print_usage_error("Missing google_drive_file_id argument.")
+                return EXIT_USAGE_ERROR
+            cmd_get_file(argv[0])
+            return EXIT_OK
+
+        if cmd == "read-doc":
+            if len(argv) < 1:
+                print_usage_error("Missing google_doc_id argument.")
+                return EXIT_USAGE_ERROR
+            cmd_read_doc(argv[0])
+            return EXIT_OK
+
+        if cmd in {"ask", "q"}:
+            return handle_query_command(argv, cmd_ask, allow_json_flag=True)
+
+        print_usage_error(f"Unknown command: {cmd}")
+        return EXIT_USAGE_ERROR
+
+    except KeyboardInterrupt:
+        print_json(
+            {
+                "ok": False,
+                "command": cmd,

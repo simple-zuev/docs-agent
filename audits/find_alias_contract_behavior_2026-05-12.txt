@@ -1,0 +1,165 @@
+==== f DOC-0001 ====
+ok: True
+route: find-doc-any
+query: DOC-0001
+document_id: DOC-0001
+document_name: 00_MASTER_INDEX_АСТЦВ_v3
+link: https://docs.google.com/spreadsheets/d/1hyWNNzsIHRLGJ65urOQUA0x_kOqCP61OkXcM3MMyedw
+
+exit_code=0
+
+==== f DOC-0001 --json ====
+ok: False
+command: find-doc-any
+query: DOC-0001 --json
+error_type: NotFound
+error_message: No matches found by Document ID, Document Name, or Link fragment.
+retryable: False
+auth_related: False
+network_related: False
+explanation: Похоже, документ или объект не найден в MASTER_INDEX по идентификатору, имени или фрагменту ссылки.
+next_step: Проверь точное Document ID, точное имя документа или сначала выполни find-doc-any.
+
+exit_code=2
+
+==== f --json DOC-0001 ====
+{
+  "ok": true,
+  "command": "find-doc-any",
+  "query": "DOC-0001",
+  "matched_by": "Document ID",
+  "result": {
+    "ok": true,
+    "command": "master-index-cache-local-search",
+    "matches_found": 1,
+    "matches": [
+      {
+        "row_number": 2,
+        "row_values": [
+          "DOC-0001",
+          "00_MASTER_INDEX_АСТЦВ_v3",
+          "Реестр",
+          "YES",
+          "Базовый документ",
+          "Актуален",
+          "00_Управление_проектом",
+          "Project Owner",
+          "Управление проектным хранилищем",
+          "ADR-007",
+          "Monthly",
+          "2026-05-07",
+          "Critical",
+          "Основной утверждённый индекс проектного хранилища",
+          "https://docs.google.com/spreadsheets/d/1hyWNNzsIHRLGJ65urOQUA0x_kOqCP61OkXcM3MMyedw"
+        ]
+      }
+    ]
+  },
+  "summary": {
+    "document_id": "DOC-0001",
+    "document_name": "00_MASTER_INDEX_АСТЦВ_v3",
+    "link": "https://docs.google.com/spreadsheets/d/1hyWNNzsIHRLGJ65urOQUA0x_kOqCP61OkXcM3MMyedw",
+    "folder": "00_Управление_проектом"
+  },
+  "attempts": [
+    {
+      "strategy": "Document ID",
+      "ok": true,
+      "matches_found": 1,
+      "error_type": null,
+      "error_message": null
+    }
+  ],
+  "cache": {
+    "used": true,
+    "cache_file": "/Users/zuevvladimir/AI/docs-agent/cache/master_index/master_index_cache.json",
+    "ttl_sec": 90
+  }
+}
+
+exit_code=0
+
+==== f --help ====
+ok: False
+command: find-doc-any
+query: --help
+error_type: NotFound
+error_message: No matches found by Document ID, Document Name, or Link fragment.
+retryable: False
+auth_related: False
+network_related: False
+explanation: Похоже, документ или объект не найден в MASTER_INDEX по идентификатору, имени или фрагменту ссылки.
+next_step: Проверь точное Document ID, точное имя документа или сначала выполни find-doc-any.
+
+exit_code=2
+
+==== find-doc-any --help ====
+ok: False
+command: find-doc-any
+query: --help
+error_type: NotFound
+error_message: No matches found by Document ID, Document Name, or Link fragment.
+retryable: False
+auth_related: False
+network_related: False
+explanation: Похоже, документ или объект не найден в MASTER_INDEX по идентификатору, имени или фрагменту ссылки.
+next_step: Проверь точное Document ID, точное имя документа или сначала выполни find-doc-any.
+
+exit_code=2
+
+==== find-doc-any --json DOC-0001 ====
+{
+  "ok": true,
+  "command": "find-doc-any",
+  "query": "DOC-0001",
+  "matched_by": "Document ID",
+  "result": {
+    "ok": true,
+    "command": "master-index-cache-local-search",
+    "matches_found": 1,
+    "matches": [
+      {
+        "row_number": 2,
+        "row_values": [
+          "DOC-0001",
+          "00_MASTER_INDEX_АСТЦВ_v3",
+          "Реестр",
+          "YES",
+          "Базовый документ",
+          "Актуален",
+          "00_Управление_проектом",
+          "Project Owner",
+          "Управление проектным хранилищем",
+          "ADR-007",
+          "Monthly",
+          "2026-05-07",
+          "Critical",
+          "Основной утверждённый индекс проектного хранилища",
+          "https://docs.google.com/spreadsheets/d/1hyWNNzsIHRLGJ65urOQUA0x_kOqCP61OkXcM3MMyedw"
+        ]
+      }
+    ]
+  },
+  "summary": {
+    "document_id": "DOC-0001",
+    "document_name": "00_MASTER_INDEX_АСТЦВ_v3",
+    "link": "https://docs.google.com/spreadsheets/d/1hyWNNzsIHRLGJ65urOQUA0x_kOqCP61OkXcM3MMyedw",
+    "folder": "00_Управление_проектом"
+  },
+  "attempts": [
+    {
+      "strategy": "Document ID",
+      "ok": true,
+      "matches_found": 1,
+      "error_type": null,
+      "error_message": null
+    }
+  ],
+  "cache": {
+    "used": true,
+    "cache_file": "/Users/zuevvladimir/AI/docs-agent/cache/master_index/master_index_cache.json",
+    "ttl_sec": 90
+  }
+}
+
+exit_code=0

@@ -1,0 +1,39 @@
+130:        "command": "find-doc-any",
+170:        "command": "find-doc-any",
+178:        "next_step": "Проверь точное Document ID, точное имя документа или сначала выполни find-doc-any.",
+476:            "Проверь точный query/Document ID/ссылку и сначала выполни find-doc-any.",
+764:    print("route: find-doc-any")
+1090:        next_step = "Проверь точное Document ID, точное имя документа или сначала выполни find-doc-any."
+1389:        command="find-doc-any",
+1522:        "command": "find-doc-any",
+1581:def cmd_find_doc_any(query: str, json_output: bool = False) -> int:
+1671:        return build_ask_result(query, "find-doc-any", found)
+1686:    return build_ask_result(query, "find-doc-any", found)
+1727:    if routed in {"find-doc-any", "get-file"}:
+1738:                    "next_step: Уточни идентификатор, имя документа или сначала выполни find-doc-any."
+1752:        if result.get("command") == "find-doc-any":
+1864:        "find-doc-any",
+1879:        "read-sheet-header",
+2468:def parse_json_flag(argv: list[str]) -> tuple[bool, list[str]]:
+2482:        _, args = parse_json_flag(args)
+2488:def handle_query_command(
+2495:        json_output, args = parse_json_flag(argv)
+2513:    json_output, args = parse_json_flag(argv)
+2533:        "  python agent_cli.py find-doc-any [--json] <query>        | f [--json] <query>\n"
+2555:    json_output, args = parse_json_flag(argv)
+2575:            json_output, args = parse_json_flag(argv)
+2582:            json_output, args = parse_json_flag(argv)
+2589:            json_output, args = parse_json_flag(argv)
+2596:            json_output, args = parse_json_flag(argv)
+2603:            json_output, args = parse_json_flag(argv)
+2610:            json_output, args = parse_json_flag(argv)
+2617:            json_output, args = parse_json_flag(argv)
+2640:            json_output, args = parse_json_flag(argv)
+2649:            json_output, args = parse_json_flag(argv)
+2663:            return handle_query_command(argv, cmd_find_doc_name)
+2666:            return handle_query_command(argv, cmd_find_link)
+2668:        if cmd in {"find-doc-any", "f"}:
+2669:            return handle_query_command(argv, cmd_find_doc_any, allow_json_flag=True)
+2672:            return handle_query_command(
+2677:            return handle_query_command(
+2696:            return handle_query_command(argv, cmd_ask, allow_json_flag=True)
