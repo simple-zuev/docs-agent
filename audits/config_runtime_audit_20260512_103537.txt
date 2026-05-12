@@ -1,0 +1,18 @@
+Config/runtime audit findings
+
+Confirmed issues:
+- agent_cli.py: duplicate parse_json_flag
+- docs_agent.py: duplicate load_config
+- docs_agent.py: undefined CONFIG_PATH_DEFAULT in lower load_config
+- docs_agent.py: undefined dry_run in create_staging_copy
+- docs_agent.py: undefined title_prefix in create_staging_copy
+- docs_agent_v2.py: duplicate load_config
+- docs_agent_v2.py: undefined CONFIG_PATH_DEFAULT in lower load_config
+- docs_agent_v2.py: undefined dry_run in create_staging_copy
+- docs_agent_v2.py: undefined title_prefix in create_staging_copy
+
+Scope rule:
+- clean refactor only
+- no repo-wide lint cleanup
+- no mixed refactors
+- preserve reversibility

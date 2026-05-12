@@ -30,14 +30,15 @@ SCOPES = [
 CHANGE_LOG_ID = "1-6F5MCJR2EkP74pROsYXsPMmu1zPwp82hl0mDi9U3EQ"
 
 
-
 CONFIG_PATH = BASE / "config" / "config.yml"
+
 
 def load_config():
     if not CONFIG_PATH.exists():
         return {}
     with CONFIG_PATH.open("r", encoding="utf-8") as f:
         return yaml.safe_load(f) or {}
+
 
 def config_get(path, default=None):
     cfg = load_config()
@@ -48,37 +49,47 @@ def config_get(path, default=None):
         cur = cur[part]
     return cur
 
+
 def is_readonly_mode():
     return config_get("safety.mode", "readonly") == "readonly"
+
 
 def is_default_dry_run():
     return bool(config_get("safety.default_dry_run", True))
 
+
 def ensure_write_allowed(operation_name: str, target: str = ""):
     if is_readonly_mode():
         suffix = f" Target: {target}" if target else ""
-        raise RuntimeError(f"Write operation blocked in readonly mode: {operation_name}.{suffix}")
+        raise RuntimeError(
+            f"Write operation blocked in readonly mode: {operation_name}.{suffix}"
+        )
+
 
 def ensure_master_index_write_allowed():
     if bool(config_get("safety.forbid_master_index_write", True)):
         raise RuntimeError("Master Index write is forbidden by config")
 
+
 def get_master_index_id():
     return config_get("documents.master_index_spreadsheet_id")
+
 
 def get_master_index_sheet():
     return config_get("documents.master_index_sheet_name", "MASTER_INDEX")
 
+
 def get_change_log_id():
     return config_get("documents.change_log_spreadsheet_id", CHANGE_LOG_ID)
+
 
 def get_change_log_sheet():
     return config_get("documents.change_log_sheet_name", "Change Log Lite")
 
 
-
 def get_sheets_service():
     return services()["sheets"]
+
 
 def normalize_jsonable(value):
     if value is None:
@@ -87,8 +98,10 @@ def normalize_jsonable(value):
         return value
     return str(value)
 
+
 def emit_json(payload: dict):
     print(json.dumps(payload, ensure_ascii=False, indent=2))
+
 
 @app.command("read-sheet-values")
 def read_sheet_values(
@@ -179,26 +192,25 @@ def read_sheet_values(
         print(f"error_message: {payload['error_message']}")
         raise typer.Exit(code=1)
 
+
 def get_default_test_folder_name():
     if bool(config_get("safety.office_as_default_test_folder", True)):
         return config_get("folders.office_name", "200_Офис")
     return config_get("folders.temp_name", "98_Временное")
 
 
-
-
 def should_dry_run(dry_run: bool = False):
     return dry_run or is_default_dry_run()
+
 
 def print_dry_run(payload: dict):
     print("DRY RUN OK")
     print(json.dumps(payload, ensure_ascii=False, indent=2))
 
 
-
-
 def get_safety_mode():
     return config_get("safety.mode", "readonly")
+
 
 def set_safety_mode_value(mode: str):
     if mode not in {"readonly", "write"}:
@@ -213,14 +225,14 @@ def set_safety_mode_value(mode: str):
     with CONFIG_PATH.open("w", encoding="utf-8") as f:
         yaml.safe_dump(cfg, f, allow_unicode=True, sort_keys=False)
 
+
 def is_write_mode():
     return get_safety_mode() == "write"
 
 
-
-
 def is_confirm_required():
     return bool(config_get("safety.require_confirm_for_write", True))
+
 
 def ensure_confirmed(confirm: bool, operation_name: str):
     if is_write_mode() and is_confirm_required() and not confirm:
@@ -228,8 +240,6 @@ def ensure_confirmed(confirm: bool, operation_name: str):
             f"Write operation requires explicit confirmation in write mode: {operation_name}. "
             f"Run with --confirm after a dry-run preview."
         )
-
-
 
 
 def emit_output(json_output: bool, payload: dict, human_lines=None):
@@ -240,8 +250,6 @@ def emit_output(json_output: bool, payload: dict, human_lines=None):
     if human_lines:
         for line in human_lines:
             print(line)
-
-
 
 
 def classify_error(exc: Exception):
@@ -278,6 +286,7 @@ def classify_error(exc: Exception):
         "network_related": network_related,
     }
 
+
 def emit_error(json_output: bool, command: str, exc: Exception):
     payload = {
         "ok": False,
@@ -300,6 +309,7 @@ def get_creds():
     TOKEN_FILE.write_text(creds.to_json(), encoding="utf-8")
     return creds
 
+
 def services():
     creds = get_creds()
     return {
@@ -308,53 +318,74 @@ def services():
         "sheets": build("sheets", "v4", credentials=creds),
     }
 
+
 def list_children(drive, folder_id, page_size=1000):
     items = []
     page_token = None
     while True:
-        res = drive.files().list(
-            q=f"'{folder_id}' in parents and trashed = false",
-            fields="nextPageToken, files(id,name,mimeType,webViewLink,modifiedTime,createdTime)",
-            pageSize=page_size,
-            pageToken=page_token,
-            supportsAllDrives=True,
-            includeItemsFromAllDrives=True,
-        ).execute()
+        res = (
+            drive.files()
+            .list(
+                q=f"'{folder_id}' in parents and trashed = false",
+                fields="nextPageToken, files(id,name,mimeType,webViewLink,modifiedTime,createdTime)",
+                pageSize=page_size,
+                pageToken=page_token,
+                supportsAllDrives=True,
+                includeItemsFromAllDrives=True,
+            )
+            .execute()
+        )
         items.extend(res.get("files", []))
         page_token = res.get("nextPageToken")
         if not page_token:
             break
     return sorted(items, key=lambda x: x["name"])
 
+
 def find_folder(drive, name, parent_id: Optional[str] = None):
     q = f"name = '{name}' and mimeType = 'application/vnd.google-apps.folder' and trashed = false"
     if parent_id:
         q += f" and '{parent_id}' in parents"
-    res = drive.files().list(
-        q=q,
-        fields="files(id,name,mimeType,webViewLink,modifiedTime,createdTime)",
-        pageSize=10,
-        supportsAllDrives=True,
-        includeItemsFromAllDrives=True,
-    ).execute()
+    res = (
+        drive.files()
+        .list(
+            q=q,
+            fields="files(id,name,mimeType,webViewLink,modifiedTime,createdTime)",
+            pageSize=10,
+            supportsAllDrives=True,
+            includeItemsFromAllDrives=True,
+        )
+        .execute()
+    )
     files = res.get("files", [])
     if not files:
         raise RuntimeError(f"Folder not found: {name}")
     return files[0]
 
 
-
 def get_sheet_values(sheets, spreadsheet_id: str, range_a1: str):
-    return sheets.spreadsheets().values().get(
-        spreadsheetId=spreadsheet_id,
-        range=range_a1,
-    ).execute().get("values", [])
+    return (
+        sheets.spreadsheets()
+        .values()
+        .get(
+            spreadsheetId=spreadsheet_id,
+            range=range_a1,
+        )
+        .execute()
+        .get("values", [])
+    )
 
 
-def get_sheet_header_map(sheets, spreadsheet_id: str, sheet_name: str, header_row: int = 1):
-    values = get_sheet_values(sheets, spreadsheet_id, f"'{sheet_name}'!A{header_row}:ZZ{header_row}")
+def get_sheet_header_map(
+    sheets, spreadsheet_id: str, sheet_name: str, header_row: int = 1
+):
+    values = get_sheet_values(
+        sheets, spreadsheet_id, f"'{sheet_name}'!A{header_row}:ZZ{header_row}"
+    )
     if not values:
-        raise RuntimeError(f"Header row not found: spreadsheet={spreadsheet_id} sheet={sheet_name} row={header_row}")
+        raise RuntimeError(
+            f"Header row not found: spreadsheet={spreadsheet_id} sheet={sheet_name} row={header_row}"
+        )
 
     header = values[0]
     mapping = {}
@@ -384,7 +415,9 @@ def pad_row(row, size: int):
     return row[:size]
 
 
-def find_rows_by_column(rows, header_map, column_name: str, match_value: str, header_row: int = 1):
+def find_rows_by_column(
+    rows, header_map, column_name: str, match_value: str, header_row: int = 1
+):
     if column_name not in header_map:
         raise RuntimeError(f"Column not found: {column_name}")
 
@@ -396,14 +429,18 @@ def find_rows_by_column(rows, header_map, column_name: str, match_value: str, he
             continue
         value = row[idx0] if idx0 < len(row) else ""
         if value == match_value:
-            matches.append({
-                "row_number": row_num,
-                "row_values": row,
-            })
+            matches.append(
+                {
+                    "row_number": row_num,
+                    "row_values": row,
+                }
+            )
     return matches
 
 
-def find_rows_by_link_fragment(rows, header_map, fragment: str, link_column: str = "Link", header_row: int = 1):
+def find_rows_by_link_fragment(
+    rows, header_map, fragment: str, link_column: str = "Link", header_row: int = 1
+):
     if link_column not in header_map:
         raise RuntimeError(f"Column not found: {link_column}")
 
@@ -415,20 +452,30 @@ def find_rows_by_link_fragment(rows, header_map, fragment: str, link_column: str
             continue
         value = row[idx0] if idx0 < len(row) else ""
         if fragment in value:
-            matches.append({
-                "row_number": row_num,
-                "row_values": row,
-            })
+            matches.append(
+                {
+                    "row_number": row_num,
+                    "row_values": row,
+                }
+            )
     return matches
 
-def get_file_meta(drive, file_id: str):
-    return drive.files().get(
-        fileId=file_id,
-        fields="id,name,mimeType,webViewLink,modifiedTime,parents",
-        supportsAllDrives=True,
-    ).execute()
 
-def append_log(sheets, action, obj, from_, to, reason, impact="Low", status="Done", notes=""):
+def get_file_meta(drive, file_id: str):
+    return (
+        drive.files()
+        .get(
+            fileId=file_id,
+            fields="id,name,mimeType,webViewLink,modifiedTime,parents",
+            supportsAllDrives=True,
+        )
+        .execute()
+    )
+
+
+def append_log(
+    sheets, action, obj, from_, to, reason, impact="Low", status="Done", notes=""
+):
     now = datetime.now()
     change_id = f"CHG-{now.strftime('%Y-%m-%d-%H%M%S')}-LOCAL"
     row = [
@@ -443,14 +490,20 @@ def append_log(sheets, action, obj, from_, to, reason, impact="Low", status="Don
         status,
         notes,
     ]
-    result = sheets.spreadsheets().values().append(
-        spreadsheetId=CHANGE_LOG_ID,
-        range="'Change Log Lite'!A:J",
-        valueInputOption="USER_ENTERED",
-        insertDataOption="INSERT_ROWS",
-        body={"values": [row]},
-    ).execute()
+    result = (
+        sheets.spreadsheets()
+        .values()
+        .append(
+            spreadsheetId=CHANGE_LOG_ID,
+            range="'Change Log Lite'!A:J",
+            valueInputOption="USER_ENTERED",
+            insertDataOption="INSERT_ROWS",
+            body={"values": [row]},
+        )
+        .execute()
+    )
     return change_id, result.get("updates", {}).get("updatedRange")
+
 
 @app.command()
 def audit():
@@ -473,7 +526,9 @@ def audit():
     out = CACHE_DIR / "cass_snapshot.json"
     out.write_text(json.dumps(snapshot, ensure_ascii=False, indent=2), encoding="utf-8")
 
-    report = REPORTS_DIR / f"cass_audit_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.txt"
+    report = (
+        REPORTS_DIR / f"cass_audit_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.txt"
+    )
     lines = [
         "Cass audit report",
         f"Generated: {snapshot['generated_at']}",
@@ -485,9 +540,10 @@ def audit():
         lines.append(f"- {item['name']} | {item['mimeType']} | {item['id']}")
     report.write_text("\n".join(lines), encoding="utf-8")
 
-    print(f"Audit OK")
+    print("Audit OK")
     print(f"Snapshot: {out}")
     print(f"Report: {report}")
+
 
 @app.command("create-temp-doc")
 def create_temp_doc():
@@ -503,15 +559,19 @@ def create_temp_doc():
 
     title = f"ASTCV_DOCS_AGENT_TEMP_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
 
-    created = drive.files().create(
-        body={
-            "name": title,
-            "mimeType": "application/vnd.google-apps.document",
-            "parents": [temp["id"]],
-        },
-        fields="id,name,webViewLink,parents",
-        supportsAllDrives=True,
-    ).execute()
+    created = (
+        drive.files()
+        .create(
+            body={
+                "name": title,
+                "mimeType": "application/vnd.google-apps.document",
+                "parents": [temp["id"]],
+            },
+            fields="id,name,webViewLink,parents",
+            supportsAllDrives=True,
+        )
+        .execute()
+    )
 
     docs.documents().batchUpdate(
         documentId=created["id"],
@@ -549,6 +609,7 @@ def create_temp_doc():
     print(f"URL: {created.get('webViewLink')}")
     print(f"Change Log: {change_id} | {updated_range}")
 
+
 @app.command("append-log")
 def append_log_cmd(
     action: str = "Test",
@@ -574,22 +635,27 @@ def append_log_cmd(
     print(f"Change ID: {change_id}")
     print(f"Updated range: {updated_range}")
 
+
 @app.command("create-staging-copy")
 def create_staging_copy(
     file_id: str,
     target_folder: str = "13_Черновики_и_review",
+    dry_run: bool = False,
+    confirm: bool = False,
 ):
     """Copy existing Drive file into staging/review folder and log it."""
     ensure_write_allowed("create-staging-copy", target=target_folder)
-    ensure_write_allowed("create-staging-copy", target=target_folder)
     if should_dry_run(dry_run):
-        print_dry_run({
-            "command": "create-doc-in-folder",
-            "target_folder": target_folder,
-            "title_prefix": title_prefix,
-            "write_mode_required": True
-        })
+        print_dry_run(
+            {
+                "command": "create-staging-copy",
+                "file_id": file_id,
+                "target_folder": target_folder,
+                "write_mode_required": True,
+            }
+        )
         return
+    ensure_confirmed(confirm, "create-staging-copy")
 
     s = services()
     drive = s["drive"]
@@ -598,23 +664,33 @@ def create_staging_copy(
     cass = find_folder(drive, "Cass")
     target = find_folder(drive, target_folder, cass["id"])
 
-    source = drive.files().get(
-        fileId=file_id,
-        fields="id,name,mimeType,webViewLink,parents",
-        supportsAllDrives=True,
-    ).execute()
+    source = (
+        drive.files()
+        .get(
+            fileId=file_id,
+            fields="id,name,mimeType,webViewLink,parents",
+            supportsAllDrives=True,
+        )
+        .execute()
+    )
 
-    copy_name = f"STAGING_COPY__{source['name']}__{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+    copy_name = (
+        f"STAGING_COPY__{source['name']}__{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+    )
 
-    copied = drive.files().copy(
-        fileId=file_id,
-        body={
-            "name": copy_name,
-            "parents": [target["id"]],
-        },
-        fields="id,name,webViewLink,parents",
-        supportsAllDrives=True,
-    ).execute()
+    copied = (
+        drive.files()
+        .copy(
+            fileId=file_id,
+            body={
+                "name": copy_name,
+                "parents": [target["id"]],
+            },
+            fields="id,name,webViewLink,parents",
+            supportsAllDrives=True,
+        )
+        .execute()
+    )
 
     change_id, updated_range = append_log(
         sheets=sheets,
@@ -637,6 +713,7 @@ def create_staging_copy(
     print(f"Target folder: Cass / {target_folder}")
     print(f"Change Log: {change_id} | {updated_range}")
 
+
 @app.command("patch-doc")
 def patch_doc(
     document_id: str,
@@ -649,11 +726,15 @@ def patch_doc(
     drive = s["drive"]
     sheets = s["sheets"]
 
-    meta = drive.files().get(
-        fileId=document_id,
-        fields="id,name,mimeType,webViewLink,parents",
-        supportsAllDrives=True,
-    ).execute()
+    meta = (
+        drive.files()
+        .get(
+            fileId=document_id,
+            fields="id,name,mimeType,webViewLink,parents",
+            supportsAllDrives=True,
+        )
+        .execute()
+    )
 
     doc = docs.documents().get(documentId=document_id).execute()
     end_index = doc["body"]["content"][-1]["endIndex"] - 1
@@ -691,6 +772,7 @@ def patch_doc(
     print(f"Inserted chars: {len(text_to_insert)}")
     print(f"Change Log: {change_id} | {updated_range}")
 
+
 @app.command("create-doc-in-folder")
 def create_doc_in_folder(
     target_folder: str,
@@ -700,12 +782,14 @@ def create_doc_in_folder(
 ):
     """Create Google Doc in selected top-level Cass folder and log it."""
     if should_dry_run(dry_run):
-        print_dry_run({
-            "command": "create-doc-in-folder",
-            "target_folder": target_folder,
-            "title_prefix": title_prefix,
-            "write_mode_required": True
-        })
+        print_dry_run(
+            {
+                "command": "create-doc-in-folder",
+                "target_folder": target_folder,
+                "title_prefix": title_prefix,
+                "write_mode_required": True,
+            }
+        )
         return
 
     ensure_write_allowed("create-doc-in-folder", target=target_folder)
@@ -720,15 +804,19 @@ def create_doc_in_folder(
 
     title = f"{title_prefix}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
 
-    created = drive.files().create(
-        body={
-            "name": title,
-            "mimeType": "application/vnd.google-apps.document",
-            "parents": [target["id"]],
-        },
-        fields="id,name,webViewLink,parents",
-        supportsAllDrives=True,
-    ).execute()
+    created = (
+        drive.files()
+        .create(
+            body={
+                "name": title,
+                "mimeType": "application/vnd.google-apps.document",
+                "parents": [target["id"]],
+            },
+            fields="id,name,webViewLink,parents",
+            supportsAllDrives=True,
+        )
+        .execute()
+    )
 
     docs.documents().batchUpdate(
         documentId=created["id"],
@@ -768,6 +856,7 @@ def create_doc_in_folder(
     print(f"URL: {created.get('webViewLink')}")
     print(f"Change Log: {change_id} | {updated_range}")
 
+
 @app.command("list-folder")
 def list_folder_cmd(
     folder_name: str,
@@ -780,7 +869,7 @@ def list_folder_cmd(
     target = find_folder(drive, folder_name, cass["id"])
     items = list_children(drive, target["id"])
 
-    print(f"LIST FOLDER OK")
+    print("LIST FOLDER OK")
     print(f"Folder: Cass / {folder_name}")
     print(f"Folder ID: {target['id']}")
     print("")
@@ -789,7 +878,10 @@ def list_folder_cmd(
         return
 
     for item in items:
-        print(f"- {item['name']} | {item['mimeType']} | {item['id']} | {item.get('webViewLink', '')}")
+        print(
+            f"- {item['name']} | {item['mimeType']} | {item['id']} | {item.get('webViewLink', '')}"
+        )
+
 
 def extract_text(elements):
     out = []
@@ -805,6 +897,7 @@ def extract_text(elements):
 
     return "".join(out)
 
+
 @app.command("read-doc")
 def read_doc(
     document_id: str,
@@ -817,11 +910,15 @@ def read_doc(
         docs = s["docs"]
         drive = s["drive"]
 
-        meta = drive.files().get(
-            fileId=document_id,
-            fields="id,name,mimeType,webViewLink,modifiedTime",
-            supportsAllDrives=True,
-        ).execute()
+        meta = (
+            drive.files()
+            .get(
+                fileId=document_id,
+                fields="id,name,mimeType,webViewLink,modifiedTime",
+                supportsAllDrives=True,
+            )
+            .execute()
+        )
 
         doc = docs.documents().get(documentId=document_id).execute()
 
@@ -861,6 +958,7 @@ def read_doc(
     except Exception as exc:
         emit_error(json_output, "read-doc", exc)
 
+
 @app.command("replace-doc-text")
 def replace_doc_text(
     document_id: str,
@@ -875,11 +973,15 @@ def replace_doc_text(
     drive = s["drive"]
     sheets = s["sheets"]
 
-    meta = drive.files().get(
-        fileId=document_id,
-        fields="id,name,mimeType,webViewLink,modifiedTime",
-        supportsAllDrives=True,
-    ).execute()
+    meta = (
+        drive.files()
+        .get(
+            fileId=document_id,
+            fields="id,name,mimeType,webViewLink,modifiedTime",
+            supportsAllDrives=True,
+        )
+        .execute()
+    )
 
     docs.documents().batchUpdate(
         documentId=document_id,
@@ -918,6 +1020,7 @@ def replace_doc_text(
     print(f"New text: {new_text}")
     print(f"Change Log: {change_id} | {updated_range}")
 
+
 @app.command("replace-doc-text-safe")
 def replace_doc_text_safe(
     document_id: str,
@@ -929,14 +1032,16 @@ def replace_doc_text_safe(
 ):
     """Backup document, then replace exact text fragment and log operation."""
     if should_dry_run(dry_run):
-        print_dry_run({
-            "command": "replace-doc-text-safe",
-            "document_id": document_id,
-            "old_text": old_text,
-            "new_text": new_text,
-            "backup_folder": backup_folder,
-            "write_mode_required": True
-        })
+        print_dry_run(
+            {
+                "command": "replace-doc-text-safe",
+                "document_id": document_id,
+                "old_text": old_text,
+                "new_text": new_text,
+                "backup_folder": backup_folder,
+                "write_mode_required": True,
+            }
+        )
         return
 
     ensure_write_allowed("replace-doc-text-safe", target=document_id)
@@ -949,23 +1054,31 @@ def replace_doc_text_safe(
     cass = find_folder(drive, "Cass")
     target = find_folder(drive, backup_folder, cass["id"])
 
-    meta = drive.files().get(
-        fileId=document_id,
-        fields="id,name,mimeType,webViewLink,modifiedTime",
-        supportsAllDrives=True,
-    ).execute()
+    meta = (
+        drive.files()
+        .get(
+            fileId=document_id,
+            fields="id,name,mimeType,webViewLink,modifiedTime",
+            supportsAllDrives=True,
+        )
+        .execute()
+    )
 
     backup_name = f"BACKUP_BEFORE_REPLACE__{meta['name']}__{datetime.now().strftime('%Y%m%d_%H%M%S')}"
 
-    backup = drive.files().copy(
-        fileId=document_id,
-        body={
-            "name": backup_name,
-            "parents": [target["id"]],
-        },
-        fields="id,name,webViewLink",
-        supportsAllDrives=True,
-    ).execute()
+    backup = (
+        drive.files()
+        .copy(
+            fileId=document_id,
+            body={
+                "name": backup_name,
+                "parents": [target["id"]],
+            },
+            fields="id,name,webViewLink",
+            supportsAllDrives=True,
+        )
+        .execute()
+    )
 
     docs.documents().batchUpdate(
         documentId=document_id,
@@ -1016,11 +1129,15 @@ def verify_doc_text(
     docs = s["docs"]
     drive = s["drive"]
 
-    meta = drive.files().get(
-        fileId=document_id,
-        fields="id,name,mimeType,webViewLink,modifiedTime",
-        supportsAllDrives=True,
-    ).execute()
+    meta = (
+        drive.files()
+        .get(
+            fileId=document_id,
+            fields="id,name,mimeType,webViewLink,modifiedTime",
+            supportsAllDrives=True,
+        )
+        .execute()
+    )
 
     doc = docs.documents().get(documentId=document_id).execute()
     content = doc.get("body", {}).get("content", [])
@@ -1049,11 +1166,15 @@ def export_doc(
     s = services()
     drive = s["drive"]
 
-    meta = drive.files().get(
-        fileId=document_id,
-        fields="id,name,mimeType,webViewLink,modifiedTime",
-        supportsAllDrives=True,
-    ).execute()
+    meta = (
+        drive.files()
+        .get(
+            fileId=document_id,
+            fields="id,name,mimeType,webViewLink,modifiedTime",
+            supportsAllDrives=True,
+        )
+        .execute()
+    )
 
     mime_map = {
         "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -1099,13 +1220,15 @@ def upload_file_to_folder(
     src = Path(local_path)
 
     if should_dry_run(dry_run):
-        print_dry_run({
-            "command": "upload-file-to-folder",
-            "local_path": str(src),
-            "folder_name": folder_name,
-            "target_name": target_name or src.name,
-            "write_mode_required": True
-        })
+        print_dry_run(
+            {
+                "command": "upload-file-to-folder",
+                "local_path": str(src),
+                "folder_name": folder_name,
+                "target_name": target_name or src.name,
+                "write_mode_required": True,
+            }
+        )
         return
 
     ensure_write_allowed("upload-file-to-folder", target=folder_name)
@@ -1126,15 +1249,19 @@ def upload_file_to_folder(
     media = MediaFileUpload(str(src), resumable=True)
     file_name = target_name or src.name
 
-    created = drive.files().create(
-        body={
-            "name": file_name,
-            "parents": [target["id"]],
-        },
-        media_body=media,
-        fields="id,name,mimeType,webViewLink,parents",
-        supportsAllDrives=True,
-    ).execute()
+    created = (
+        drive.files()
+        .create(
+            body={
+                "name": file_name,
+                "parents": [target["id"]],
+            },
+            media_body=media,
+            fields="id,name,mimeType,webViewLink,parents",
+            supportsAllDrives=True,
+        )
+        .execute()
+    )
 
     change_id, updated_range = append_log(
         sheets=sheets,
@@ -1169,13 +1296,15 @@ def move_file_with_log(
 ):
     """Move Drive file into selected top-level Cass folder and write Change Log Lite."""
     if should_dry_run(dry_run):
-        print_dry_run({
-            "command": "move-file-with-log",
-            "file_id": file_id,
-            "target_folder_name": target_folder_name,
-            "reason": reason,
-            "write_mode_required": True
-        })
+        print_dry_run(
+            {
+                "command": "move-file-with-log",
+                "file_id": file_id,
+                "target_folder_name": target_folder_name,
+                "reason": reason,
+                "write_mode_required": True,
+            }
+        )
         return
 
     ensure_write_allowed("move-file-with-log", target=target_folder_name)
@@ -1188,7 +1317,9 @@ def move_file_with_log(
         raise typer.BadParameter("Reason must not be empty")
 
     if file_id.startswith("REPLACE_") or file_id == "FILE_ID":
-        raise typer.BadParameter("Replace placeholder file_id with a real Google Drive file ID")
+        raise typer.BadParameter(
+            "Replace placeholder file_id with a real Google Drive file ID"
+        )
 
     cass = find_folder(drive, "Cass")
     target = find_folder(drive, target_folder_name, cass["id"])
@@ -1197,13 +1328,17 @@ def move_file_with_log(
     old_parents = meta_before.get("parents", [])
     remove_parents = ",".join(old_parents) if old_parents else None
 
-    updated = drive.files().update(
-        fileId=file_id,
-        addParents=target["id"],
-        removeParents=remove_parents,
-        fields="id,name,mimeType,webViewLink,parents",
-        supportsAllDrives=True,
-    ).execute()
+    updated = (
+        drive.files()
+        .update(
+            fileId=file_id,
+            addParents=target["id"],
+            removeParents=remove_parents,
+            fields="id,name,mimeType,webViewLink,parents",
+            supportsAllDrives=True,
+        )
+        .execute()
+    )
 
     meta_after = get_file_meta(drive, file_id)
     parents_after = meta_after.get("parents", [])
@@ -1275,11 +1410,15 @@ def list_folder_by_id(
     s = services()
     drive = s["drive"]
 
-    meta = drive.files().get(
-        fileId=folder_id,
-        fields="id,name,mimeType,webViewLink,modifiedTime,parents",
-        supportsAllDrives=True,
-    ).execute()
+    meta = (
+        drive.files()
+        .get(
+            fileId=folder_id,
+            fields="id,name,mimeType,webViewLink,modifiedTime,parents",
+            supportsAllDrives=True,
+        )
+        .execute()
+    )
 
     items = list_children(drive, folder_id)
 
@@ -1289,7 +1428,9 @@ def list_folder_by_id(
     print("")
 
     for item in items:
-        print(f"- {item['name']} | {item['mimeType']} | {item['id']} | {item.get('webViewLink', '')}")
+        print(
+            f"- {item['name']} | {item['mimeType']} | {item['id']} | {item.get('webViewLink', '')}"
+        )
 
 
 @app.command("read-sheet-header")
@@ -1360,7 +1501,9 @@ def find_row_by_column(
         sheets = s["sheets"]
 
         rows = get_sheet_rows(sheets, spreadsheet_id, sheet_name)
-        header, mapping = get_sheet_header_map(sheets, spreadsheet_id, sheet_name, header_row=header_row)
+        header, mapping = get_sheet_header_map(
+            sheets, spreadsheet_id, sheet_name, header_row=header_row
+        )
 
         matches = find_rows_by_column(
             rows=rows,
@@ -1392,7 +1535,9 @@ def find_row_by_column(
             "",
         ]
         for item in matches:
-            human_lines.append(f"ROW {item['row_number']}: {json.dumps(item['row_values'], ensure_ascii=False)}")
+            human_lines.append(
+                f"ROW {item['row_number']}: {json.dumps(item['row_values'], ensure_ascii=False)}"
+            )
 
         emit_output(json_output, payload, human_lines=human_lines)
     except Exception as exc:
@@ -1406,7 +1551,9 @@ def append_master_index_row(
     payload_json: str,
 ):
     """Append one row into Master Index-like sheet using header names from JSON payload."""
-    ensure_write_allowed("append-master-index-row", target=f"{spreadsheet_id}/{sheet_name}")
+    ensure_write_allowed(
+        "append-master-index-row", target=f"{spreadsheet_id}/{sheet_name}"
+    )
     ensure_master_index_write_allowed()
     s = services()
     sheets = s["sheets"]
@@ -1415,7 +1562,9 @@ def append_master_index_row(
     if not isinstance(payload, dict):
         raise typer.BadParameter("payload_json must be a JSON object")
 
-    header, mapping = get_sheet_header_map(sheets, spreadsheet_id, sheet_name, header_row=1)
+    header, mapping = get_sheet_header_map(
+        sheets, spreadsheet_id, sheet_name, header_row=1
+    )
     row = [""] * len(header)
 
     unknown = [k for k in payload.keys() if k not in mapping]
@@ -1425,13 +1574,18 @@ def append_master_index_row(
     for key, value in payload.items():
         row[mapping[key] - 1] = "" if value is None else str(value)
 
-    result = sheets.spreadsheets().values().append(
-        spreadsheetId=spreadsheet_id,
-        range=f"'{sheet_name}'!A:ZZ",
-        valueInputOption="USER_ENTERED",
-        insertDataOption="INSERT_ROWS",
-        body={"values": [row]},
-    ).execute()
+    result = (
+        sheets.spreadsheets()
+        .values()
+        .append(
+            spreadsheetId=spreadsheet_id,
+            range=f"'{sheet_name}'!A:ZZ",
+            valueInputOption="USER_ENTERED",
+            insertDataOption="INSERT_ROWS",
+            body={"values": [row]},
+        )
+        .execute()
+    )
 
     print("APPEND MASTER INDEX ROW OK")
     print(f"Spreadsheet ID: {spreadsheet_id}")
@@ -1451,7 +1605,9 @@ def update_master_index_row(
     payload_json: str,
 ):
     """Update exactly one row in Master Index-like sheet by matching one column."""
-    ensure_write_allowed("update-master-index-row", target=f"{spreadsheet_id}/{sheet_name}")
+    ensure_write_allowed(
+        "update-master-index-row", target=f"{spreadsheet_id}/{sheet_name}"
+    )
     ensure_master_index_write_allowed()
     s = services()
     sheets = s["sheets"]
@@ -1461,7 +1617,9 @@ def update_master_index_row(
         raise typer.BadParameter("payload_json must be a JSON object")
 
     rows = get_sheet_rows(sheets, spreadsheet_id, sheet_name)
-    header, mapping = get_sheet_header_map(sheets, spreadsheet_id, sheet_name, header_row=1)
+    header, mapping = get_sheet_header_map(
+        sheets, spreadsheet_id, sheet_name, header_row=1
+    )
 
     matches = find_rows_by_column(
         rows=rows,
@@ -1475,7 +1633,9 @@ def update_master_index_row(
         raise RuntimeError(f"No rows found for {match_column}={match_value}")
 
     if len(matches) > 1:
-        raise RuntimeError(f"More than one row found for {match_column}={match_value}: {len(matches)}")
+        raise RuntimeError(
+            f"More than one row found for {match_column}={match_value}: {len(matches)}"
+        )
 
     target = matches[0]
     row_num = target["row_number"]
@@ -1492,12 +1652,17 @@ def update_master_index_row(
     end_col = col_to_a1(len(header))
     target_range = f"'{sheet_name}'!A{row_num}:{end_col}{row_num}"
 
-    result = sheets.spreadsheets().values().update(
-        spreadsheetId=spreadsheet_id,
-        range=target_range,
-        valueInputOption="USER_ENTERED",
-        body={"values": [new_row]},
-    ).execute()
+    result = (
+        sheets.spreadsheets()
+        .values()
+        .update(
+            spreadsheetId=spreadsheet_id,
+            range=target_range,
+            valueInputOption="USER_ENTERED",
+            body={"values": [new_row]},
+        )
+        .execute()
+    )
 
     print("UPDATE MASTER INDEX ROW OK")
     print(f"Spreadsheet ID: {spreadsheet_id}")
@@ -1534,7 +1699,9 @@ def find_row_by_link_fragment(
         sheets = s["sheets"]
 
         rows = get_sheet_rows(sheets, spreadsheet_id, sheet_name)
-        header, mapping = get_sheet_header_map(sheets, spreadsheet_id, sheet_name, header_row=header_row)
+        header, mapping = get_sheet_header_map(
+            sheets, spreadsheet_id, sheet_name, header_row=header_row
+        )
 
         matches = find_rows_by_link_fragment(
             rows=rows,
@@ -1566,7 +1733,9 @@ def find_row_by_link_fragment(
             "",
         ]
         for item in matches:
-            human_lines.append(f"ROW {item['row_number']}: {json.dumps(item['row_values'], ensure_ascii=False)}")
+            human_lines.append(
+                f"ROW {item['row_number']}: {json.dumps(item['row_values'], ensure_ascii=False)}"
+            )
 
         emit_output(json_output, payload, human_lines=human_lines)
     except Exception as exc:
@@ -1584,7 +1753,9 @@ def show_config_status(
             "command": "show-config-status",
             "safety_mode": config_get("safety.mode", "readonly"),
             "default_dry_run": config_get("safety.default_dry_run", True),
-            "forbid_master_index_write": config_get("safety.forbid_master_index_write", True),
+            "forbid_master_index_write": config_get(
+                "safety.forbid_master_index_write", True
+            ),
             "forbid_delete": config_get("safety.forbid_delete", True),
             "default_test_folder": get_default_test_folder_name(),
             "master_index_spreadsheet_id": get_master_index_id(),
@@ -1616,7 +1787,9 @@ def show_safety_mode(
             "command": "show-safety-mode",
             "mode": get_safety_mode(),
             "default_dry_run": is_default_dry_run(),
-            "forbid_master_index_write": config_get("safety.forbid_master_index_write", True),
+            "forbid_master_index_write": config_get(
+                "safety.forbid_master_index_write", True
+            ),
             "forbid_delete": config_get("safety.forbid_delete", True),
             "default_test_folder": get_default_test_folder_name(),
         }
@@ -1641,42 +1814,18 @@ def set_safety_mode(
     set_safety_mode_value(mode)
 
     print("SET SAFETY MODE OK")
-    print(json.dumps({
-        "old_mode": old_mode,
-        "new_mode": mode,
-        "config_path": str(CONFIG_PATH),
-    }, ensure_ascii=False, indent=2))
+    print(
+        json.dumps(
+            {
+                "old_mode": old_mode,
+                "new_mode": mode,
+                "config_path": str(CONFIG_PATH),
+            },
+            ensure_ascii=False,
+            indent=2,
+        )
+    )
+
 
 if __name__ == "__main__":
     app()
-
-class AgentConfig:
-    raw: dict
-
-    @property
-    def default_dry_run(self) -> bool:
-        return bool(self.raw.get("safety", {}).get("default_dry_run", False))
-
-    @property
-    def retries(self) -> int:
-        return int(self.raw.get("google_api", {}).get("retries", 5))
-
-    @property
-    def initial_backoff_sec(self) -> float:
-        return float(self.raw.get("google_api", {}).get("initial_backoff_sec", 1.0))
-
-    @property
-    def max_backoff_sec(self) -> float:
-        return float(self.raw.get("google_api", {}).get("max_backoff_sec", 16.0))
-
-    @property
-    def qps_limit(self) -> float:
-        return float(self.raw.get("google_api", {}).get("qps_limit", 4.0))
-
-def load_config(path: str = CONFIG_PATH_DEFAULT) -> AgentConfig:
-    p = Path(path)
-    if not p.exists():
-        raise SystemExit(f"config not found: {p}")
-    with p.open("r", encoding="utf-8") as f:
-        raw = yaml.safe_load(f) or {}
-    return AgentConfig(raw=raw)

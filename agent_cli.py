@@ -40,26 +40,30 @@ def is_quota_or_rate_limit_error_text(value: str | None) -> bool:
     return any(marker in s for marker in markers)
 
 
-
-
 MASTER_INDEX_CACHE_DIR = BASE / "cache" / "master_index"
 MASTER_INDEX_CACHE_FILE = MASTER_INDEX_CACHE_DIR / "master_index_cache.json"
 MASTER_INDEX_CACHE_TTL_SEC = 90
 
+
 def now_epoch_int() -> int:
     import time
+
     return int(time.time())
+
 
 def ensure_master_index_cache_dir() -> None:
     MASTER_INDEX_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+
 
 def normalize_cell(v):
     if v is None:
         return ""
     return str(v).strip()
 
+
 def safe_lower(v):
     return normalize_cell(v).lower()
+
 
 def _cache_header_index(header):
     m = {}
@@ -69,6 +73,7 @@ def _cache_header_index(header):
             m[key] = i
     return m
 
+
 def _row_value_by_name(row, idx_map, column_name):
     idx = idx_map.get(column_name)
     if idx is None:
@@ -76,6 +81,7 @@ def _row_value_by_name(row, idx_map, column_name):
     if idx >= len(row):
         return ""
     return normalize_cell(row[idx])
+
 
 def _build_find_doc_any_success_from_cache(query, row, row_number, header):
     idx_map = _cache_header_index(header)
@@ -135,6 +141,7 @@ def _build_find_doc_any_success_from_cache(query, row, row_number, header):
         },
     }
 
+
 def _build_find_doc_any_not_found_from_cache(query):
     return {
         "ok": False,
@@ -163,8 +170,10 @@ def _build_find_doc_any_not_found_from_cache(query):
         },
     }
 
+
 def load_master_index_cache():
     import json
+
     if not MASTER_INDEX_CACHE_FILE.exists():
         return None
     try:
@@ -187,13 +196,16 @@ def load_master_index_cache():
 
     return data
 
+
 def save_master_index_cache(payload):
     import json
+
     ensure_master_index_cache_dir()
     MASTER_INDEX_CACHE_FILE.write_text(
         json.dumps(payload, ensure_ascii=False, indent=2),
         encoding="utf-8",
     )
+
 
 def _parse_master_index_rows_from_live_result(live_result):
     result = (live_result or {}).get("result") or {}
@@ -206,6 +218,7 @@ def _parse_master_index_rows_from_live_result(live_result):
         return None
 
     return row_values
+
 
 def refresh_master_index_cache_via_docs_agent():
     seed = find_doc_any_payload_live("DOC-0001")
@@ -258,6 +271,7 @@ def refresh_master_index_cache_via_docs_agent():
         "mode": "stage29-seed-cache",
     }
 
+
 def extend_master_index_cache_from_success(payload):
     cache = load_master_index_cache()
     if cache is None:
@@ -277,6 +291,7 @@ def extend_master_index_cache_from_success(payload):
     cache["rows"] = rows
     cache["fetched_at_epoch"] = now_epoch_int()
     save_master_index_cache(cache)
+
 
 def find_doc_any_payload_from_cache(query):
     cache = load_master_index_cache()
@@ -309,6 +324,7 @@ def find_doc_any_payload_from_cache(query):
             return _build_find_doc_any_success_from_cache(q, row, i, header)
 
     return _build_find_doc_any_not_found_from_cache(q)
+
 
 def payload_contains_quota_or_rate_limit(payload) -> bool:
     if payload is None:
@@ -356,7 +372,9 @@ def safe_error_message(payload: dict | None) -> str | None:
     return payload.get("error_message")
 
 
-def build_doctor_summary(*, env_ok: bool, status_ok: bool, master_index_ok: bool, smoke_ok: bool) -> str:
+def build_doctor_summary(
+    *, env_ok: bool, status_ok: bool, master_index_ok: bool, smoke_ok: bool
+) -> str:
     if env_ok and status_ok and master_index_ok and smoke_ok:
         return "CLI выглядит работоспособным: окружение, status, доступ к MASTER_INDEX и smoke-проверка прошли успешно."
     failed = []
@@ -370,7 +388,6 @@ def build_doctor_summary(*, env_ok: bool, status_ok: bool, master_index_ok: bool
         failed.append("smoke")
     failed_text = ", ".join(failed)
     return f"Обнаружены проблемы в следующих зонах: {failed_text}."
-
 
 
 def diagnose_payload_failure(payload: dict | None) -> tuple[str, str, str]:
@@ -437,7 +454,12 @@ def diagnose_payload_failure(payload: dict | None) -> tuple[str, str, str]:
             "Проверь точный query/Document ID/ссылку и сначала выполни find-doc-any.",
         )
 
-    if error_type in {"EmptyOutput", "JSONDecodeError", "TimeoutExpired", "SmokeCheckFailed"}:
+    if error_type in {
+        "EmptyOutput",
+        "JSONDecodeError",
+        "TimeoutExpired",
+        "SmokeCheckFailed",
+    }:
         return (
             "internal",
             "Похоже на внутренний сбой CLI или дочернего docs_agent.py.",
@@ -450,13 +472,18 @@ def diagnose_payload_failure(payload: dict | None) -> tuple[str, str, str]:
         "Проверь debug-вывод и повтори диагностику через doctor --json.",
     )
 
-def build_doctor_next_step(*, env_ok: bool, status_ok: bool, master_index_ok: bool, smoke_ok: bool) -> str:
+
+def build_doctor_next_step(
+    *, env_ok: bool, status_ok: bool, master_index_ok: bool, smoke_ok: bool
+) -> str:
     if not env_ok:
         return "Проверь активацию venv и доступность python/agent_cli.py."
     if not status_ok:
         return "Сначала выполни python agent_cli.py status --json и проверь блоки safety/config."
     if not master_index_ok:
-        return "Проверь доступность MASTER_INDEX и повтори python agent_cli.py f DOC-0001."
+        return (
+            "Проверь доступность MASTER_INDEX и повтори python agent_cli.py f DOC-0001."
+        )
     if not smoke_ok:
         return "Запусти bash scripts/regression_smoke_quiet.sh отдельно и проверь, какой шаг падает."
     return "Можно начинать штатную работу."
@@ -503,8 +530,14 @@ def doctor_payload() -> dict:
     sample = checks[failed[0]]
 
     diagnosis = str(sample.get("diagnosis") or "internal")
-    likely_cause = str(sample.get("likely_cause") or "Похоже на внутренний сбой CLI или дочернего docs_agent.py.")
-    recommended_action = str(sample.get("recommended_action") or "Проверь debug-вывод и отдельно запусти doctor --json.")
+    likely_cause = str(
+        sample.get("likely_cause")
+        or "Похоже на внутренний сбой CLI или дочернего docs_agent.py."
+    )
+    recommended_action = str(
+        sample.get("recommended_action")
+        or "Проверь debug-вывод и отдельно запусти doctor --json."
+    )
     error_type = str(sample.get("error_type") or "DoctorCheckFailed")
     error_message = str(sample.get("error_message") or "doctor check failed")
 
@@ -523,6 +556,7 @@ def doctor_payload() -> dict:
         "auth_related": bool(sample.get("auth_related")),
         "network_related": bool(sample.get("network_related")),
     }
+
 
 def doctor_lite_payload() -> dict:
     env = {
@@ -567,7 +601,9 @@ def doctor_lite_payload() -> dict:
 
     if sample.get("auth_related"):
         diagnosis = "auth"
-        likely_cause = "Похоже на проблему доступа, авторизации или прав к внешним сервисам."
+        likely_cause = (
+            "Похоже на проблему доступа, авторизации или прав к внешним сервисам."
+        )
         recommended_action = "Проверь credentials, доступы и авторизацию."
     elif sample.get("network_related") or sample.get("retryable"):
         diagnosis = "network"
@@ -587,8 +623,8 @@ def doctor_lite_payload() -> dict:
         "diagnosis": diagnosis,
         "likely_cause": likely_cause,
         "recommended_action": recommended_action,
-        "error_type": str(sample.get('error_type') or 'DoctorLiteCheckFailed'),
-        "error_message": str(sample.get('error_message') or 'doctor-lite check failed'),
+        "error_type": str(sample.get("error_type") or "DoctorLiteCheckFailed"),
+        "error_message": str(sample.get("error_message") or "doctor-lite check failed"),
         "retryable": bool(sample.get("retryable")),
         "auth_related": bool(sample.get("auth_related")),
         "network_related": bool(sample.get("network_related")),
@@ -647,13 +683,27 @@ def run_smoke_explain_payload() -> dict:
         likely_cause = "Похоже на внутренний сбой smoke-проверки."
         recommended_action = "Запусти bash scripts/regression_smoke_explain.sh отдельно и проверь первый failing step."
 
-        if "quota" in blob or "429" in blob or "rate limit" in blob or "rate_limit" in blob:
+        if (
+            "quota" in blob
+            or "429" in blob
+            or "rate limit" in blob
+            or "rate_limit" in blob
+        ):
             diagnosis = "network"
-            likely_cause = "Похоже на временную внешнюю проблему или превышение квоты API."
+            likely_cause = (
+                "Похоже на временную внешнюю проблему или превышение квоты API."
+            )
             recommended_action = "Подожди 60-90 секунд и повтори doctor/smoke."
-        elif "auth" in blob or "forbidden" in blob or "permission" in blob or "unauthorized" in blob:
+        elif (
+            "auth" in blob
+            or "forbidden" in blob
+            or "permission" in blob
+            or "unauthorized" in blob
+        ):
             diagnosis = "auth"
-            likely_cause = "Похоже на проблему доступа или авторизации к внешним сервисам."
+            likely_cause = (
+                "Похоже на проблему доступа или авторизации к внешним сервисам."
+            )
             recommended_action = "Проверь credentials, токены и права доступа."
 
     payload = {
@@ -672,15 +722,18 @@ def run_smoke_explain_payload() -> dict:
     }
 
     if proc.returncode != 0:
-        payload.update({
-            "error_type": "SmokeCheckFailed",
-            "error_message": "regression_smoke_explain.sh returned non-zero exit code.",
-            "retryable": diagnosis == "network",
-            "auth_related": diagnosis == "auth",
-            "network_related": diagnosis == "network",
-        })
+        payload.update(
+            {
+                "error_type": "SmokeCheckFailed",
+                "error_message": "regression_smoke_explain.sh returned non-zero exit code.",
+                "retryable": diagnosis == "network",
+                "auth_related": diagnosis == "auth",
+                "network_related": diagnosis == "network",
+            }
+        )
 
     return payload
+
 
 def print_compact_find(payload: dict):
     print(f"ok: {payload.get('ok')}")
@@ -692,6 +745,7 @@ def print_compact_find(payload: dict):
         print(f"document_name: {summary.get('document_name')}")
         print(f"link: {summary.get('link')}")
 
+
 def print_compact_open(payload: dict):
     print(f"ok: {payload.get('ok')}")
     print("route: open-doc-from-query")
@@ -702,6 +756,7 @@ def print_compact_open(payload: dict):
         print(f"document_id: {summary.get('document_id')}")
         print(f"document_name: {summary.get('document_name')}")
         print(f"link: {summary.get('link')}")
+
 
 def print_compact_read(payload: dict):
     print(f"ok: {payload.get('ok')}")
@@ -724,6 +779,7 @@ def print_compact_read(payload: dict):
             print("")
             print("[truncated]")
 
+
 def print_compact_status(payload: dict):
     print(f"ok: {payload.get('ok')}")
     print("route: status")
@@ -742,14 +798,16 @@ def print_compact_status(payload: dict):
     print(f"change_log_id: {config.get('change_log_spreadsheet_id')}")
 
 
-
-
 def print_compact_doctor_lite(payload: dict):
     print(f"ok: {payload.get('ok')}")
     print("route: doctor-lite")
-    print(f"environment_ok: {(payload.get('checks') or {}).get('environment', {}).get('ok')}")
+    print(
+        f"environment_ok: {(payload.get('checks') or {}).get('environment', {}).get('ok')}"
+    )
     print(f"status_ok: {(payload.get('checks') or {}).get('status', {}).get('ok')}")
-    print(f"master_index_ok: {(payload.get('checks') or {}).get('master_index_lookup', {}).get('ok')}")
+    print(
+        f"master_index_ok: {(payload.get('checks') or {}).get('master_index_lookup', {}).get('ok')}"
+    )
     print(f"summary: {payload.get('summary')}")
     print(f"next_step: {payload.get('next_step')}")
     print(f"diagnosis: {payload.get('diagnosis')}")
@@ -758,6 +816,7 @@ def print_compact_doctor_lite(payload: dict):
     if not payload.get("ok"):
         print(f"error_type: {payload.get('error_type')}")
         print(f"error_message: {payload.get('error_message')}")
+
 
 def print_compact_doctor(payload: dict):
     print(f"ok: {payload.get('ok')}")
@@ -815,7 +874,9 @@ def is_retryable_network_error(payload: dict) -> bool:
     return False
 
 
-def run_docs_agent_with_retry(args: list[str], retries: int = 3, sleep_sec: float = 1.0) -> dict:
+def run_docs_agent_with_retry(
+    args: list[str], retries: int = 3, sleep_sec: float = 1.0
+) -> dict:
     import time
 
     attempts = []
@@ -823,12 +884,14 @@ def run_docs_agent_with_retry(args: list[str], retries: int = 3, sleep_sec: floa
 
     for attempt in range(1, retries + 1):
         payload = run_docs_agent(args)
-        attempts.append({
-            "attempt": attempt,
-            "ok": payload.get("ok"),
-            "error_type": payload.get("error_type"),
-            "error_message": payload.get("error_message"),
-        })
+        attempts.append(
+            {
+                "attempt": attempt,
+                "ok": payload.get("ok"),
+                "error_type": payload.get("error_type"),
+                "error_message": payload.get("error_message"),
+            }
+        )
         last = payload
 
         if payload.get("ok"):
@@ -852,6 +915,7 @@ def run_docs_agent_with_retry(args: list[str], retries: int = 3, sleep_sec: floa
             "attempts": attempts,
         }
     return last
+
 
 def run_docs_agent(args: list[str]) -> dict:
     cmd = [PYTHON_BIN, str(DOCS_AGENT)] + args + ["--json-output"]
@@ -974,22 +1038,32 @@ def build_compact_error_output(payload: dict) -> list[str]:
         explanation = "Похоже, документ или объект не найден в MASTER_INDEX по идентификатору, имени или фрагменту ссылки."
         next_step = "Проверь точное Document ID, точное имя документа или сначала выполни find-doc-any."
     elif error_type == "LinkParseError":
-        explanation = "CLI нашёл запись, но не смог извлечь корректный Google ID из ссылки."
+        explanation = (
+            "CLI нашёл запись, но не смог извлечь корректный Google ID из ссылки."
+        )
         next_step = "Проверь поле Link в MASTER_INDEX и формат ссылки на Google Docs/Sheets/Drive."
     elif auth_related:
         explanation = "Похоже, проблема связана с авторизацией или доступом к Google API / учётным данным."
         next_step = "Проверь активную авторизацию, credentials, токены и доступ к нужному Google Drive объекту."
     elif network_related and error_type == "TimeoutExpired":
-        explanation = "Вызов docs_agent.py превысил лимит ожидания и был прерван по таймауту."
+        explanation = (
+            "Вызов docs_agent.py превысил лимит ожидания и был прерван по таймауту."
+        )
         next_step = "Повтори команду позже; если ошибка повторяется, проверь сеть, Google API и при необходимости увеличь timeout."
     elif network_related or retryable:
-        explanation = "Похоже, произошёл временный сетевой или нестабильный внешний сбой."
+        explanation = (
+            "Похоже, произошёл временный сетевой или нестабильный внешний сбой."
+        )
         next_step = "Повтори команду; если ошибка повторяется, проверь сеть, доступ к Google API и stderr/_debug."
     elif error_type == "EmptyOutput":
-        explanation = "Внешний процесс docs_agent.py завершился без ожидаемого JSON-ответа."
+        explanation = (
+            "Внешний процесс docs_agent.py завершился без ожидаемого JSON-ответа."
+        )
         next_step = "Проверь stderr/_debug, затем отдельно запусти docs_agent.py вручную и посмотри, почему stdout пустой."
     elif error_type == "JSONDecodeError":
-        explanation = "docs_agent.py вернул вывод, который не удалось разобрать как JSON."
+        explanation = (
+            "docs_agent.py вернул вывод, который не удалось разобрать как JSON."
+        )
         next_step = "Проверь stdout_preview/stderr в _debug и убедись, что docs_agent.py печатает только валидный JSON."
     else:
         explanation = "Произошёл внутренний или нераспознанный сбой CLI/обёртки."
@@ -998,6 +1072,7 @@ def build_compact_error_output(payload: dict) -> list[str]:
     lines.append(f"explanation: {explanation}")
     lines.append(f"next_step: {next_step}")
     return lines
+
 
 def print_compact_error(payload: dict) -> None:
     print_human_lines(build_compact_error_output(payload))
@@ -1077,7 +1152,7 @@ def normalize_query_for_lookup(query: str) -> str:
         changed = False
         for prefix in prefixes:
             if ql.startswith(prefix):
-                q = q[len(prefix):].strip()
+                q = q[len(prefix) :].strip()
                 ql = q.lower()
                 changed = True
 
@@ -1095,7 +1170,6 @@ def cmd_status_payload() -> dict:
     }
 
 
-
 def cmd_status(json_output: bool = False) -> int:
     payload = cmd_status_payload()
     if json_output:
@@ -1103,7 +1177,6 @@ def cmd_status(json_output: bool = False) -> int:
     else:
         print_compact_status(payload)
     return resolve_command_exit_code(payload)
-
 
 
 def cmd_doctor(json_output: bool = False) -> int:
@@ -1114,64 +1187,77 @@ def cmd_doctor(json_output: bool = False) -> int:
         print_compact_doctor(payload)
     return resolve_command_exit_code(payload)
 
+
 def cmd_find_doc_id(value: str) -> None:
-    payload = run_docs_agent_with_retry([
-        "find-row-by-column",
-        MASTER_INDEX_ID,
-        MASTER_INDEX_SHEET,
-        "Document ID",
-        value,
-    ])
+    payload = run_docs_agent_with_retry(
+        [
+            "find-row-by-column",
+            MASTER_INDEX_ID,
+            MASTER_INDEX_SHEET,
+            "Document ID",
+            value,
+        ]
+    )
     print_json(payload)
 
 
 def cmd_find_doc_name(value: str) -> None:
-    payload = run_docs_agent_with_retry([
-        "find-row-by-column",
-        MASTER_INDEX_ID,
-        MASTER_INDEX_SHEET,
-        "Document Name",
-        value,
-    ])
+    payload = run_docs_agent_with_retry(
+        [
+            "find-row-by-column",
+            MASTER_INDEX_ID,
+            MASTER_INDEX_SHEET,
+            "Document Name",
+            value,
+        ]
+    )
     print_json(payload)
 
 
 def cmd_find_link(value: str) -> None:
-    payload = run_docs_agent_with_retry([
-        "find-row-by-link-fragment",
-        MASTER_INDEX_ID,
-        MASTER_INDEX_SHEET,
-        value,
-    ])
+    payload = run_docs_agent_with_retry(
+        [
+            "find-row-by-link-fragment",
+            MASTER_INDEX_ID,
+            MASTER_INDEX_SHEET,
+            value,
+        ]
+    )
     print_json(payload)
 
 
 def cmd_get_file(file_id: str) -> None:
-    payload = run_docs_agent_with_retry([
-        "get-file",
-        file_id,
-    ])
+    payload = run_docs_agent_with_retry(
+        [
+            "get-file",
+            file_id,
+        ]
+    )
     print_json(payload)
 
 
 def cmd_read_doc(document_id: str) -> None:
-    payload = run_docs_agent_with_retry([
-        "read-doc",
-        document_id,
-    ])
+    payload = run_docs_agent_with_retry(
+        [
+            "read-doc",
+            document_id,
+        ]
+    )
     print_json(payload)
 
 
 def _find_doc_any_payload_live_impl(query: str) -> dict:
     attempts = []
 
-    by_id = run_docs_agent_with_retry([
-        "find-row-by-column",
-        MASTER_INDEX_ID,
-        MASTER_INDEX_SHEET,
-        "Document ID",
-        query,
-    ])
+    by_id = run_docs_agent_with_retry(
+        [
+            "find-row-by-column",
+            MASTER_INDEX_ID,
+            MASTER_INDEX_SHEET,
+            "Document ID",
+            query,
+        ]
+    )
     attempts.append(summarize_attempt("Document ID", by_id))
     if by_id.get("ok") and by_id.get("matches_found", 0) > 0:
         return build_find_doc_success_payload(
@@ -1181,13 +1267,15 @@ def _find_doc_any_payload_live_impl(query: str) -> dict:
             attempts=attempts,
         )
 
-    by_name = run_docs_agent_with_retry([
-        "find-row-by-column",
-        MASTER_INDEX_ID,
-        MASTER_INDEX_SHEET,
-        "Document Name",
-        query,
-    ])
+    by_name = run_docs_agent_with_retry(
+        [
+            "find-row-by-column",
+            MASTER_INDEX_ID,
+            MASTER_INDEX_SHEET,
+            "Document Name",
+            query,
+        ]
+    )
     attempts.append(summarize_attempt("Document Name", by_name))
     if by_name.get("ok") and by_name.get("matches_found", 0) > 0:
         return build_find_doc_success_payload(
@@ -1197,12 +1285,14 @@ def _find_doc_any_payload_live_impl(query: str) -> dict:
             attempts=attempts,
         )
 
-    by_link = run_docs_agent_with_retry([
-        "find-row-by-link-fragment",
-        MASTER_INDEX_ID,
-        MASTER_INDEX_SHEET,
-        query,
-    ])
+    by_link = run_docs_agent_with_retry(
+        [
+            "find-row-by-link-fragment",
+            MASTER_INDEX_ID,
+            MASTER_INDEX_SHEET,
+            query,
+        ]
+    )
     attempts.append(summarize_attempt("Link fragment", by_link))
     if by_link.get("ok") and by_link.get("matches_found", 0) > 0:
         return build_find_doc_success_payload(
@@ -1219,8 +1309,6 @@ def _find_doc_any_payload_live_impl(query: str) -> dict:
         error_message="No matches found by Document ID, Document Name, or Link fragment.",
         attempts=attempts,
     )
-
-
 
 
 def resolve_exit_code(payload: dict | None) -> int:
@@ -1250,9 +1338,9 @@ def resolve_exit_code(payload: dict | None) -> int:
     return EXIT_INTERNAL_ERROR
 
 
-
 def find_doc_any_payload_live(query):
     return _find_doc_any_payload_live_impl(query)
+
 
 def find_doc_any_payload(query):
     cached = find_doc_any_payload_from_cache(query)
@@ -1430,6 +1518,7 @@ def cmd_open_doc_from_query(query: str, json_output: bool = False) -> int:
             print_compact_error(payload)
     return resolve_command_exit_code(payload)
 
+
 def cmd_read_doc_from_query(query: str, json_output: bool = False) -> int:
     payload = read_doc_from_query_payload(query)
     if json_output:
@@ -1441,27 +1530,34 @@ def cmd_read_doc_from_query(query: str, json_output: bool = False) -> int:
             print_compact_error(payload)
     return resolve_command_exit_code(payload)
 
+
 def is_status_query(query_lower: str) -> bool:
-    return any(x in query_lower for x in [
-        "status",
-        "статус",
-        "mode",
-        "режим",
-        "config",
-        "конфиг",
-        "безопас",
-    ])
+    return any(
+        x in query_lower
+        for x in [
+            "status",
+            "статус",
+            "mode",
+            "режим",
+            "config",
+            "конфиг",
+            "безопас",
+        ]
+    )
 
 
 def is_read_query(query_lower: str) -> bool:
-    return any(x in query_lower for x in [
-        "read",
-        "прочитай",
-        "read-doc",
-        "content",
-        "содержимое",
-        "текст документа",
-    ])
+    return any(
+        x in query_lower
+        for x in [
+            "read",
+            "прочитай",
+            "read-doc",
+            "content",
+            "содержимое",
+            "текст документа",
+        ]
+    )
 
 
 def build_ask_result(query: str, routed_to: str, result: dict, **extra) -> dict:
@@ -1524,7 +1620,6 @@ def ask_payload(query: str) -> dict:
     return ask_find_payload(query, lookup_query)
 
 
-
 def build_compact_ask_output(payload: dict) -> list[str]:
     lines: list[str] = []
     ok = payload.get("ok", False)
@@ -1541,7 +1636,9 @@ def build_compact_ask_output(payload: dict) -> list[str]:
         config = result.get("config", {})
         lines.append(f"mode: {safety.get('mode')}")
         lines.append(f"default_test_folder: {safety.get('default_test_folder')}")
-        lines.append(f"master_index: {config.get('master_index_sheet_name')} / {config.get('master_index_spreadsheet_id')}")
+        lines.append(
+            f"master_index: {config.get('master_index_sheet_name')} / {config.get('master_index_spreadsheet_id')}"
+        )
         return lines
 
     if routed in {"find-doc-any", "get-file"}:
@@ -1551,14 +1648,22 @@ def build_compact_ask_output(payload: dict) -> list[str]:
             lines.append(f"error_type: {result.get('error_type')}")
             lines.append(f"error_message: {result.get('error_message')}")
             if result.get("error_type") == "NotFound":
-                lines.append("explanation: По запросу ничего не найдено в индексе или в файловом поиске.")
-                lines.append("next_step: Уточни идентификатор, имя документа или сначала выполни find-doc-any.")
+                lines.append(
+                    "explanation: По запросу ничего не найдено в индексе или в файловом поиске."
+                )
+                lines.append(
+                    "next_step: Уточни идентификатор, имя документа или сначала выполни find-doc-any."
+                )
             elif result.get("network_related") or result.get("retryable"):
-                lines.append("explanation: Похоже на временный сетевой сбой при поиске.")
+                lines.append(
+                    "explanation: Похоже на временный сетевой сбой при поиске."
+                )
                 lines.append("next_step: Повтори команду или проверь status --json.")
             else:
                 lines.append("explanation: Поиск завершился ошибкой.")
-                lines.append("next_step: Запусти команду в JSON-режиме и посмотри debug-поля.")
+                lines.append(
+                    "next_step: Запусти команду в JSON-режиме и посмотри debug-поля."
+                )
             return lines
 
         if result.get("command") == "find-doc-any":
@@ -1599,18 +1704,28 @@ def build_compact_ask_output(payload: dict) -> list[str]:
                 next_step = "Проверь link в MASTER_INDEX для найденного документа."
             elif auth_related:
                 explanation = "Чтение документа не удалось из-за проблемы авторизации или прав доступа."
-                next_step = "Проверь авторизацию Google API и права доступа к документу."
+                next_step = (
+                    "Проверь авторизацию Google API и права доступа к документу."
+                )
             elif network_related and error_type == "TimeoutExpired":
                 explanation = "Чтение документа прервано по таймауту при обращении к docs_agent.py или внешнему API."
                 next_step = "Повтори команду позже; если ошибка повторяется, проверь сеть и доступность Google API."
             elif network_related or retryable:
-                explanation = "Во время чтения документа произошёл временный сетевой сбой."
-                next_step = "Повтори команду; если сбой стабилен, проверь сеть и _debug."
+                explanation = (
+                    "Во время чтения документа произошёл временный сетевой сбой."
+                )
+                next_step = (
+                    "Повтори команду; если сбой стабилен, проверь сеть и _debug."
+                )
             elif error_type == "EmptyOutput":
-                explanation = "docs_agent.py не вернул ожидаемый JSON при чтении документа."
+                explanation = (
+                    "docs_agent.py не вернул ожидаемый JSON при чтении документа."
+                )
                 next_step = "Проверь stderr/_debug и отдельно запусти docs_agent.py read-doc вручную."
             elif error_type == "JSONDecodeError":
-                explanation = "Ответ docs_agent.py при чтении документа оказался невалидным JSON."
+                explanation = (
+                    "Ответ docs_agent.py при чтении документа оказался невалидным JSON."
+                )
                 next_step = "Проверь stdout_preview/stderr в _debug."
             else:
                 explanation = "Во время чтения документа произошёл внутренний или нераспознанный сбой."
@@ -1638,15 +1753,18 @@ def build_compact_ask_output(payload: dict) -> list[str]:
 
     if not ok:
         result = payload.get("result", {})
-        lines.append(f"error_type: {result.get('error_type') or payload.get('error_type')}")
-        lines.append(f"error_message: {result.get('error_message') or payload.get('error_message')}")
+        lines.append(
+            f"error_type: {result.get('error_type') or payload.get('error_type')}"
+        )
+        lines.append(
+            f"error_message: {result.get('error_message') or payload.get('error_message')}"
+        )
         lines.append("explanation: Запрос маршрутизирован, но завершился ошибкой.")
         lines.append("next_step: Повтори команду в JSON-режиме и проверь debug-поля.")
         return lines
 
     lines.append(json.dumps(payload, ensure_ascii=False, indent=2))
     return lines
-
 
 
 def cmd_doctor_lite(json_output: bool = False) -> int:
@@ -1657,6 +1775,7 @@ def cmd_doctor_lite(json_output: bool = False) -> int:
         print_compact_doctor_lite(payload)
     return resolve_command_exit_code(payload)
 
+
 def cmd_ask(query: str, json_output: bool = False) -> int:
     payload = ask_payload(query)
     if json_output:
@@ -1664,7 +1783,6 @@ def cmd_ask(query: str, json_output: bool = False) -> int:
     else:
         print_human_lines(build_compact_ask_output(payload))
     return resolve_command_exit_code(payload)
-
 
 
 def parse_json_flag(argv: list[str]) -> tuple[bool, list[str]]:
@@ -1676,8 +1794,9 @@ def parse_json_flag(argv: list[str]) -> tuple[bool, list[str]]:
     return json_output, args
 
 
-
-def require_query_args(argv: list[str], allow_json_flag: bool = False) -> tuple[bool, list[str]] | None:
+def require_query_args(
+    argv: list[str], allow_json_flag: bool = False
+) -> tuple[bool, list[str]] | None:
     args = argv[:]
     if allow_json_flag:
         _, args = parse_json_flag(args)
@@ -1706,6 +1825,7 @@ def handle_query_command(
         return handler(value, json_output=json_output)
     return handler(value)
 
+
 def run_query_command(
     argv: list[str],
     handler,
@@ -1717,6 +1837,7 @@ def run_query_command(
     value = " ".join(args)
     handler(value, json_output=json_output)
     return 0
+
 
 def usage() -> None:
     print(
@@ -1739,21 +1860,12 @@ def usage() -> None:
         "  python agent_cli.py f DOC-0001\n"
         "  python agent_cli.py o DOC-0002\n"
         "  python agent_cli.py r DOC-0002\n"
-        "  python agent_cli.py r \"00_PROJECT_AI_OPERATING_PROMPT_АСТЦВ\"\n"
-        "  python agent_cli.py q \"прочитай DOC-0002\"\n"
-        "  python agent_cli.py q --json \"прочитай 00_PROJECT_AI_OPERATING_PROMPT_АСТЦВ\"\n"
+        '  python agent_cli.py r "00_PROJECT_AI_OPERATING_PROMPT_АСТЦВ"\n'
+        '  python agent_cli.py q "прочитай DOC-0002"\n'
+        '  python agent_cli.py q --json "прочитай 00_PROJECT_AI_OPERATING_PROMPT_АСТЦВ"\n'
         "  python agent_cli.py doctor\n"
         "  python agent_cli.py doctor --json\n"
     )
-
-
-def parse_json_flag(argv: list[str]) -> tuple[bool, list[str]]:
-    json_output = False
-    args = argv[:]
-    if args and args[0] == "--json":
-        json_output = True
-        args = args[1:]
-    return json_output, args
 
 
 def run_query_handler(argv: list[str], handler) -> int:
@@ -1821,10 +1933,14 @@ def main() -> int:
             return handle_query_command(argv, cmd_find_doc_any, allow_json_flag=True)
 
         if cmd in {"open-doc-from-query", "o"}:
-            return handle_query_command(argv, cmd_open_doc_from_query, allow_json_flag=True)
+            return handle_query_command(
+                argv, cmd_open_doc_from_query, allow_json_flag=True
+            )
 
         if cmd in {"read-doc-from-query", "r"}:
-            return handle_query_command(argv, cmd_read_doc_from_query, allow_json_flag=True)
+            return handle_query_command(
+                argv, cmd_read_doc_from_query, allow_json_flag=True
+            )
 
         if cmd == "get-file":
             if len(argv) < 1:
@@ -1847,16 +1963,19 @@ def main() -> int:
         return EXIT_USAGE_ERROR
 
     except KeyboardInterrupt:
-        print_json({
-            "ok": False,
-            "command": cmd,
-            "error_type": "KeyboardInterrupt",
-            "error_message": "Interrupted by user",
-            "retryable": True,
-            "auth_related": False,
-            "network_related": False,
-        })
+        print_json(
+            {
+                "ok": False,
+                "command": cmd,
+                "error_type": "KeyboardInterrupt",
+                "error_message": "Interrupted by user",
+                "retryable": True,
+                "auth_related": False,
+                "network_related": False,
+            }
+        )
         return EXIT_INTERRUPTED
+
 
 if __name__ == "__main__":
     raise SystemExit(main())
