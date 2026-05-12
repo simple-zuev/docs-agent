@@ -1,0 +1,18 @@
+Audit scope
+- parity-only candidate review for docs_agent_v2.py::update_master_index_row()
+- no implementation in this step
+- no command surface expansion
+- no capability expansion
+
+Questions to answer
+- is update_master_index_row() already behaviorally aligned with docs_agent.py
+- if not, is the remaining delta narrow enough for a one-function implementation step
+- does any change require broader helper rollout or multi-route migration
+
+Decision rule
+- prefer no-op / exhaustion conclusion if already aligned
+- otherwise allow only one-function parity implementation next
+- reject any step that would widen scope beyond update_master_index_row()
+
+Expected safe outcome
+- determine whether update_master_index_row() is already exhausted or is the next real narrow implementation candidate
