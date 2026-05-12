@@ -25,6 +25,12 @@ docs-agent — это локальный инструмент, который п
 
 cd ~/AI/docs-agent
 source venv312/bin/activate
+
+Primary operator path:
+- use `python agent_cli.py ...` as the main operator-facing entrypoint
+- treat internal scripts such as `docs_agent.py` and `docs_agent_v2.py` as non-primary operator entrypoints
+- use the project venv / project interpreter for routine work instead of system `python3`
+
 bash scripts/operator_start.sh
 
 ## Основные entrypoints
