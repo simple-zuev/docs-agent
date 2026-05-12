@@ -1,0 +1,181 @@
+    return re.fullmatch(r"[a-zA-Z0-9_-]{20,}", value) is not None
+
+
+def normalize_query_for_lookup(query: str) -> str:
+    q = query.strip()
+
+    prefixes = [
+        "прочитай ",
+        "read ",
+        "read-doc ",
+        "открой ",
+        "open ",
+        "show ",
+        "покажи ",
+        "найди ",
+        "find ",
+        "документ ",
+        "doc ",
+    ]
+
+    ql = q.lower()
+    changed = True
+    while changed:
+        changed = False
+        for prefix in prefixes:
+            if ql.startswith(prefix):
+                q = q[len(prefix) :].strip()
+                ql = q.lower()
+                changed = True
+
+    return q
+
+
+def cmd_status_payload() -> dict:
+    safety = run_docs_agent_with_retry(["show-safety-mode"])
+    config = run_docs_agent_with_retry(["show-config-status"])
+    return {
+        "ok": bool(safety.get("ok")) and bool(config.get("ok")),
+        "command": "status",
+        "safety": safety,
+        "config": config,
+    }
+
+
+def repo_state_payload() -> dict:
+    payload = branch_safety_snapshot(BASE)
+
+    if payload.get("ok"):
+        return payload
+
+    return {
+        "ok": False,
+        "command": "repo-state",
+        "error_type": payload.get("error_type", "RepoStateError"),
+        "error_message": payload.get(
+            "error_message", "Failed to build repo state snapshot."
+        ),
+        "retryable": bool(payload.get("retryable")),
+        "auth_related": False,
+        "network_related": False,
+        "details": payload,
+    }
+
+
+def cmd_repo_state(json_output: bool = False) -> int:
+    payload = repo_state_payload()
+    if json_output:
+        print_json(payload)
+    else:
+        if payload.get("ok"):
+            print_compact_repo_state(payload)
+        else:
+            print_compact_error(payload)
+    return resolve_command_exit_code(payload)
+
+
+def cmd_status(json_output: bool = False) -> int:
+    payload = cmd_status_payload()
+    if json_output:
+        print_json(payload)
+    else:
+        print_compact_status(payload)
+    return resolve_command_exit_code(payload)
+
+
+def cmd_doctor(json_output: bool = False) -> int:
+    payload = doctor_payload()
+    if json_output:
+        print_json(payload)
+    else:
+        print_compact_doctor(payload)
+    return resolve_command_exit_code(payload)
+
+
+def cmd_find_doc_id(value: str) -> None:
+    payload = run_docs_agent_with_retry(
+        [
+            "find-row-by-column",
+            MASTER_INDEX_ID,
+            MASTER_INDEX_SHEET,
+            "Document ID",
+            value,
+        ]
+    )
+    print_json(payload)
+
+
+def cmd_find_doc_name(value: str) -> None:
+    payload = run_docs_agent_with_retry(
+        [
+            "find-row-by-column",
+            MASTER_INDEX_ID,
+            MASTER_INDEX_SHEET,
+            "Document Name",
+            value,
+        ]
+    )
+    print_json(payload)
+
+
+def cmd_find_link(value: str) -> None:
+    payload = run_docs_agent_with_retry(
+        [
+            "find-row-by-link-fragment",
+            MASTER_INDEX_ID,
+            MASTER_INDEX_SHEET,
+            value,
+        ]
+    )
+    print_json(payload)
+
+
+def cmd_get_file(file_id: str) -> None:
+    payload = run_docs_agent_with_retry(
+        [
+            "get-file",
+            file_id,
+        ]
+    )
+    print_json(payload)
+
+
+def cmd_read_doc(document_id: str) -> None:
+    payload = run_docs_agent_with_retry(
+        [
+            "read-doc",
+            document_id,
+        ]
+    )
+    print_json(payload)
+
+
+def _find_doc_any_payload_live_impl(query: str) -> dict:
+    attempts = []
+
+    by_id = run_docs_agent_with_retry(
+        [
+            "find-row-by-column",
+            MASTER_INDEX_ID,
+            MASTER_INDEX_SHEET,
+            "Document ID",
+            query,
+        ]
+    )
+    attempts.append(summarize_attempt("Document ID", by_id))
+    if by_id.get("ok") and by_id.get("matches_found", 0) > 0:
+        return build_find_doc_success_payload(
+            query=query,
+            matched_by="Document ID",
+            result=by_id,
+            attempts=attempts,
+        )
+
+    by_name = run_docs_agent_with_retry(
+        [
+            "find-row-by-column",
+            MASTER_INDEX_ID,
+            MASTER_INDEX_SHEET,
+            "Document Name",
+            query,
+        ]

@@ -1,0 +1,19 @@
+Scope
+- audit-only diagnosis of document-access runtime behavior
+- commands examined: read-doc, get-file, read-doc-from-query, r
+- no production code changes
+
+Known findings from prior audit wave
+- help entrypoints were previously unstable and have now been isolated as a separate narrow fix
+- direct command probes showed KeyboardInterrupt / exit_code=130
+- missing-argument behavior is stable and not the current blocker
+
+Diagnosis goals
+- determine whether blocking occurs in agent_cli dispatch, subprocess wrapper, retry handling, docs_agent invocation, or external dependency path
+- determine whether the next step should be:
+  1. a narrow runtime timeout/behavior fix
+  2. an external dependency diagnosis only
+  3. deferral of document-access stabilization until later
+
+Preliminary conclusion
+- fill after artifact review

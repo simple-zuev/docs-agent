@@ -1,0 +1,38 @@
+69:@app.command("read-sheet-values")
+383:def get_file_meta(drive, file_id: str):
+427:@app.command()
+467:@app.command("create-temp-doc")
+525:@app.command("append-log")
+551:@app.command("create-staging-copy")
+629:@app.command("patch-doc")
+681:@app.command("create-doc-in-folder")
+758:@app.command("create-draft-doc")
+847:@app.command("append-review-note")
+932:@app.command("write-draft-doc")
+1028:@app.command("list-folder")
+1069:@app.command("read-doc")
+1070:def read_doc(
+1103:            "command": "read-doc",
+1127:        emit_error(json_output, "read-doc", exc)
+1130:@app.command("replace-doc-text")
+1182:@app.command("replace-doc-text-safe")
+1271:@app.command("verify-doc-text")
+1308:@app.command("export-doc")
+1360:@app.command("upload-file-to-folder")
+1438:@app.command("move-file-with-log")
+1524:@app.command("get-file")
+1525:def get_file(
+1537:            "command": "get-file",
+1551:        emit_error(json_output, "get-file", exc)
+1554:@app.command("list-folder-by-id")
+1585:@app.command("read-sheet-header")
+1616:@app.command("get-sheet-rows")
+1638:@app.command("find-row-by-column")
+1667:            "command": "find-row-by-column",
+1693:        emit_error(json_output, "find-row-by-column", exc)
+1696:@app.command("append-master-index-row")
+1748:@app.command("update-master-index-row")
+1836:@app.command("find-row-by-link-fragment")
+1894:@app.command("show-config-status")
+1928:@app.command("show-safety-mode")
+1957:@app.command("set-safety-mode")

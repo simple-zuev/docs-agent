@@ -1,0 +1,15 @@
+Document access runtime diagnosis inventory
+
+Scope
+- audit-only diagnosis of runtime behavior for the document-access layer
+
+Commands under focus
+- read-doc
+- get-file
+- read-doc-from-query
+- r
+
+Reason
+- help entrypoints were stabilized
+- direct execution probes still showed interruption / hanging behavior
+- next step is to isolate where runtime delay or blocking occurs
