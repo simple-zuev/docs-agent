@@ -1,0 +1,40 @@
+agent_cli bounded write surface inventory
+date: 2026-05-12
+branch: feature/review-draft-envelope-audit
+
+cmd_* inventory reviewed
+- cmd_status_payload
+- cmd_repo_state
+- cmd_status
+- cmd_doctor
+- cmd_find_doc_id
+- cmd_find_doc_name
+- cmd_find_link
+- cmd_get_file
+- cmd_read_doc
+- cmd_find_doc_any
+- cmd_open_doc_from_query
+- cmd_read_doc_from_query
+- cmd_capabilities
+- cmd_assemble_context
+- cmd_doc_body_only
+- cmd_artifact_state
+- cmd_doctor_lite
+- cmd_ask
+
+bounded write handlers confirmed
+- cmd_doc_body_only
+- cmd_artifact_state
+
+main() surfaced write routes confirmed
+- doc-body-only
+- artifact-state
+
+finding
+- no additional ready bounded write cmd_* handler confirmed in current agent_cli.py
+- no surfaced minimal review/draft-adjacent write route candidate confirmed
+- next implementation-first step in agent_cli.py would require capability expansion or introduction of a new surfaced write route not already implemented as cmd_* handler
+
+conclusion
+- safe narrow implementation step not established
+- current iteration should remain audit-only
