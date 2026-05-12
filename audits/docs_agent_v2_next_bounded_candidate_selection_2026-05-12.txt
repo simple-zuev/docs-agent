@@ -1,0 +1,47 @@
+Next bounded candidate selection after remaining surface audit
+
+Goal
+- choose exactly one next docs_agent_v2 bounded candidate
+- avoid orchestration-heavy surfaces
+- avoid repo-wide cleanup
+- keep next change reviewable and adjacent to already exhausted/aligned lines
+
+Selection criteria
+- helper or route is small and locally understandable
+- surface can be audited independently
+- candidate does not require broad dispatch or architecture reshaping
+- candidate should open a new bounded line rather than re-open an exhausted one
+
+Decision
+- selected candidate: set_safety_mode
+
+Why selected
+- boundedness: this is a small, self-contained command surface with narrow responsibility
+- scope: it avoids broader orchestration and cross-cutting helper reshaping
+- reviewability: it can be audited independently before any mutation
+- line choice: it opens a new safety/runtime-control bounded line after exhaustion of replace/read/verify/export/file-operation/master-index surfaces
+
+Rejected nearby surfaces
+- append_master_index_row — already aligned/exhausted
+- update_master_index_row — already aligned/exhausted
+- read_doc — exhausted line
+- replace_doc_text — exhausted line
+- replace_doc_text_safe — exhausted line
+- verify_doc_text — exhausted line
+- export_doc — exhausted line
+- upload_file_to_folder — exhausted line
+- move_file_with_log — exhausted line
+- audit — not safely bounded for the next smallest step
+- services — too cross-cutting
+- append_log — too cross-cutting
+- patch_doc — too cross-cutting
+- create_staging_copy — broader mutation workflow surface
+- get_file — possible later candidate, but less clearly preferable than the safety-control surface
+- list_folder_by_id — possible later candidate, but lower priority than the safety-control surface
+- read_sheet_header — possible later candidate, but lower priority than the safety-control surface
+- get_sheet_rows_cmd — possible later candidate, but lower priority than the safety-control surface
+- find_row_by_column — possible later candidate, but lower priority than the safety-control surface
+- find_row_by_link_fragment — possible later candidate, but lower priority than the safety-control surface
+
+Recommended next step
+- perform an audit-only parity review of set_safety_mode before any production mutation

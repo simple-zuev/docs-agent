@@ -1,0 +1,17 @@
+Conclusion
+
+The remaining bounded surface audit and candidate-selection pass established one concrete next bounded target.
+
+Outcome
+- selected next bounded candidate: set_safety_mode
+- exhausted lines remain closed: replace/read/verify/export/file-operation/master-index
+- orchestration-heavy and cross-cutting surfaces remain out of scope
+
+Reasoning
+- set_safety_mode is smaller and more reviewable than orchestration-level helpers
+- it can be audited independently
+- it opens a new bounded safety/runtime-control line without re-opening exhausted surfaces
+
+Recommended follow-up
+- next step should be an audit-only parity review focused only on set_safety_mode
+- no production mutation should be made before that targeted review
