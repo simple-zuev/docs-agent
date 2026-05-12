@@ -1,0 +1,20 @@
+Audit scope
+- select the next bounded surface after the exhausted read/verify/export line
+- avoid returning to already exhausted local surfaces
+- avoid capability expansion
+- prefer one existing bounded function only
+
+Candidate preference order
+1. docs_agent_v2.py::upload_file_to_folder()
+2. docs_agent_v2.py::move_file_with_log()
+3. docs_agent_v2.py::append_master_index_row()
+4. docs_agent_v2.py::update_master_index_row()
+
+Decision rule
+- choose exactly one next candidate
+- prefer a neighboring bounded file-operation surface before master-index row mutation surface
+- prefer output-only or parity-only implementation potential
+- reject candidates that require broad helper rollout or multi-route migration
+
+Expected safe outcome
+- determine whether upload_file_to_folder() is the next narrow implementation candidate after the exhausted read line

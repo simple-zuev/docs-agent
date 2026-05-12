@@ -1,0 +1,13 @@
+==== next bounded surface audit after exhausted read line ====
+
+==== docs_agent_v2 candidate defs ====
+903:def upload_file_to_folder(
+981:def move_file_with_log(
+1204:def append_master_index_row(
+1256:def update_master_index_row(
+
+==== docs_agent reference defs ====
+1361:def upload_file_to_folder(
+1439:def move_file_with_log(
+1697:def append_master_index_row(
+1749:def update_master_index_row(
