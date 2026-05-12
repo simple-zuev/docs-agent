@@ -1,0 +1,23 @@
+docs_agent_v2 help/exit audit review
+baseline: main@4d3cbe1
+scope: docs_agent_v2.py only
+
+inventory_has_sys_exit: no
+inventory_has_raise_SystemExit: yes
+inventory_has_help_token: yes
+inventory_has_help_flag_literal: yes
+inventory_has_print_calls: yes
+help_output_has_exit_code_0: no
+empty_output_has_exit_code_0: no
+unknown_output_has_exit_code_0: no
+
+observations:
+- --help invocation produced traceback
+- empty invocation produced traceback
+- unknown command produced traceback
+- no success exit observed in tested invocations
+
+candidate assessment:
+- decide next step only after manual review of outputs
+- mutation is allowed only if a single narrow inconsistency is clearly established
+- otherwise close as audit-only with no code change

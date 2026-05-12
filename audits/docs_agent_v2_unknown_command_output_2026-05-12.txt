@@ -1,0 +1,7 @@
+=== python3 docs_agent_v2.py definitely-unknown-command ===
+Traceback (most recent call last):
+  File "/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py", line 5, in <module>
+    import typer
+ModuleNotFoundError: No module named 'typer'
+
+exit_code=

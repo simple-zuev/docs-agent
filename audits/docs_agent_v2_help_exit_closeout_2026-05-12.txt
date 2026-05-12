@@ -1,0 +1,28 @@
+docs_agent_v2 help/exit audit closeout
+baseline: main@4d3cbe1
+scope: docs_agent_v2.py only
+result: audit-only, no code mutation
+
+what was checked
+- static inventory for help/usage/exit related tokens
+- direct runtime invocation with:
+  - python3 docs_agent_v2.py --help
+  - python3 docs_agent_v2.py
+  - python3 docs_agent_v2.py definitely-unknown-command
+
+established findings
+- no explicit usage() helper established
+- no explicit --help literal established in docs_agent_v2.py inventory
+- no explicit raise SystemExit / sys.exit based help-path candidate established from static scan
+- direct system-python execution fails before command parsing with:
+  ModuleNotFoundError: No module named 'typer'
+
+interpretation
+- this audit did not isolate a help/exit surface defect inside docs_agent_v2.py
+- observed failures are consistent with execution outside canonical project runtime
+- therefore a narrow behavior mutation is not justified from current evidence
+
+decision
+- close this iteration as audit-only
+- no code change
+- any future docs_agent_v2 runtime-surface audit should be performed under canonical project interpreter / venv as a separate iteration

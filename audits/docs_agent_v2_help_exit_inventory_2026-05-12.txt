@@ -1,0 +1,214 @@
+docs_agent_v2 help/exit inventory
+file: /Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py
+
+=== pattern: \busage\b ===
+NOT FOUND
+
+=== pattern: --help ===
+NOT FOUND
+
+=== pattern: -h ===
+1111: @app.command("read-sheet-header")
+
+=== pattern: \bhelp\b ===
+NOT FOUND
+
+=== pattern: sys\.exit ===
+NOT FOUND
+
+=== pattern: raise SystemExit ===
+NOT FOUND
+
+=== pattern: \bexit\( ===
+NOT FOUND
+
+=== pattern: print\( ===
+53:     print("DRY RUN OK")
+54:     print(json.dumps(payload, ensure_ascii=False, indent=2))
+296:     print("Audit OK")
+297:     print(f"Snapshot: {out}")
+298:     print(f"Report: {report}")
+352:     print("CREATE TEMP DOC OK")
+353:     print(f"Name: {created['name']}")
+354:     print(f"ID: {created['id']}")
+355:     print(f"URL: {created.get('webViewLink')}")
+356:     print(f"Change Log: {change_id} | {updated_range}")
+380:     print("APPEND LOG OK")
+381:     print(f"Change ID: {change_id}")
+382:     print(f"Updated range: {updated_range}")
+453:     print("CREATE STAGING COPY OK")
+454:     print(f"Source name: {source['name']}")
+455:     print(f"Source ID: {source['id']}")
+456:     print(f"Copy name: {copied['name']}")
+457:     print(f"Copy ID: {copied['id']}")
+458:     print(f"Copy URL: {copied.get('webViewLink')}")
+459:     print(f"Target folder: Cass / {target_folder}")
+460:     print(f"Change Log: {change_id} | {updated_range}")
+507:     print("PATCH DOC OK")
+508:     print(f"Document: {meta['name']}")
+509:     print(f"ID: {document_id}")
+510:     print(f"URL: {meta.get('webViewLink')}")
+511:     print(f"Inserted chars: {len(text_to_insert)}")
+512:     print(f"Change Log: {change_id} | {updated_range}")
+584:     print("CREATE DOC IN FOLDER OK")
+585:     print(f"Folder: Cass / {target_folder}")
+586:     print(f"Name: {created['name']}")
+587:     print(f"ID: {created['id']}")
+588:     print(f"URL: {created.get('webViewLink')}")
+589:     print(f"Change Log: {change_id} | {updated_range}")
+604:     print("LIST FOLDER OK")
+605:     print(f"Folder: Cass / {folder_name}")
+606:     print(f"Folder ID: {target['id']}")
+607:     print("")
+609:         print("- empty")
+613:         print(
+661:     print("READ DOC OK")
+662:     print(f"Name: {meta['name']}")
+663:     print(f"ID: {meta['id']}")
+664:     print(f"Modified: {meta.get('modifiedTime')}")
+665:     print(f"URL: {meta.get('webViewLink')}")
+666:     print("")
+667:     print("----- DOCUMENT CONTENT BEGIN -----")
+668:     print(text_content)
+669:     print("----- DOCUMENT CONTENT END -----")
+715:     print("REPLACE DOC TEXT OK")
+716:     print(f"Document: {meta['name']}")
+717:     print(f"ID: {document_id}")
+718:     print(f"URL: {meta.get('webViewLink')}")
+719:     print(f"Old text: {old_text}")
+720:     print(f"New text: {new_text}")
+721:     print(f"Change Log: {change_id} | {updated_range}")
+803:     print("SAFE REPLACE DOC TEXT OK")
+804:     print(f"Document: {meta['name']}")
+805:     print(f"Document ID: {document_id}")
+806:     print(f"Document URL: {meta.get('webViewLink')}")
+807:     print(f"Backup: {backup['name']}")
+808:     print(f"Backup ID: {backup['id']}")
+809:     print(f"Backup URL: {backup.get('webViewLink')}")
+810:     print(f"Change Log: {change_id} | {updated_range}")
+840:     print("VERIFY DOC TEXT OK")
+841:     print(f"Name: {meta['name']}")
+842:     print(f"ID: {meta['id']}")
+843:     print(f"Modified: {meta.get('modifiedTime')}")
+844:     print(f"URL: {meta.get('webViewLink')}")
+845:     print(f"Search text: {text_to_find}")
+846:     print(f"Found: {found}")
+847:     print(f"Count: {count}")
+894:     print("EXPORT DOC OK")
+895:     print(f"Name: {meta['name']}")
+896:     print(f"ID: {meta['id']}")
+897:     print(f"Format: {export_format}")
+898:     print(f"Output: {out_file}")
+899:     print(f"URL: {meta.get('webViewLink')}")
+969:     print("UPLOAD FILE OK")
+970:     print(f"Local path: {src}")
+971:     print(f"Uploaded name: {created['name']}")
+972:     print(f"File ID: {created['id']}")
+973:     print(f"Folder: Cass / {folder_name}")
+974:     print(f"Target folder ID: {target['id']}")
+975:     print(f"Created parents: {created.get('parents', [])}")
+976:     print(f"URL: {created.get('webViewLink')}")
+977:     print(f"Change Log: {change_id} | {updated_range}")
+1054:     print("MOVE FILE OK")
+1055:     print(f"File: {updated['name']}")
+1056:     print(f"File ID: {updated['id']}")
+1057:     print(f"Old parents: {old_parents}")
+1058:     print(f"New parents (update response): {updated.get('parents', [])}")
+1059:     print(f"New parents (verified): {parents_after}")
+1060:     print(f"Target folder: Cass / {target_folder_name}")
+1061:     print(f"Target folder ID: {target['id']}")
+1062:     print(f"URL: {updated.get('webViewLink')}")
+1063:     print(f"Change Log: {change_id} | {updated_range}")
+1076:     print("GET FILE OK")
+1077:     print(json.dumps(meta, ensure_ascii=False, indent=2))
+1100:     print("LIST FOLDER BY ID OK")
+1101:     print(f"Folder: {meta['name']}")
+1102:     print(f"Folder ID: {meta['id']}")
+1103:     print("")
+1106:         print(
+1128:     print("READ SHEET HEADER OK")
+1129:     print(f"Spreadsheet ID: {spreadsheet_id}")
+1130:     print(f"Sheet: {sheet_name}")
+1131:     print(f"Header row: {header_row}")
+1132:     print("")
+1133:     print("Header values:")
+1135:         print(f"{i:03d} | {col_to_a1(i)} | {value}")
+1137:     print("")
+1138:     print("Header map:")
+1139:     print(json.dumps(mapping, ensure_ascii=False, indent=2))
+1154:     print("GET SHEET ROWS OK")
+1155:     print(f"Spreadsheet ID: {spreadsheet_id}")
+1156:     print(f"Sheet: {sheet_name}")
+1157:     print(f"Total rows fetched: {len(rows)}")
+1158:     print("")
+1161:         print(f"ROW {row_num}: {json.dumps(row, ensure_ascii=False)}")
+1189:     print("FIND ROW BY COLUMN OK")
+1190:     print(f"Spreadsheet ID: {spreadsheet_id}")
+1191:     print(f"Sheet: {sheet_name}")
+1192:     print(f"Column: {column_name}")
+1193:     print(f"Match value: {match_value}")
+1194:     print(f"Matches found: {len(matches)}")
+1195:     print("")
+1198:         print(
+1246:     print("APPEND MASTER INDEX ROW OK")
+1247:     print(f"Spreadsheet ID: {spreadsheet_id}")
+1248:     print(f"Sheet: {sheet_name}")
+1249:     print("Payload:")
+1250:     print(json.dumps(payload, ensure_ascii=False, indent=2))
+1251:     print(f"Updated range: {result.get('updates', {}).get('updatedRange')}")
+1252:     print(f"Updated rows: {result.get('updates', {}).get('updatedRows')}")
+1323:     print("UPDATE MASTER INDEX ROW OK")
+1324:     print(f"Spreadsheet ID: {spreadsheet_id}")
+1325:     print(f"Sheet: {sheet_name}")
+1326:     print(f"Match column: {match_column}")
+1327:     print(f"Match value: {match_value}")
+1328:     print(f"Row number: {row_num}")
+1329:     print("")
+1330:     print("Old row:")
+1331:     print(json.dumps(current_row, ensure_ascii=False, indent=2))
+1332:     print("")
+1333:     print("Patch payload:")
+1334:     print(json.dumps(payload, ensure_ascii=False, indent=2))
+1335:     print("")
+1336:     print("New row:")
+1337:     print(json.dumps(new_row, ensure_ascii=False, indent=2))
+1338:     print("")
+1339:     print(f"Updated range: {result.get('updatedRange')}")
+1340:     print(f"Updated cells: {result.get('updatedCells')}")
+1368:     print("FIND ROW BY LINK FRAGMENT OK")
+1369:     print(f"Spreadsheet ID: {spreadsheet_id}")
+1370:     print(f"Sheet: {sheet_name}")
+1371:     print(f"Link column: {link_column}")
+1372:     print(f"Fragment: {fragment}")
+1373:     print(f"Matches found: {len(matches)}")
+1374:     print("")
+1377:         print(
+1385:     print("CONFIG STATUS OK")
+1386:     print(
+1411:     print("SAFETY MODE OK")
+1412:     print(
+1437:     print("SET SAFETY MODE OK")
+1438:     print(
+
+=== pattern: stderr ===
+NOT FOUND
+
+=== pattern: stdout ===
+NOT FOUND
+
+=== pattern: json\.dumps ===
+54:     print(json.dumps(payload, ensure_ascii=False, indent=2))
+280:     out.write_text(json.dumps(snapshot, ensure_ascii=False, indent=2), encoding="utf-8")
+1077:     print(json.dumps(meta, ensure_ascii=False, indent=2))
+1139:     print(json.dumps(mapping, ensure_ascii=False, indent=2))
+1161:         print(f"ROW {row_num}: {json.dumps(row, ensure_ascii=False)}")
+1199:             f"ROW {item['row_number']}: {json.dumps(item['row_values'], ensure_ascii=False)}"
+1250:     print(json.dumps(payload, ensure_ascii=False, indent=2))
+1331:     print(json.dumps(current_row, ensure_ascii=False, indent=2))
+1334:     print(json.dumps(payload, ensure_ascii=False, indent=2))
+1337:     print(json.dumps(new_row, ensure_ascii=False, indent=2))
+1378:             f"ROW {item['row_number']}: {json.dumps(item['row_values'], ensure_ascii=False)}"
+1387:         json.dumps(
+1413:         json.dumps(
+1439:         json.dumps(
+

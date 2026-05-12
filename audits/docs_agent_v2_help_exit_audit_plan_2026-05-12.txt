@@ -1,0 +1,5 @@
+docs_agent_v2 help/exit audit
+baseline: main@4d3cbe1
+target: docs_agent_v2.py only
+scope: help, usage, unknown-command, exit/output consistency
+non-goals: no code mutation, no agent_cli.py changes, no README/docs changes
