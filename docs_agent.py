@@ -10,7 +10,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from googleapiclient.http import MediaIoBaseDownload
-from doc_text_mutation import replace_all_text
+from doc_text_mutation import insert_text_at_index, replace_all_text
 from runtime_config import (
     CONFIG_PATH,
     config_get,
@@ -492,23 +492,16 @@ def create_temp_doc():
         .execute()
     )
 
-    docs.documents().batchUpdate(
-        documentId=created["id"],
-        body={
-            "requests": [
-                {
-                    "insertText": {
-                        "location": {"index": 1},
-                        "text": (
-                            "ASTCV Docs Agent temporary staging document.\n"
-                            f"Файл создан внутри Cass / {get_default_test_folder_name()}.\n"
-                            "Canonical-документы не изменялись.\n"
-                        ),
-                    }
-                }
-            ]
-        },
-    ).execute()
+    insert_text_at_index(
+        docs=docs,
+        document_id=created["id"],
+        index=1,
+        text_to_insert=(
+            "ASTCV Docs Agent temporary staging document.\n"
+            f"Файл создан внутри Cass / {get_default_test_folder_name()}.\n"
+            "Canonical-документы не изменялись.\n"
+        ),
+    )
 
     change_id, updated_range = append_log(
         sheets=sheets,
@@ -658,19 +651,12 @@ def patch_doc(
     doc = docs.documents().get(documentId=document_id).execute()
     end_index = doc["body"]["content"][-1]["endIndex"] - 1
 
-    docs.documents().batchUpdate(
-        documentId=document_id,
-        body={
-            "requests": [
-                {
-                    "insertText": {
-                        "location": {"index": end_index},
-                        "text": text_to_insert,
-                    }
-                }
-            ]
-        },
-    ).execute()
+    insert_text_at_index(
+        docs=docs,
+        document_id=document_id,
+        index=end_index,
+        text_to_insert=text_to_insert,
+    )
 
     change_id, updated_range = append_log(
         sheets=sheets,
@@ -737,24 +723,17 @@ def create_doc_in_folder(
         .execute()
     )
 
-    docs.documents().batchUpdate(
-        documentId=created["id"],
-        body={
-            "requests": [
-                {
-                    "insertText": {
-                        "location": {"index": 1},
-                        "text": (
-                            "Тестовый документ ASTCV Docs Agent.\n"
-                            f"Папка: Cass / {target_folder}.\n"
-                            "Назначение: проверка создания файлов в выбранной папке Cass.\n"
-                            "Canonical-документы не изменялись.\n"
-                        ),
-                    }
-                }
-            ]
-        },
-    ).execute()
+    insert_text_at_index(
+        docs=docs,
+        document_id=created["id"],
+        index=1,
+        text_to_insert=(
+            "Тестовый документ ASTCV Docs Agent.\n"
+            f"Папка: Cass / {target_folder}.\n"
+            "Назначение: проверка создания файлов в выбранной папке Cass.\n"
+            "Canonical-документы не изменялись.\n"
+        ),
+    )
 
     change_id, updated_range = append_log(
         sheets=sheets,
