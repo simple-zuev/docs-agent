@@ -1,0 +1,3 @@
+Stage: doc-body-only mode
+Goal: add a safe non-mutating output mode that prepares structured draft body from partial or resolved context
+Constraints: no mutation-layer expansion, no write operations, no hidden source assumptions, honest partial-context output only

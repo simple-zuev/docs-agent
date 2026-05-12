@@ -1,0 +1,4 @@
+Stage: minimal safe create-draft-doc
+Goal: add bounded draft creation in review scope only
+Constraints: no write-to-existing-doc, no canonical mutation, no registry mutation beyond existing bounded log flow, no broad refactor
+Scope: review folder only, explicit title, explicit confirm, existing controlled helper reuse preferred
