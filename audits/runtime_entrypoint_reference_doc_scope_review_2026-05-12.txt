@@ -1,0 +1,11 @@
+Runtime entrypoint reference doc-scope review
+Date: 2026-05-12
+
+doc-scope docs_agent.py references: 4
+doc-scope docs_agent_v2.py references: 3
+doc-scope agent_cli.py references: 60
+
+Assessment target
+- review only operator-facing documentation scope
+- ignore code internals, venv content, caches, and prior audit artifacts
+- determine whether any human-facing guidance still suggests direct docs_agent.py/docs_agent_v2.py execution as normal operator path

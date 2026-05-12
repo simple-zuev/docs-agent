@@ -1,0 +1,13 @@
+Runtime entrypoint reference audit plan
+Date: 2026-05-12
+
+Scope
+- repository-wide text/docs/examples references to direct docs_agent.py and docs_agent_v2.py execution
+
+Goal
+- confirm whether repository guidance is fully aligned to agent_cli.py as the operator-facing entrypoint
+
+Constraints
+- audit-only
+- no code mutation
+- no repo-wide cleanup

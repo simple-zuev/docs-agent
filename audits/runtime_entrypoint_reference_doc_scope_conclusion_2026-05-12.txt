@@ -1,0 +1,5 @@
+Conclusion
+- canonical operator-facing runtime contract remains aligned to agent_cli.py
+- direct docs_agent.py / docs_agent_v2.py execution is not presented as a normal operator workflow in current human-facing docs
+- no narrow follow-up mutation candidate established from this audit
+- recommended next step should move away from runtime-entrypoint docs and target a different low-risk audit/refactor surface

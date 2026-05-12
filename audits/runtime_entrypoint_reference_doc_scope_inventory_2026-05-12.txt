@@ -1,0 +1,70 @@
+==== README and top-level markdown ====
+/Users/zuevvladimir/AI/docs-agent/README.md:35:- python agent_cli.py doctor-lite
+/Users/zuevvladimir/AI/docs-agent/README.md:36:- python agent_cli.py doctor-lite --json
+/Users/zuevvladimir/AI/docs-agent/README.md:39:- python agent_cli.py doctor
+/Users/zuevvladimir/AI/docs-agent/README.md:40:- python agent_cli.py doctor --json
+/Users/zuevvladimir/AI/docs-agent/README.md:45:- python agent_cli.py status
+/Users/zuevvladimir/AI/docs-agent/README.md:46:- python agent_cli.py status --json
+/Users/zuevvladimir/AI/docs-agent/README.md:47:- python agent_cli.py f "DOC-0001"
+/Users/zuevvladimir/AI/docs-agent/README.md:48:- python agent_cli.py o "DOC-0002"
+/Users/zuevvladimir/AI/docs-agent/README.md:49:- python agent_cli.py r "DOC-0002"
+/Users/zuevvladimir/AI/docs-agent/README.md:50:- python agent_cli.py q "прочитай DOC-0002"
+/Users/zuevvladimir/AI/docs-agent/README.md:35:- python agent_cli.py doctor-lite
+/Users/zuevvladimir/AI/docs-agent/README.md:36:- python agent_cli.py doctor-lite --json
+/Users/zuevvladimir/AI/docs-agent/README.md:39:- python agent_cli.py doctor
+/Users/zuevvladimir/AI/docs-agent/README.md:40:- python agent_cli.py doctor --json
+/Users/zuevvladimir/AI/docs-agent/README.md:45:- python agent_cli.py status
+/Users/zuevvladimir/AI/docs-agent/README.md:46:- python agent_cli.py status --json
+/Users/zuevvladimir/AI/docs-agent/README.md:47:- python agent_cli.py f "DOC-0001"
+/Users/zuevvladimir/AI/docs-agent/README.md:48:- python agent_cli.py o "DOC-0002"
+/Users/zuevvladimir/AI/docs-agent/README.md:49:- python agent_cli.py r "DOC-0002"
+/Users/zuevvladimir/AI/docs-agent/README.md:50:- python agent_cli.py q "прочитай DOC-0002"
+
+==== docs/ markdown ====
+/Users/zuevvladimir/AI/docs-agent/docs/APPEND_REVIEW_NOTE_DESIGN.md:31:- `docs_agent.py append-review-note`
+/Users/zuevvladimir/AI/docs-agent/docs/APPEND_REVIEW_NOTE_DESIGN.md:63:- optionally connect command to `agent_cli.py`
+/Users/zuevvladimir/AI/docs-agent/docs/GOOGLE_API_OPERATING_NOTES.md:37:- python agent_cli.py doctor-lite
+/Users/zuevvladimir/AI/docs-agent/docs/GOOGLE_API_OPERATING_NOTES.md:40:- python agent_cli.py doctor
+/Users/zuevvladimir/AI/docs-agent/docs/PROJECT_STATUS.md:20:- python agent_cli.py doctor-lite
+/Users/zuevvladimir/AI/docs-agent/docs/PROJECT_STATUS.md:21:- python agent_cli.py status
+/Users/zuevvladimir/AI/docs-agent/docs/PROJECT_STATUS.md:43:- python agent_cli.py doctor
+/Users/zuevvladimir/AI/docs-agent/docs/PROJECT_STATUS.md:85:- working agent_cli.py was restored from local backup
+/Users/zuevvladimir/AI/docs-agent/docs/CREATE_DRAFT_DOC_DESIGN.md:30:- `docs_agent.py create-draft-doc`
+/Users/zuevvladimir/AI/docs-agent/docs/CREATE_DRAFT_DOC_DESIGN.md:31:- optionally later `agent_cli.py artifact-state` integration reuse
+/Users/zuevvladimir/AI/docs-agent/docs/CREATE_DRAFT_DOC_DESIGN.md:62:- `agent_cli.py status --json`
+/Users/zuevvladimir/AI/docs-agent/docs/CREATE_DRAFT_DOC_DESIGN.md:63:- `agent_cli.py doctor-lite --json`
+/Users/zuevvladimir/AI/docs-agent/docs/ARCHITECTURAL_NOTES.md:10:- agent_cli.py
+/Users/zuevvladimir/AI/docs-agent/docs/ARCHITECTURAL_NOTES.md:13:- docs_agent.py
+/Users/zuevvladimir/AI/docs-agent/docs/ARCHITECTURAL_NOTES.md:14:- частично docs_agent_v2.py
+/Users/zuevvladimir/AI/docs-agent/docs/REPOSITORY_RULES.md:5:- agent_cli.py — основной CLI
+/Users/zuevvladimir/AI/docs-agent/docs/REPOSITORY_RULES.md:6:- docs_agent.py — основной интеграционный слой
+/Users/zuevvladimir/AI/docs-agent/docs/REPOSITORY_RULES.md:7:- docs_agent_v2.py — альтернативный draft / расширенный вариант
+/Users/zuevvladimir/AI/docs-agent/docs/AI_AGENT_GUIDE.md:65:- python agent_cli.py doctor-lite --json
+/Users/zuevvladimir/AI/docs-agent/docs/AI_AGENT_GUIDE.md:66:- затем при необходимости python agent_cli.py doctor --json
+/Users/zuevvladimir/AI/docs-agent/docs/HUMAN_OPERATOR_GUIDE.md:24:- python agent_cli.py status
+/Users/zuevvladimir/AI/docs-agent/docs/HUMAN_OPERATOR_GUIDE.md:25:- python agent_cli.py status --json
+/Users/zuevvladimir/AI/docs-agent/docs/HUMAN_OPERATOR_GUIDE.md:28:- python agent_cli.py f "DOC-0001"
+/Users/zuevvladimir/AI/docs-agent/docs/HUMAN_OPERATOR_GUIDE.md:31:- python agent_cli.py o "DOC-0002"
+/Users/zuevvladimir/AI/docs-agent/docs/HUMAN_OPERATOR_GUIDE.md:34:- python agent_cli.py r "DOC-0002"
+/Users/zuevvladimir/AI/docs-agent/docs/HUMAN_OPERATOR_GUIDE.md:35:- python agent_cli.py q "прочитай DOC-0002"
+/Users/zuevvladimir/AI/docs-agent/docs/HUMAN_OPERATOR_GUIDE.md:40:- python agent_cli.py doctor-lite
+/Users/zuevvladimir/AI/docs-agent/docs/HUMAN_OPERATOR_GUIDE.md:41:- python agent_cli.py doctor-lite --json
+/Users/zuevvladimir/AI/docs-agent/docs/HUMAN_OPERATOR_GUIDE.md:44:- python agent_cli.py doctor
+/Users/zuevvladimir/AI/docs-agent/docs/HUMAN_OPERATOR_GUIDE.md:45:- python agent_cli.py doctor --json
+/Users/zuevvladimir/AI/docs-agent/docs/CHANGE_CONTROL.md:42:- python -m py_compile agent_cli.py
+/Users/zuevvladimir/AI/docs-agent/docs/CHANGE_CONTROL.md:45:- при необходимости python agent_cli.py doctor-lite --json
+/Users/zuevvladimir/AI/docs-agent/docs/KNOWN_LIMITATIONS.md:45:docs_agent_v2.py пока следует считать:
+/Users/zuevvladimir/AI/docs-agent/docs/COMMAND_REFERENCE.md:12:- python agent_cli.py doctor-lite
+/Users/zuevvladimir/AI/docs-agent/docs/COMMAND_REFERENCE.md:13:- python agent_cli.py doctor-lite --json
+/Users/zuevvladimir/AI/docs-agent/docs/COMMAND_REFERENCE.md:18:- python agent_cli.py doctor
+/Users/zuevvladimir/AI/docs-agent/docs/COMMAND_REFERENCE.md:19:- python agent_cli.py doctor --json
+/Users/zuevvladimir/AI/docs-agent/docs/COMMAND_REFERENCE.md:27:- python agent_cli.py status
+/Users/zuevvladimir/AI/docs-agent/docs/COMMAND_REFERENCE.md:28:- python agent_cli.py status --json
+/Users/zuevvladimir/AI/docs-agent/docs/COMMAND_REFERENCE.md:31:- python agent_cli.py f "DOC-0001"
+/Users/zuevvladimir/AI/docs-agent/docs/COMMAND_REFERENCE.md:32:- python agent_cli.py find-doc-any "DOC-0001"
+/Users/zuevvladimir/AI/docs-agent/docs/COMMAND_REFERENCE.md:35:- python agent_cli.py o "DOC-0002"
+/Users/zuevvladimir/AI/docs-agent/docs/COMMAND_REFERENCE.md:38:- python agent_cli.py r "DOC-0002"
+/Users/zuevvladimir/AI/docs-agent/docs/COMMAND_REFERENCE.md:39:- python agent_cli.py r "00_PROJECT_AI_OPERATING_PROMPT_АСТЦВ"
+/Users/zuevvladimir/AI/docs-agent/docs/COMMAND_REFERENCE.md:42:- python agent_cli.py q "прочитай DOC-0002"
+/Users/zuevvladimir/AI/docs-agent/docs/INSTALLATION.md:49:python agent_cli.py status
+/Users/zuevvladimir/AI/docs-agent/docs/INSTALLATION.md:50:python agent_cli.py f "DOC-0001"

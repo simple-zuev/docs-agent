@@ -1,0 +1,23 @@
+Runtime entrypoint reference doc-scope closeout
+Date: 2026-05-12
+
+Outcome
+- audit completed in narrowed human-facing documentation scope
+
+What was reviewed
+- README.md
+- docs/*.md
+- docs/*.txt
+
+Key finding
+- no operator-facing documentation was found that instructs normal users/operators to run docs_agent.py directly
+- no operator-facing documentation was found that instructs normal users/operators to run docs_agent_v2.py directly
+- active command examples consistently use agent_cli.py as the operator-facing entrypoint
+
+Interpretation of residual references
+- remaining docs_agent.py and docs_agent_v2.py mentions are descriptive/module-level references in design, architecture, repository, or limitations documents
+- these references describe internal structure or planned surfaces rather than operator runtime guidance
+
+Conclusion
+- no safe doc mutation is required in this iteration
+- closeout remains audit-only
