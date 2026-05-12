@@ -1868,6 +1868,142 @@ def cmd_ask(query: str, json_output: bool = False) -> int:
     return resolve_command_exit_code(payload)
 
 
+def read_text_file_payload(
+    path_value: str, *, command: str, arg_name: str
+) -> dict | str:
+    try:
+        return Path(path_value).read_text(encoding="utf-8")
+    except Exception as exc:
+        return build_error_payload(
+            command=command,
+            error_type=type(exc).__name__,
+            error_message=f"Failed to read {arg_name} file: {path_value} | {exc}",
+            retryable=False,
+            auth_related=False,
+            network_related=False,
+            details={"path": path_value, "arg_name": arg_name},
+        )
+
+
+def cmd_create_draft_doc(
+    title: str,
+    *,
+    dry_run: bool = False,
+    confirm: bool = False,
+    json_output: bool = False,
+) -> int:
+    args = ["create-draft-doc", title]
+    if dry_run:
+        args.append("--dry-run")
+    if confirm:
+        args.append("--confirm")
+
+    payload = run_docs_agent_with_retry(args)
+
+    if json_output:
+        print_json(payload)
+        return resolve_command_exit_code(payload)
+
+    if isinstance(payload, dict) and payload.get("ok"):
+        print("COMMAND OK")
+        print(f"Command: {payload.get('command')}")
+        for key in ("title", "document_id", "next_safe_step"):
+            if payload.get(key) is not None:
+                print(f"{key}: {payload.get(key)}")
+        return EXIT_OK
+
+    print_compact_error(payload)
+    return resolve_command_exit_code(payload)
+
+
+def cmd_write_draft_doc(
+    document_id: str,
+    body_file: str,
+    *,
+    dry_run: bool = False,
+    confirm: bool = False,
+    json_output: bool = False,
+) -> int:
+    body_text = read_text_file_payload(
+        body_file,
+        command="write-draft-doc",
+        arg_name="body-file",
+    )
+    if isinstance(body_text, dict):
+        if json_output:
+            print_json(body_text)
+        else:
+            print_compact_error(body_text)
+        return resolve_command_exit_code(body_text)
+
+    args = ["write-draft-doc", document_id, body_text]
+    if dry_run:
+        args.append("--dry-run")
+    if confirm:
+        args.append("--confirm")
+
+    payload = run_docs_agent_with_retry(args)
+
+    if json_output:
+        print_json(payload)
+        return resolve_command_exit_code(payload)
+
+    if isinstance(payload, dict) and payload.get("ok"):
+        print("COMMAND OK")
+        print(f"Command: {payload.get('command')}")
+        for key in ("title", "document_id", "next_safe_step"):
+            if payload.get(key) is not None:
+                print(f"{key}: {payload.get(key)}")
+        return EXIT_OK
+
+    print_compact_error(payload)
+    return resolve_command_exit_code(payload)
+
+
+def cmd_append_review_note(
+    document_id: str,
+    note_file: str,
+    *,
+    dry_run: bool = False,
+    confirm: bool = False,
+    json_output: bool = False,
+) -> int:
+    note_text = read_text_file_payload(
+        note_file,
+        command="append-review-note",
+        arg_name="note-file",
+    )
+    if isinstance(note_text, dict):
+        if json_output:
+            print_json(note_text)
+        else:
+            print_compact_error(note_text)
+        return resolve_command_exit_code(note_text)
+
+    args = ["append-review-note", document_id, note_text]
+    if dry_run:
+        args.append("--dry-run")
+    if confirm:
+        args.append("--confirm")
+
+    payload = run_docs_agent_with_retry(args)
+
+    if json_output:
+        print_json(payload)
+        return resolve_command_exit_code(payload)
+
+    if isinstance(payload, dict) and payload.get("ok"):
+        print("COMMAND OK")
+        print(f"Command: {payload.get('command')}")
+        for key in ("title", "document_id", "next_safe_step"):
+            if payload.get(key) is not None:
+                print(f"{key}: {payload.get(key)}")
+        return EXIT_OK
+
+    print_compact_error(payload)
+    return resolve_command_exit_code(payload)
+
+
 def parse_json_flag(argv: list[str]) -> tuple[bool, list[str]]:
     json_output = False
     args = argv[:]
@@ -1927,6 +2063,9 @@ def usage() -> None:
         "Usage:\n"
         "  python agent_cli.py status [--json]\n  python agent_cli.py repo-state [--json]    | rs [--json]\n"
         "  python agent_cli.py doctor [--json]        | diagnose [--json]\n"
+        "  python agent_cli.py create-draft-doc [--json] --title <title> [--dry-run] [--confirm]\n"
+        "  python agent_cli.py write-draft-doc [--json] --document-id <id> --body-file <path> [--dry-run] [--confirm]\n"
+        "  python agent_cli.py append-review-note [--json] --document-id <id> --note-file <path> [--dry-run] [--confirm]\n"
         "  python agent_cli.py find-doc-id <DOC-XXXX>\n"
         "  python agent_cli.py find-doc-name <document name>\n"
         "  python agent_cli.py find-link <drive_id_or_url_fragment>\n"
@@ -2005,6 +2144,100 @@ def main() -> int:
                 print_usage_error("doctor does not accept positional arguments.")
                 return EXIT_USAGE_ERROR
             return cmd_doctor(json_output=json_output)
+
+        if cmd == "create-draft-doc":
+            json_output, args = parse_json_flag(argv)
+            dry_run = False
+            confirm = False
+
+            filtered_args = []
+            for arg in args:
+                if arg == "--dry-run":
+                    dry_run = True
+                    continue
+                if arg == "--confirm":
+                    confirm = True
+                    continue
+                filtered_args.append(arg)
+
+            if len(filtered_args) != 2 or filtered_args[0] != "--title":
+                print_usage_error(
+                    "create-draft-doc requires: --title <title> [--dry-run] [--confirm]"
+                )
+                return EXIT_USAGE_ERROR
+
+            return cmd_create_draft_doc(
+                filtered_args[1],
+                dry_run=dry_run,
+                confirm=confirm,
+                json_output=json_output,
+            )
+
+        if cmd == "write-draft-doc":
+            json_output, args = parse_json_flag(argv)
+            dry_run = False
+            confirm = False
+
+            filtered_args = []
+            for arg in args:
+                if arg == "--dry-run":
+                    dry_run = True
+                    continue
+                if arg == "--confirm":
+                    confirm = True
+                    continue
+                filtered_args.append(arg)
+
+            if (
+                len(filtered_args) != 4
+                or filtered_args[0] != "--document-id"
+                or filtered_args[2] != "--body-file"
+            ):
+                print_usage_error(
+                    "write-draft-doc requires: --document-id <id> --body-file <path> [--dry-run] [--confirm]"
+                )
+                return EXIT_USAGE_ERROR
+
+            return cmd_write_draft_doc(
+                filtered_args[1],
+                filtered_args[3],
+                dry_run=dry_run,
+                confirm=confirm,
+                json_output=json_output,
+            )
+
+        if cmd == "append-review-note":
+            json_output, args = parse_json_flag(argv)
+            dry_run = False
+            confirm = False
+
+            filtered_args = []
+            for arg in args:
+                if arg == "--dry-run":
+                    dry_run = True
+                    continue
+                if arg == "--confirm":
+                    confirm = True
+                    continue
+                filtered_args.append(arg)
+
+            if (
+                len(filtered_args) != 4
+                or filtered_args[0] != "--document-id"
+                or filtered_args[2] != "--note-file"
+            ):
+                print_usage_error(
+                    "append-review-note requires: --document-id <id> --note-file <path> [--dry-run] [--confirm]"
+                )
+                return EXIT_USAGE_ERROR
+
+            return cmd_append_review_note(
+                filtered_args[1],
+                filtered_args[3],
+                dry_run=dry_run,
+                confirm=confirm,
+                json_output=json_output,
+            )
 
         if cmd == "find-doc-id":
             if len(argv) < 1:

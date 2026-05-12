@@ -1,0 +1,3 @@
+Stage: agent-cli write routes for draft workflow
+Goal: expose create-draft-doc, write-draft-doc, and append-review-note through agent_cli.py with bounded argument contracts
+Constraints: no new mutation semantics, no broad refactor, reuse existing docs_agent.py commands, preserve explicit validation and confirm discipline
