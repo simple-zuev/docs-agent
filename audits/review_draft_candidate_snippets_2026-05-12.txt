@@ -1,0 +1,1500 @@
+================================================================================
+Lines 264-291
+        "Type",
+        "Baseline",
+        "Status Class",
+        "Status",
+        "Folder",
+        "Owner",
+        "Purpose",
+        "ADR",
+        "Review Cadence",
+        "Last Review Date",
+        "Criticality",
+        "Description",
+        "Link",
+    ]
+
+    save_master_index_cache(
+        {
+            "fetched_at_epoch": now_epoch_int(),
+            "header": header_guess,
+            "rows": [row],
+            "mode": "stage29-seed-cache",
+        }
+    )
+
+    return {
+        "ok": True,
+        "command": "master-index-cache-refresh",
+        "rows_cached": 1,
+================================================================================
+Lines 265-292
+        "Baseline",
+        "Status Class",
+        "Status",
+        "Folder",
+        "Owner",
+        "Purpose",
+        "ADR",
+        "Review Cadence",
+        "Last Review Date",
+        "Criticality",
+        "Description",
+        "Link",
+    ]
+
+    save_master_index_cache(
+        {
+            "fetched_at_epoch": now_epoch_int(),
+            "header": header_guess,
+            "rows": [row],
+            "mode": "stage29-seed-cache",
+        }
+    )
+
+    return {
+        "ok": True,
+        "command": "master-index-cache-refresh",
+        "rows_cached": 1,
+        "cache_file": str(MASTER_INDEX_CACHE_FILE),
+================================================================================
+Lines 791-818
+        print(f"document_id: {summary.get('document_id')}")
+        print(f"document_name: {summary.get('document_name')}")
+        print(f"link: {summary.get('link')}")
+
+    read_result = payload.get("read_result") or {}
+    content = read_result.get("content", "")
+    if content:
+        print("")
+        print("content_preview:")
+        preview = content[:1200]
+        print(preview)
+        if read_result.get("truncated") or len(content) > 1200:
+            print("")
+            print("[truncated]")
+
+
+def print_compact_status(payload: dict):
+    print(f"ok: {payload.get('ok')}")
+    print("route: status")
+
+    safety = payload.get("safety") or {}
+    config = payload.get("config") or {}
+
+    print(f"mode: {safety.get('mode')}")
+    print(f"default_dry_run: {safety.get('default_dry_run')}")
+    print(f"forbid_master_index_write: {safety.get('forbid_master_index_write')}")
+    print(f"forbid_delete: {safety.get('forbid_delete')}")
+    print(f"default_test_folder: {safety.get('default_test_folder')}")
+================================================================================
+Lines 792-819
+        print(f"document_name: {summary.get('document_name')}")
+        print(f"link: {summary.get('link')}")
+
+    read_result = payload.get("read_result") or {}
+    content = read_result.get("content", "")
+    if content:
+        print("")
+        print("content_preview:")
+        preview = content[:1200]
+        print(preview)
+        if read_result.get("truncated") or len(content) > 1200:
+            print("")
+            print("[truncated]")
+
+
+def print_compact_status(payload: dict):
+    print(f"ok: {payload.get('ok')}")
+    print("route: status")
+
+    safety = payload.get("safety") or {}
+    config = payload.get("config") or {}
+
+    print(f"mode: {safety.get('mode')}")
+    print(f"default_dry_run: {safety.get('default_dry_run')}")
+    print(f"forbid_master_index_write: {safety.get('forbid_master_index_write')}")
+    print(f"forbid_delete: {safety.get('forbid_delete')}")
+    print(f"default_test_folder: {safety.get('default_test_folder')}")
+    print(f"master_index_sheet: {config.get('master_index_sheet_name')}")
+================================================================================
+Lines 793-820
+        print(f"link: {summary.get('link')}")
+
+    read_result = payload.get("read_result") or {}
+    content = read_result.get("content", "")
+    if content:
+        print("")
+        print("content_preview:")
+        preview = content[:1200]
+        print(preview)
+        if read_result.get("truncated") or len(content) > 1200:
+            print("")
+            print("[truncated]")
+
+
+def print_compact_status(payload: dict):
+    print(f"ok: {payload.get('ok')}")
+    print("route: status")
+
+    safety = payload.get("safety") or {}
+    config = payload.get("config") or {}
+
+    print(f"mode: {safety.get('mode')}")
+    print(f"default_dry_run: {safety.get('default_dry_run')}")
+    print(f"forbid_master_index_write: {safety.get('forbid_master_index_write')}")
+    print(f"forbid_delete: {safety.get('forbid_delete')}")
+    print(f"default_test_folder: {safety.get('default_test_folder')}")
+    print(f"master_index_sheet: {config.get('master_index_sheet_name')}")
+    print(f"master_index_id: {config.get('master_index_spreadsheet_id')}")
+================================================================================
+Lines 984-1011
+            error_type="TimeoutExpired",
+            error_message=f"docs_agent.py timed out after {DOCS_AGENT_TIMEOUT_SEC} seconds.",
+            retryable=True,
+            auth_related=False,
+            network_related=True,
+            _debug={
+                "cmd": cmd,
+                "timeout_sec": DOCS_AGENT_TIMEOUT_SEC,
+                "stdout_preview": (exc.stdout or "")[:500] if exc.stdout else "",
+                "stderr_preview": (exc.stderr or "")[:500] if exc.stderr else "",
+            },
+        )
+    except Exception as exc:
+        return build_error_payload(
+            command="subprocess",
+            error_type=exc.__class__.__name__,
+            error_message=f"Failed to start docs_agent.py: {exc}",
+            retryable=False,
+            auth_related=False,
+            network_related=False,
+            _debug={
+                "cmd": cmd,
+            },
+        )
+
+    stdout = (proc.stdout or "").strip()
+    stderr = (proc.stderr or "").strip()
+
+================================================================================
+Lines 985-1012
+            error_message=f"docs_agent.py timed out after {DOCS_AGENT_TIMEOUT_SEC} seconds.",
+            retryable=True,
+            auth_related=False,
+            network_related=True,
+            _debug={
+                "cmd": cmd,
+                "timeout_sec": DOCS_AGENT_TIMEOUT_SEC,
+                "stdout_preview": (exc.stdout or "")[:500] if exc.stdout else "",
+                "stderr_preview": (exc.stderr or "")[:500] if exc.stderr else "",
+            },
+        )
+    except Exception as exc:
+        return build_error_payload(
+            command="subprocess",
+            error_type=exc.__class__.__name__,
+            error_message=f"Failed to start docs_agent.py: {exc}",
+            retryable=False,
+            auth_related=False,
+            network_related=False,
+            _debug={
+                "cmd": cmd,
+            },
+        )
+
+    stdout = (proc.stdout or "").strip()
+    stderr = (proc.stderr or "").strip()
+
+    if not stdout:
+================================================================================
+Lines 1015-1042
+            error_type="EmptyOutput",
+            error_message="No stdout from docs_agent.py.",
+            retryable=False,
+            auth_related=False,
+            network_related=False,
+            _debug={
+                "returncode": proc.returncode,
+                "stderr": stderr,
+                "stdout_preview": stdout[:500],
+                "cmd": cmd,
+                "timeout_sec": DOCS_AGENT_TIMEOUT_SEC,
+            },
+        )
+
+    try:
+        data = json.loads(stdout)
+    except Exception as exc:
+        return build_error_payload(
+            command="subprocess",
+            error_type=exc.__class__.__name__,
+            error_message="Failed to parse JSON output from docs_agent.py.",
+            retryable=False,
+            auth_related=False,
+            network_related=False,
+            _debug={
+                "returncode": proc.returncode,
+                "stderr": stderr,
+                "stdout_preview": stdout[:1000],
+================================================================================
+Lines 1034-1061
+            error_type=exc.__class__.__name__,
+            error_message="Failed to parse JSON output from docs_agent.py.",
+            retryable=False,
+            auth_related=False,
+            network_related=False,
+            _debug={
+                "returncode": proc.returncode,
+                "stderr": stderr,
+                "stdout_preview": stdout[:1000],
+                "cmd": cmd,
+                "timeout_sec": DOCS_AGENT_TIMEOUT_SEC,
+            },
+        )
+
+    if "_debug" not in data:
+        data["_debug"] = {
+            "returncode": proc.returncode,
+            "stderr": stderr,
+            "cmd": cmd,
+            "timeout_sec": DOCS_AGENT_TIMEOUT_SEC,
+        }
+
+    return data
+
+
+def print_json(payload: dict) -> None:
+    print(json.dumps(payload, ensure_ascii=False, indent=2))
+
+================================================================================
+Lines 1110-1137
+        explanation = (
+            "Внешний процесс docs_agent.py завершился без ожидаемого JSON-ответа."
+        )
+        next_step = "Проверь stderr/_debug, затем отдельно запусти docs_agent.py вручную и посмотри, почему stdout пустой."
+    elif error_type == "JSONDecodeError":
+        explanation = (
+            "docs_agent.py вернул вывод, который не удалось разобрать как JSON."
+        )
+        next_step = "Проверь stdout_preview/stderr в _debug и убедись, что docs_agent.py печатает только валидный JSON."
+    else:
+        explanation = "Произошёл внутренний или нераспознанный сбой CLI/обёртки."
+        next_step = "Проверь _debug, stderr и повтори сценарий через status / smoke / точечный вызов команды."
+
+    lines.append(f"explanation: {explanation}")
+    lines.append(f"next_step: {next_step}")
+    return lines
+
+
+def print_compact_error(payload: dict) -> None:
+    print_human_lines(build_compact_error_output(payload))
+
+
+def print_human_lines(lines: list[str]) -> None:
+    for line in lines:
+        print(line)
+
+
+def extract_first_match_value(payload: dict, idx: int):
+================================================================================
+Lines 1804-1831
+                explanation = (
+                    "docs_agent.py не вернул ожидаемый JSON при чтении документа."
+                )
+                next_step = "Проверь stderr/_debug и отдельно запусти docs_agent.py read-doc вручную."
+            elif error_type == "JSONDecodeError":
+                explanation = (
+                    "Ответ docs_agent.py при чтении документа оказался невалидным JSON."
+                )
+                next_step = "Проверь stdout_preview/stderr в _debug."
+            else:
+                explanation = "Во время чтения документа произошёл внутренний или нераспознанный сбой."
+                next_step = "Проверь _debug и повтори сценарий через status и точечный read-doc вызов."
+
+            lines.append(f"explanation: {explanation}")
+            lines.append(f"next_step: {next_step}")
+            return lines
+
+        summary = result.get("summary", {}) or {}
+        read_result = result.get("read_result", {}) or {}
+        content = read_result.get("content", "") or ""
+        content_preview = content[:800]
+
+        lines.append(f"document_id: {summary.get('document_id')}")
+        lines.append(f"document_name: {summary.get('document_name')}")
+        lines.append(f"link: {summary.get('link')}")
+        lines.append("")
+        lines.append("content_preview:")
+        lines.append(content_preview)
+================================================================================
+Lines 1816-1843
+
+            lines.append(f"explanation: {explanation}")
+            lines.append(f"next_step: {next_step}")
+            return lines
+
+        summary = result.get("summary", {}) or {}
+        read_result = result.get("read_result", {}) or {}
+        content = read_result.get("content", "") or ""
+        content_preview = content[:800]
+
+        lines.append(f"document_id: {summary.get('document_id')}")
+        lines.append(f"document_name: {summary.get('document_name')}")
+        lines.append(f"link: {summary.get('link')}")
+        lines.append("")
+        lines.append("content_preview:")
+        lines.append(content_preview)
+        if read_result.get("truncated"):
+            lines.append("")
+            lines.append("[truncated]")
+        return lines
+
+    if not ok:
+        result = payload.get("result", {})
+        lines.append(
+            f"error_type: {result.get('error_type') or payload.get('error_type')}"
+        )
+        lines.append(
+            f"error_message: {result.get('error_message') or payload.get('error_message')}"
+================================================================================
+Lines 1822-1849
+        read_result = result.get("read_result", {}) or {}
+        content = read_result.get("content", "") or ""
+        content_preview = content[:800]
+
+        lines.append(f"document_id: {summary.get('document_id')}")
+        lines.append(f"document_name: {summary.get('document_name')}")
+        lines.append(f"link: {summary.get('link')}")
+        lines.append("")
+        lines.append("content_preview:")
+        lines.append(content_preview)
+        if read_result.get("truncated"):
+            lines.append("")
+            lines.append("[truncated]")
+        return lines
+
+    if not ok:
+        result = payload.get("result", {})
+        lines.append(
+            f"error_type: {result.get('error_type') or payload.get('error_type')}"
+        )
+        lines.append(
+            f"error_message: {result.get('error_message') or payload.get('error_message')}"
+        )
+        lines.append("explanation: Запрос маршрутизирован, но завершился ошибкой.")
+        lines.append("next_step: Повтори команду в JSON-режиме и проверь debug-поля.")
+        return lines
+
+    lines.append(json.dumps(payload, ensure_ascii=False, indent=2))
+================================================================================
+Lines 1823-1850
+        content = read_result.get("content", "") or ""
+        content_preview = content[:800]
+
+        lines.append(f"document_id: {summary.get('document_id')}")
+        lines.append(f"document_name: {summary.get('document_name')}")
+        lines.append(f"link: {summary.get('link')}")
+        lines.append("")
+        lines.append("content_preview:")
+        lines.append(content_preview)
+        if read_result.get("truncated"):
+            lines.append("")
+            lines.append("[truncated]")
+        return lines
+
+    if not ok:
+        result = payload.get("result", {})
+        lines.append(
+            f"error_type: {result.get('error_type') or payload.get('error_type')}"
+        )
+        lines.append(
+            f"error_message: {result.get('error_message') or payload.get('error_message')}"
+        )
+        lines.append("explanation: Запрос маршрутизирован, но завершился ошибкой.")
+        lines.append("next_step: Повтори команду в JSON-режиме и проверь debug-поля.")
+        return lines
+
+    lines.append(json.dumps(payload, ensure_ascii=False, indent=2))
+    return lines
+================================================================================
+Lines 1864-1891
+        "find-doc-any",
+        "open-doc-from-query",
+        "read-doc-from-query",
+        "read-doc",
+        "get-file",
+    ]
+    bounded_write = [
+        "create-temp-doc",
+        "create-staging-copy",
+        "create-doc-in-folder",
+        "replace-doc-text-safe",
+        "move-file-with-log",
+    ]
+    registry_and_sheet_helpers = [
+        "read-sheet-values",
+        "read-sheet-header",
+        "get-sheet-rows",
+        "find-row-by-column",
+        "find-row-by-link-fragment",
+        "append-log",
+        "append-master-index-row",
+        "update-master-index-row",
+    ]
+    config_and_safety = [
+        "show-config-status",
+        "show-safety-mode",
+        "set-safety-mode",
+    ]
+================================================================================
+Lines 1905-1932
+    }
+
+    capabilities = {
+        "can_find_docs": True,
+        "can_read_docs": True,
+        "can_read_sheets": True,
+        "can_list_folders": True,
+        "can_get_file_meta": True,
+        "can_create_draft_doc": True,
+        "can_create_staging_copy": True,
+        "can_safe_replace": True,
+        "can_move_with_log": True,
+        "can_update_registry": True,
+        "can_patch_doc": True,
+        "patch_doc_autonomous_mode_allowed": False,
+        "master_index_write_allowed": not bool(safety.get("forbid_master_index_write")),
+        "delete_allowed": not bool(safety.get("forbid_delete")),
+    }
+
+    notes = [
+        "Capability discovery is descriptive and reflects currently surfaced CLI/document operations.",
+        "Safe autonomous mode should prefer read-only, draft-first, create-staging-copy, and replace-doc-text-safe.",
+        "patch-doc exists but should be treated as supervised-only for autonomous agent workflows.",
+        "Master Index writes and delete operations remain constrained by current safety settings.",
+    ]
+
+    return {
+        "ok": True,
+================================================================================
+Lines 1906-1933
+
+    capabilities = {
+        "can_find_docs": True,
+        "can_read_docs": True,
+        "can_read_sheets": True,
+        "can_list_folders": True,
+        "can_get_file_meta": True,
+        "can_create_draft_doc": True,
+        "can_create_staging_copy": True,
+        "can_safe_replace": True,
+        "can_move_with_log": True,
+        "can_update_registry": True,
+        "can_patch_doc": True,
+        "patch_doc_autonomous_mode_allowed": False,
+        "master_index_write_allowed": not bool(safety.get("forbid_master_index_write")),
+        "delete_allowed": not bool(safety.get("forbid_delete")),
+    }
+
+    notes = [
+        "Capability discovery is descriptive and reflects currently surfaced CLI/document operations.",
+        "Safe autonomous mode should prefer read-only, draft-first, create-staging-copy, and replace-doc-text-safe.",
+        "patch-doc exists but should be treated as supervised-only for autonomous agent workflows.",
+        "Master Index writes and delete operations remain constrained by current safety settings.",
+    ]
+
+    return {
+        "ok": True,
+        "command": "capabilities",
+================================================================================
+Lines 1918-1945
+        "can_patch_doc": True,
+        "patch_doc_autonomous_mode_allowed": False,
+        "master_index_write_allowed": not bool(safety.get("forbid_master_index_write")),
+        "delete_allowed": not bool(safety.get("forbid_delete")),
+    }
+
+    notes = [
+        "Capability discovery is descriptive and reflects currently surfaced CLI/document operations.",
+        "Safe autonomous mode should prefer read-only, draft-first, create-staging-copy, and replace-doc-text-safe.",
+        "patch-doc exists but should be treated as supervised-only for autonomous agent workflows.",
+        "Master Index writes and delete operations remain constrained by current safety settings.",
+    ]
+
+    return {
+        "ok": True,
+        "command": "capabilities",
+        "categories": {
+            "diagnostics": diagnostics,
+            "read_only": read_only,
+            "bounded_write": bounded_write,
+            "registry_and_sheet_helpers": registry_and_sheet_helpers,
+            "config_and_safety": config_and_safety,
+        },
+        "capabilities": capabilities,
+        "safety": safety,
+        "status_snapshot_ok": bool(status_payload.get("ok")),
+        "notes": notes,
+    }
+================================================================================
+Lines 1975-2002
+            "Поддержка JTBD и CJM",
+        ],
+        "repository_governance_and_operator_context": [
+            "DOC-0001",
+            "Change Log Lite",
+            "status",
+            "capabilities",
+        ],
+        "working_drafts_and_review_artifacts": [
+            "13_Черновики_и_review",
+        ],
+    }
+
+    resolved_sources = []
+    unresolved_sources = []
+
+    for group_name, items in source_groups.items():
+        for item in items:
+            if item == "DOC-0001":
+                payload = find_doc_any_payload_from_cache("DOC-0001")
+                if payload.get("ok"):
+                    resolved_sources.append(
+                        {
+                            "group": group_name,
+                            "query": item,
+                            "matched_by": payload.get("matched_by"),
+                            "summary": payload.get("summary"),
+                        }
+================================================================================
+Lines 1976-2003
+        ],
+        "repository_governance_and_operator_context": [
+            "DOC-0001",
+            "Change Log Lite",
+            "status",
+            "capabilities",
+        ],
+        "working_drafts_and_review_artifacts": [
+            "13_Черновики_и_review",
+        ],
+    }
+
+    resolved_sources = []
+    unresolved_sources = []
+
+    for group_name, items in source_groups.items():
+        for item in items:
+            if item == "DOC-0001":
+                payload = find_doc_any_payload_from_cache("DOC-0001")
+                if payload.get("ok"):
+                    resolved_sources.append(
+                        {
+                            "group": group_name,
+                            "query": item,
+                            "matched_by": payload.get("matched_by"),
+                            "summary": payload.get("summary"),
+                        }
+                    )
+================================================================================
+Lines 2041-2068
+                                    "change_log_sheet_name"
+                                )
+                            ),
+                        },
+                    }
+                )
+                continue
+
+            if item == "13_Черновики_и_review":
+                resolved_sources.append(
+                    {
+                        "group": group_name,
+                        "query": item,
+                        "matched_by": "known-folder",
+                        "summary": {"name": "13_Черновики_и_review"},
+                    }
+                )
+                continue
+
+            payload = find_doc_any_payload_from_cache(item)
+            if payload.get("ok"):
+                resolved_sources.append(
+                    {
+                        "group": group_name,
+                        "query": item,
+                        "matched_by": payload.get("matched_by"),
+                        "summary": payload.get("summary"),
+                    }
+================================================================================
+Lines 2047-2074
+                continue
+
+            if item == "13_Черновики_и_review":
+                resolved_sources.append(
+                    {
+                        "group": group_name,
+                        "query": item,
+                        "matched_by": "known-folder",
+                        "summary": {"name": "13_Черновики_и_review"},
+                    }
+                )
+                continue
+
+            payload = find_doc_any_payload_from_cache(item)
+            if payload.get("ok"):
+                resolved_sources.append(
+                    {
+                        "group": group_name,
+                        "query": item,
+                        "matched_by": payload.get("matched_by"),
+                        "summary": payload.get("summary"),
+                    }
+                )
+            else:
+                unresolved_sources.append(
+                    {
+                        "group": group_name,
+                        "query": item,
+================================================================================
+Lines 2073-2100
+                        "group": group_name,
+                        "query": item,
+                        "reason": "CacheMiss",
+                        "error_message": "Source was not available through current cache-only lookup.",
+                    }
+                )
+
+    recommended_generation_mode = (
+        "draft-doc" if len(unresolved_sources) == 0 else "doc-body-only"
+    )
+
+    return {
+        "ok": True,
+        "command": "assemble-context",
+        "profile": profile,
+        "source_groups": source_groups,
+        "resolved_sources": resolved_sources,
+        "unresolved_sources": unresolved_sources,
+        "capabilities_snapshot": capabilities,
+        "safety_snapshot": status_payload,
+        "context_summary": {
+            "resolved_count": len(resolved_sources),
+            "unresolved_count": len(unresolved_sources),
+            "partial_context": len(unresolved_sources) > 0,
+        },
+        "recommended_generation_mode": recommended_generation_mode,
+        "next_safe_step": (
+            "Use draft-doc when all critical sources are resolved; otherwise prefer doc-body-only and avoid direct mutation."
+================================================================================
+Lines 2092-2119
+        "safety_snapshot": status_payload,
+        "context_summary": {
+            "resolved_count": len(resolved_sources),
+            "unresolved_count": len(unresolved_sources),
+            "partial_context": len(unresolved_sources) > 0,
+        },
+        "recommended_generation_mode": recommended_generation_mode,
+        "next_safe_step": (
+            "Use draft-doc when all critical sources are resolved; otherwise prefer doc-body-only and avoid direct mutation."
+        ),
+    }
+
+
+def doc_body_only_outline(document_type: str) -> list[str]:
+    outlines = {
+        "operating-model": [
+            "Назначение",
+            "Область применения",
+            "Роли и ответственность",
+            "Основные процессы",
+            "Контрольные точки",
+            "Ограничения и риски",
+            "Следующие шаги",
+        ],
+        "instruction": [
+            "Назначение инструкции",
+            "Область применения",
+            "Предварительные условия",
+================================================================================
+Lines 2135-2162
+            "Контекст",
+            "Проблема",
+            "Принятое решение",
+            "Альтернативы",
+            "Ограничения",
+            "Риски",
+            "Следующие шаги",
+        ],
+        "draft-spec": [
+            "Назначение",
+            "Контекст",
+            "Функциональные требования",
+            "Нефункциональные требования",
+            "Ограничения",
+            "Риски и допущения",
+            "Следующие шаги",
+        ],
+    }
+    return outlines.get(
+        document_type,
+        [
+            "Назначение",
+            "Контекст",
+            "Основное содержание",
+            "Ограничения",
+            "Риски и допущения",
+            "Следующие шаги",
+        ],
+================================================================================
+Lines 2214-2241
+
+    lines.extend(
+        [
+            "## Допущения",
+            "- Использован только подтверждённый и частично разрешённый контекст текущего agent workflow.",
+            "- При появлении дополнительных canonical sources документ должен быть уточнён.",
+            "",
+            "## Следующий безопасный шаг",
+            "Создать или выбрать draft document в review-контуре и перенести это тело документа в controlled write workflow.",
+            "",
+        ]
+    )
+
+    return "\n".join(lines)
+
+
+def doc_body_only_payload(profile: str, document_type: str, title: str) -> dict:
+    context_payload = assemble_context_payload(profile)
+    if not context_payload.get("ok"):
+        return context_payload
+
+    outline = doc_body_only_outline(document_type)
+    body = build_doc_body_only_body(
+        profile=profile,
+        document_type=document_type,
+        title=title,
+        context_payload=context_payload,
+    )
+================================================================================
+Lines 2244-2271
+        item.get("query")
+        for item in (context_payload.get("unresolved_sources") or [])
+        if item.get("query")
+    ]
+
+    assumptions = [
+        "Body is generated without direct mutation.",
+        "Body may be based on partial context when unresolved sources exist.",
+        "Further review is required before canonical or review-draft update.",
+    ]
+
+    return {
+        "ok": True,
+        "command": "doc-body-only",
+        "profile": profile,
+        "document_type": document_type,
+        "title": title,
+        "context_snapshot": {
+            "resolved_count": (context_payload.get("context_summary") or {}).get(
+                "resolved_count"
+            ),
+            "unresolved_count": (context_payload.get("context_summary") or {}).get(
+                "unresolved_count"
+            ),
+            "partial_context": (context_payload.get("context_summary") or {}).get(
+                "partial_context"
+            ),
+        },
+================================================================================
+Lines 2268-2295
+            "partial_context": (context_payload.get("context_summary") or {}).get(
+                "partial_context"
+            ),
+        },
+        "outline": outline,
+        "body": body,
+        "assumptions": assumptions,
+        "unresolved_dependencies": unresolved_dependencies,
+        "next_safe_step": "Create or select a draft document in review scope and use controlled write workflow to place this body.",
+    }
+
+
+def artifact_state_payload(file_id: str) -> dict:
+    file_payload = run_docs_agent_with_retry(["get-file", file_id])
+    if not isinstance(file_payload, dict) or not file_payload.get("ok"):
+        return build_error_payload(
+            command="artifact-state",
+            error_type=(file_payload or {}).get("error_type", "ArtifactLookupError"),
+            error_message=(file_payload or {}).get(
+                "error_message", "Failed to read artifact metadata."
+            ),
+            retryable=bool((file_payload or {}).get("retryable")),
+            auth_related=bool((file_payload or {}).get("auth_related")),
+            network_related=bool((file_payload or {}).get("network_related")),
+            target_artifact={"file_id": file_id},
+            lookup_result=file_payload,
+        )
+
+================================================================================
+Lines 2296-2323
+    file_meta = file_payload.get("file") or {}
+    name = str(file_meta.get("name") or "")
+    parents = file_meta.get("parents") or []
+
+    default_test_folder = (
+        (cmd_status_payload().get("safety") or {}).get("default_test_folder")
+    ) or ""
+
+    review_folder_id = "1rZtuXOyThzFf_LFWaD4w5nHwuXCDIHQh"
+    office_folder_id = "1I8xbFY0sjdS4bVPICr4pOg7qkTftgHBv"
+
+    in_review_scope = review_folder_id in parents
+    in_default_test_scope = office_folder_id in parents
+
+    placement = {
+        "parents": parents,
+        "review_folder_id": review_folder_id,
+        "office_folder_id": office_folder_id,
+        "review_scope_by_parent_id": in_review_scope,
+        "default_test_scope_by_parent_id": in_default_test_scope,
+        "default_test_folder": default_test_folder,
+    }
+
+    artifact_state = "Unknown"
+    review_status = "Needs classification"
+    next_safe_step = "Review artifact placement and classify before write actions."
+
+    if name.startswith("BACKUP_BEFORE_REPLACE__"):
+================================================================================
+Lines 2299-2326
+
+    default_test_folder = (
+        (cmd_status_payload().get("safety") or {}).get("default_test_folder")
+    ) or ""
+
+    review_folder_id = "1rZtuXOyThzFf_LFWaD4w5nHwuXCDIHQh"
+    office_folder_id = "1I8xbFY0sjdS4bVPICr4pOg7qkTftgHBv"
+
+    in_review_scope = review_folder_id in parents
+    in_default_test_scope = office_folder_id in parents
+
+    placement = {
+        "parents": parents,
+        "review_folder_id": review_folder_id,
+        "office_folder_id": office_folder_id,
+        "review_scope_by_parent_id": in_review_scope,
+        "default_test_scope_by_parent_id": in_default_test_scope,
+        "default_test_folder": default_test_folder,
+    }
+
+    artifact_state = "Unknown"
+    review_status = "Needs classification"
+    next_safe_step = "Review artifact placement and classify before write actions."
+
+    if name.startswith("BACKUP_BEFORE_REPLACE__"):
+        artifact_state = "Historical reference"
+        review_status = "Not for direct mutation"
+        next_safe_step = "Use as backup/reference only."
+================================================================================
+Lines 2304-2331
+    review_folder_id = "1rZtuXOyThzFf_LFWaD4w5nHwuXCDIHQh"
+    office_folder_id = "1I8xbFY0sjdS4bVPICr4pOg7qkTftgHBv"
+
+    in_review_scope = review_folder_id in parents
+    in_default_test_scope = office_folder_id in parents
+
+    placement = {
+        "parents": parents,
+        "review_folder_id": review_folder_id,
+        "office_folder_id": office_folder_id,
+        "review_scope_by_parent_id": in_review_scope,
+        "default_test_scope_by_parent_id": in_default_test_scope,
+        "default_test_folder": default_test_folder,
+    }
+
+    artifact_state = "Unknown"
+    review_status = "Needs classification"
+    next_safe_step = "Review artifact placement and classify before write actions."
+
+    if name.startswith("BACKUP_BEFORE_REPLACE__"):
+        artifact_state = "Historical reference"
+        review_status = "Not for direct mutation"
+        next_safe_step = "Use as backup/reference only."
+    elif name.startswith("STAGING_COPY__"):
+        artifact_state = "Pending review"
+        review_status = "Review required"
+        next_safe_step = "Inspect staging artifact and decide whether body placement or review note is needed."
+    elif in_review_scope:
+================================================================================
+Lines 2306-2333
+
+    in_review_scope = review_folder_id in parents
+    in_default_test_scope = office_folder_id in parents
+
+    placement = {
+        "parents": parents,
+        "review_folder_id": review_folder_id,
+        "office_folder_id": office_folder_id,
+        "review_scope_by_parent_id": in_review_scope,
+        "default_test_scope_by_parent_id": in_default_test_scope,
+        "default_test_folder": default_test_folder,
+    }
+
+    artifact_state = "Unknown"
+    review_status = "Needs classification"
+    next_safe_step = "Review artifact placement and classify before write actions."
+
+    if name.startswith("BACKUP_BEFORE_REPLACE__"):
+        artifact_state = "Historical reference"
+        review_status = "Not for direct mutation"
+        next_safe_step = "Use as backup/reference only."
+    elif name.startswith("STAGING_COPY__"):
+        artifact_state = "Pending review"
+        review_status = "Review required"
+        next_safe_step = "Inspect staging artifact and decide whether body placement or review note is needed."
+    elif in_review_scope:
+        artifact_state = "Draft"
+        review_status = "In review scope"
+================================================================================
+Lines 2312-2339
+        "review_folder_id": review_folder_id,
+        "office_folder_id": office_folder_id,
+        "review_scope_by_parent_id": in_review_scope,
+        "default_test_scope_by_parent_id": in_default_test_scope,
+        "default_test_folder": default_test_folder,
+    }
+
+    artifact_state = "Unknown"
+    review_status = "Needs classification"
+    next_safe_step = "Review artifact placement and classify before write actions."
+
+    if name.startswith("BACKUP_BEFORE_REPLACE__"):
+        artifact_state = "Historical reference"
+        review_status = "Not for direct mutation"
+        next_safe_step = "Use as backup/reference only."
+    elif name.startswith("STAGING_COPY__"):
+        artifact_state = "Pending review"
+        review_status = "Review required"
+        next_safe_step = "Inspect staging artifact and decide whether body placement or review note is needed."
+    elif in_review_scope:
+        artifact_state = "Draft"
+        review_status = "In review scope"
+        next_safe_step = (
+            "Safe candidate for bounded draft workflow after target validation."
+        )
+    elif in_default_test_scope:
+        artifact_state = "Draft"
+        review_status = "In default test scope"
+================================================================================
+Lines 2313-2340
+        "office_folder_id": office_folder_id,
+        "review_scope_by_parent_id": in_review_scope,
+        "default_test_scope_by_parent_id": in_default_test_scope,
+        "default_test_folder": default_test_folder,
+    }
+
+    artifact_state = "Unknown"
+    review_status = "Needs classification"
+    next_safe_step = "Review artifact placement and classify before write actions."
+
+    if name.startswith("BACKUP_BEFORE_REPLACE__"):
+        artifact_state = "Historical reference"
+        review_status = "Not for direct mutation"
+        next_safe_step = "Use as backup/reference only."
+    elif name.startswith("STAGING_COPY__"):
+        artifact_state = "Pending review"
+        review_status = "Review required"
+        next_safe_step = "Inspect staging artifact and decide whether body placement or review note is needed."
+    elif in_review_scope:
+        artifact_state = "Draft"
+        review_status = "In review scope"
+        next_safe_step = (
+            "Safe candidate for bounded draft workflow after target validation."
+        )
+    elif in_default_test_scope:
+        artifact_state = "Draft"
+        review_status = "In default test scope"
+        next_safe_step = "Validate whether this artifact should stay test-only or move into review workflow."
+================================================================================
+Lines 2317-2344
+    }
+
+    artifact_state = "Unknown"
+    review_status = "Needs classification"
+    next_safe_step = "Review artifact placement and classify before write actions."
+
+    if name.startswith("BACKUP_BEFORE_REPLACE__"):
+        artifact_state = "Historical reference"
+        review_status = "Not for direct mutation"
+        next_safe_step = "Use as backup/reference only."
+    elif name.startswith("STAGING_COPY__"):
+        artifact_state = "Pending review"
+        review_status = "Review required"
+        next_safe_step = "Inspect staging artifact and decide whether body placement or review note is needed."
+    elif in_review_scope:
+        artifact_state = "Draft"
+        review_status = "In review scope"
+        next_safe_step = (
+            "Safe candidate for bounded draft workflow after target validation."
+        )
+    elif in_default_test_scope:
+        artifact_state = "Draft"
+        review_status = "In default test scope"
+        next_safe_step = "Validate whether this artifact should stay test-only or move into review workflow."
+    elif name:
+        artifact_state = "Canonical or non-review artifact"
+        review_status = "Outside review scope"
+        next_safe_step = (
+================================================================================
+Lines 2319-2346
+    artifact_state = "Unknown"
+    review_status = "Needs classification"
+    next_safe_step = "Review artifact placement and classify before write actions."
+
+    if name.startswith("BACKUP_BEFORE_REPLACE__"):
+        artifact_state = "Historical reference"
+        review_status = "Not for direct mutation"
+        next_safe_step = "Use as backup/reference only."
+    elif name.startswith("STAGING_COPY__"):
+        artifact_state = "Pending review"
+        review_status = "Review required"
+        next_safe_step = "Inspect staging artifact and decide whether body placement or review note is needed."
+    elif in_review_scope:
+        artifact_state = "Draft"
+        review_status = "In review scope"
+        next_safe_step = (
+            "Safe candidate for bounded draft workflow after target validation."
+        )
+    elif in_default_test_scope:
+        artifact_state = "Draft"
+        review_status = "In default test scope"
+        next_safe_step = "Validate whether this artifact should stay test-only or move into review workflow."
+    elif name:
+        artifact_state = "Canonical or non-review artifact"
+        review_status = "Outside review scope"
+        next_safe_step = (
+            "Avoid bounded write until artifact scope is explicitly validated."
+        )
+================================================================================
+Lines 2320-2347
+    review_status = "Needs classification"
+    next_safe_step = "Review artifact placement and classify before write actions."
+
+    if name.startswith("BACKUP_BEFORE_REPLACE__"):
+        artifact_state = "Historical reference"
+        review_status = "Not for direct mutation"
+        next_safe_step = "Use as backup/reference only."
+    elif name.startswith("STAGING_COPY__"):
+        artifact_state = "Pending review"
+        review_status = "Review required"
+        next_safe_step = "Inspect staging artifact and decide whether body placement or review note is needed."
+    elif in_review_scope:
+        artifact_state = "Draft"
+        review_status = "In review scope"
+        next_safe_step = (
+            "Safe candidate for bounded draft workflow after target validation."
+        )
+    elif in_default_test_scope:
+        artifact_state = "Draft"
+        review_status = "In default test scope"
+        next_safe_step = "Validate whether this artifact should stay test-only or move into review workflow."
+    elif name:
+        artifact_state = "Canonical or non-review artifact"
+        review_status = "Outside review scope"
+        next_safe_step = (
+            "Avoid bounded write until artifact scope is explicitly validated."
+        )
+
+================================================================================
+Lines 2321-2348
+    next_safe_step = "Review artifact placement and classify before write actions."
+
+    if name.startswith("BACKUP_BEFORE_REPLACE__"):
+        artifact_state = "Historical reference"
+        review_status = "Not for direct mutation"
+        next_safe_step = "Use as backup/reference only."
+    elif name.startswith("STAGING_COPY__"):
+        artifact_state = "Pending review"
+        review_status = "Review required"
+        next_safe_step = "Inspect staging artifact and decide whether body placement or review note is needed."
+    elif in_review_scope:
+        artifact_state = "Draft"
+        review_status = "In review scope"
+        next_safe_step = (
+            "Safe candidate for bounded draft workflow after target validation."
+        )
+    elif in_default_test_scope:
+        artifact_state = "Draft"
+        review_status = "In default test scope"
+        next_safe_step = "Validate whether this artifact should stay test-only or move into review workflow."
+    elif name:
+        artifact_state = "Canonical or non-review artifact"
+        review_status = "Outside review scope"
+        next_safe_step = (
+            "Avoid bounded write until artifact scope is explicitly validated."
+        )
+
+    return build_mutation_envelope(
+================================================================================
+Lines 2322-2349
+
+    if name.startswith("BACKUP_BEFORE_REPLACE__"):
+        artifact_state = "Historical reference"
+        review_status = "Not for direct mutation"
+        next_safe_step = "Use as backup/reference only."
+    elif name.startswith("STAGING_COPY__"):
+        artifact_state = "Pending review"
+        review_status = "Review required"
+        next_safe_step = "Inspect staging artifact and decide whether body placement or review note is needed."
+    elif in_review_scope:
+        artifact_state = "Draft"
+        review_status = "In review scope"
+        next_safe_step = (
+            "Safe candidate for bounded draft workflow after target validation."
+        )
+    elif in_default_test_scope:
+        artifact_state = "Draft"
+        review_status = "In default test scope"
+        next_safe_step = "Validate whether this artifact should stay test-only or move into review workflow."
+    elif name:
+        artifact_state = "Canonical or non-review artifact"
+        review_status = "Outside review scope"
+        next_safe_step = (
+            "Avoid bounded write until artifact scope is explicitly validated."
+        )
+
+    return build_mutation_envelope(
+        command="artifact-state",
+================================================================================
+Lines 2323-2350
+    if name.startswith("BACKUP_BEFORE_REPLACE__"):
+        artifact_state = "Historical reference"
+        review_status = "Not for direct mutation"
+        next_safe_step = "Use as backup/reference only."
+    elif name.startswith("STAGING_COPY__"):
+        artifact_state = "Pending review"
+        review_status = "Review required"
+        next_safe_step = "Inspect staging artifact and decide whether body placement or review note is needed."
+    elif in_review_scope:
+        artifact_state = "Draft"
+        review_status = "In review scope"
+        next_safe_step = (
+            "Safe candidate for bounded draft workflow after target validation."
+        )
+    elif in_default_test_scope:
+        artifact_state = "Draft"
+        review_status = "In default test scope"
+        next_safe_step = "Validate whether this artifact should stay test-only or move into review workflow."
+    elif name:
+        artifact_state = "Canonical or non-review artifact"
+        review_status = "Outside review scope"
+        next_safe_step = (
+            "Avoid bounded write until artifact scope is explicitly validated."
+        )
+
+    return build_mutation_envelope(
+        command="artifact-state",
+        ok=True,
+================================================================================
+Lines 2324-2351
+        artifact_state = "Historical reference"
+        review_status = "Not for direct mutation"
+        next_safe_step = "Use as backup/reference only."
+    elif name.startswith("STAGING_COPY__"):
+        artifact_state = "Pending review"
+        review_status = "Review required"
+        next_safe_step = "Inspect staging artifact and decide whether body placement or review note is needed."
+    elif in_review_scope:
+        artifact_state = "Draft"
+        review_status = "In review scope"
+        next_safe_step = (
+            "Safe candidate for bounded draft workflow after target validation."
+        )
+    elif in_default_test_scope:
+        artifact_state = "Draft"
+        review_status = "In default test scope"
+        next_safe_step = "Validate whether this artifact should stay test-only or move into review workflow."
+    elif name:
+        artifact_state = "Canonical or non-review artifact"
+        review_status = "Outside review scope"
+        next_safe_step = (
+            "Avoid bounded write until artifact scope is explicitly validated."
+        )
+
+    return build_mutation_envelope(
+        command="artifact-state",
+        ok=True,
+        next_step=next_safe_step,
+================================================================================
+Lines 2325-2352
+        review_status = "Not for direct mutation"
+        next_safe_step = "Use as backup/reference only."
+    elif name.startswith("STAGING_COPY__"):
+        artifact_state = "Pending review"
+        review_status = "Review required"
+        next_safe_step = "Inspect staging artifact and decide whether body placement or review note is needed."
+    elif in_review_scope:
+        artifact_state = "Draft"
+        review_status = "In review scope"
+        next_safe_step = (
+            "Safe candidate for bounded draft workflow after target validation."
+        )
+    elif in_default_test_scope:
+        artifact_state = "Draft"
+        review_status = "In default test scope"
+        next_safe_step = "Validate whether this artifact should stay test-only or move into review workflow."
+    elif name:
+        artifact_state = "Canonical or non-review artifact"
+        review_status = "Outside review scope"
+        next_safe_step = (
+            "Avoid bounded write until artifact scope is explicitly validated."
+        )
+
+    return build_mutation_envelope(
+        command="artifact-state",
+        ok=True,
+        next_step=next_safe_step,
+        target_artifact={
+================================================================================
+Lines 2327-2354
+    elif name.startswith("STAGING_COPY__"):
+        artifact_state = "Pending review"
+        review_status = "Review required"
+        next_safe_step = "Inspect staging artifact and decide whether body placement or review note is needed."
+    elif in_review_scope:
+        artifact_state = "Draft"
+        review_status = "In review scope"
+        next_safe_step = (
+            "Safe candidate for bounded draft workflow after target validation."
+        )
+    elif in_default_test_scope:
+        artifact_state = "Draft"
+        review_status = "In default test scope"
+        next_safe_step = "Validate whether this artifact should stay test-only or move into review workflow."
+    elif name:
+        artifact_state = "Canonical or non-review artifact"
+        review_status = "Outside review scope"
+        next_safe_step = (
+            "Avoid bounded write until artifact scope is explicitly validated."
+        )
+
+    return build_mutation_envelope(
+        command="artifact-state",
+        ok=True,
+        next_step=next_safe_step,
+        target_artifact={
+            "file_id": file_id,
+            "name": name,
+================================================================================
+Lines 2330-2357
+        next_safe_step = "Inspect staging artifact and decide whether body placement or review note is needed."
+    elif in_review_scope:
+        artifact_state = "Draft"
+        review_status = "In review scope"
+        next_safe_step = (
+            "Safe candidate for bounded draft workflow after target validation."
+        )
+    elif in_default_test_scope:
+        artifact_state = "Draft"
+        review_status = "In default test scope"
+        next_safe_step = "Validate whether this artifact should stay test-only or move into review workflow."
+    elif name:
+        artifact_state = "Canonical or non-review artifact"
+        review_status = "Outside review scope"
+        next_safe_step = (
+            "Avoid bounded write until artifact scope is explicitly validated."
+        )
+
+    return build_mutation_envelope(
+        command="artifact-state",
+        ok=True,
+        next_step=next_safe_step,
+        target_artifact={
+            "file_id": file_id,
+            "name": name,
+            "mime_type": file_meta.get("mimeType"),
+            "web_view_link": file_meta.get("webViewLink"),
+        },
+================================================================================
+Lines 2331-2358
+    elif in_review_scope:
+        artifact_state = "Draft"
+        review_status = "In review scope"
+        next_safe_step = (
+            "Safe candidate for bounded draft workflow after target validation."
+        )
+    elif in_default_test_scope:
+        artifact_state = "Draft"
+        review_status = "In default test scope"
+        next_safe_step = "Validate whether this artifact should stay test-only or move into review workflow."
+    elif name:
+        artifact_state = "Canonical or non-review artifact"
+        review_status = "Outside review scope"
+        next_safe_step = (
+            "Avoid bounded write until artifact scope is explicitly validated."
+        )
+
+    return build_mutation_envelope(
+        command="artifact-state",
+        ok=True,
+        next_step=next_safe_step,
+        target_artifact={
+            "file_id": file_id,
+            "name": name,
+            "mime_type": file_meta.get("mimeType"),
+            "web_view_link": file_meta.get("webViewLink"),
+        },
+        artifact_state=artifact_state,
+================================================================================
+Lines 2332-2359
+        artifact_state = "Draft"
+        review_status = "In review scope"
+        next_safe_step = (
+            "Safe candidate for bounded draft workflow after target validation."
+        )
+    elif in_default_test_scope:
+        artifact_state = "Draft"
+        review_status = "In default test scope"
+        next_safe_step = "Validate whether this artifact should stay test-only or move into review workflow."
+    elif name:
+        artifact_state = "Canonical or non-review artifact"
+        review_status = "Outside review scope"
+        next_safe_step = (
+            "Avoid bounded write until artifact scope is explicitly validated."
+        )
+
+    return build_mutation_envelope(
+        command="artifact-state",
+        ok=True,
+        next_step=next_safe_step,
+        target_artifact={
+            "file_id": file_id,
+            "name": name,
+            "mime_type": file_meta.get("mimeType"),
+            "web_view_link": file_meta.get("webViewLink"),
+        },
+        artifact_state=artifact_state,
+        review_status=review_status,
+================================================================================
+Lines 2334-2361
+        next_safe_step = (
+            "Safe candidate for bounded draft workflow after target validation."
+        )
+    elif in_default_test_scope:
+        artifact_state = "Draft"
+        review_status = "In default test scope"
+        next_safe_step = "Validate whether this artifact should stay test-only or move into review workflow."
+    elif name:
+        artifact_state = "Canonical or non-review artifact"
+        review_status = "Outside review scope"
+        next_safe_step = (
+            "Avoid bounded write until artifact scope is explicitly validated."
+        )
+
+    return build_mutation_envelope(
+        command="artifact-state",
+        ok=True,
+        next_step=next_safe_step,
+        target_artifact={
+            "file_id": file_id,
+            "name": name,
+            "mime_type": file_meta.get("mimeType"),
+            "web_view_link": file_meta.get("webViewLink"),
+        },
+        artifact_state=artifact_state,
+        review_status=review_status,
+        placement=placement,
+        next_safe_step=next_safe_step,
+================================================================================
+Lines 2335-2362
+            "Safe candidate for bounded draft workflow after target validation."
+        )
+    elif in_default_test_scope:
+        artifact_state = "Draft"
+        review_status = "In default test scope"
+        next_safe_step = "Validate whether this artifact should stay test-only or move into review workflow."
+    elif name:
+        artifact_state = "Canonical or non-review artifact"
+        review_status = "Outside review scope"
+        next_safe_step = (
+            "Avoid bounded write until artifact scope is explicitly validated."
+        )
+
+    return build_mutation_envelope(
+        command="artifact-state",
+        ok=True,
+        next_step=next_safe_step,
+        target_artifact={
+            "file_id": file_id,
+            "name": name,
+            "mime_type": file_meta.get("mimeType"),
+            "web_view_link": file_meta.get("webViewLink"),
+        },
+        artifact_state=artifact_state,
+        review_status=review_status,
+        placement=placement,
+        next_safe_step=next_safe_step,
+        lookup_result=file_payload,
+================================================================================
+Lines 2351-2378
+        next_step=next_safe_step,
+        target_artifact={
+            "file_id": file_id,
+            "name": name,
+            "mime_type": file_meta.get("mimeType"),
+            "web_view_link": file_meta.get("webViewLink"),
+        },
+        artifact_state=artifact_state,
+        review_status=review_status,
+        placement=placement,
+        next_safe_step=next_safe_step,
+        lookup_result=file_payload,
+    )
+
+
+def cmd_capabilities(json_output: bool = False) -> int:
+    payload = capabilities_payload()
+    if json_output:
+        print_json(payload)
+        return EXIT_OK
+
+    print("CAPABILITIES OK")
+    print(f"Safety mode: {payload['safety'].get('mode')}")
+    print(f"Default dry run: {payload['safety'].get('default_dry_run')}")
+    print("")
+    for category, routes in payload["categories"].items():
+        print(f"[{category}]")
+        for route in routes:
+================================================================================
+Lines 2435-2462
+        print_json(payload)
+        return resolve_command_exit_code(payload)
+
+    if payload.get("ok"):
+        print("ARTIFACT STATE OK")
+        print(f"File ID: {(payload.get('target_artifact') or {}).get('file_id')}")
+        print(f"Name: {(payload.get('target_artifact') or {}).get('name')}")
+        print(f"Artifact state: {payload.get('artifact_state')}")
+        print(f"Review status: {payload.get('review_status')}")
+        print(f"Next safe step: {payload.get('next_safe_step')}")
+        return EXIT_OK
+
+    print_compact_error(payload)
+    return resolve_command_exit_code(payload)
+
+
+def cmd_doctor_lite(json_output: bool = False) -> int:
+    payload = doctor_lite_payload()
+    if json_output:
+        print_json(payload)
+    else:
+        print_compact_doctor_lite(payload)
+    return resolve_command_exit_code(payload)
+
+
+def cmd_ask(query: str, json_output: bool = False) -> int:
+    payload = ask_payload(query)
+    if json_output:

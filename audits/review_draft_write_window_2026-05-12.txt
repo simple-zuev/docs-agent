@@ -1,0 +1,441 @@
+def artifact_state_payload(file_id: str) -> dict:
+    file_payload = run_docs_agent_with_retry(["get-file", file_id])
+    if not isinstance(file_payload, dict) or not file_payload.get("ok"):
+        return build_error_payload(
+            command="artifact-state",
+            error_type=(file_payload or {}).get("error_type", "ArtifactLookupError"),
+            error_message=(file_payload or {}).get(
+                "error_message", "Failed to read artifact metadata."
+            ),
+            retryable=bool((file_payload or {}).get("retryable")),
+            auth_related=bool((file_payload or {}).get("auth_related")),
+            network_related=bool((file_payload or {}).get("network_related")),
+            target_artifact={"file_id": file_id},
+            lookup_result=file_payload,
+        )
+
+    file_meta = file_payload.get("file") or {}
+    name = str(file_meta.get("name") or "")
+    parents = file_meta.get("parents") or []
+
+    default_test_folder = (
+        (cmd_status_payload().get("safety") or {}).get("default_test_folder")
+    ) or ""
+
+    review_folder_id = "1rZtuXOyThzFf_LFWaD4w5nHwuXCDIHQh"
+    office_folder_id = "1I8xbFY0sjdS4bVPICr4pOg7qkTftgHBv"
+
+    in_review_scope = review_folder_id in parents
+    in_default_test_scope = office_folder_id in parents
+
+    placement = {
+        "parents": parents,
+        "review_folder_id": review_folder_id,
+        "office_folder_id": office_folder_id,
+        "review_scope_by_parent_id": in_review_scope,
+        "default_test_scope_by_parent_id": in_default_test_scope,
+        "default_test_folder": default_test_folder,
+    }
+
+    artifact_state = "Unknown"
+    review_status = "Needs classification"
+    next_safe_step = "Review artifact placement and classify before write actions."
+
+    if name.startswith("BACKUP_BEFORE_REPLACE__"):
+        artifact_state = "Historical reference"
+        review_status = "Not for direct mutation"
+        next_safe_step = "Use as backup/reference only."
+    elif name.startswith("STAGING_COPY__"):
+        artifact_state = "Pending review"
+        review_status = "Review required"
+        next_safe_step = "Inspect staging artifact and decide whether body placement or review note is needed."
+    elif in_review_scope:
+        artifact_state = "Draft"
+        review_status = "In review scope"
+        next_safe_step = (
+            "Safe candidate for bounded draft workflow after target validation."
+        )
+    elif in_default_test_scope:
+        artifact_state = "Draft"
+        review_status = "In default test scope"
+        next_safe_step = "Validate whether this artifact should stay test-only or move into review workflow."
+    elif name:
+        artifact_state = "Canonical or non-review artifact"
+        review_status = "Outside review scope"
+        next_safe_step = (
+            "Avoid bounded write until artifact scope is explicitly validated."
+        )
+
+    return build_mutation_envelope(
+        command="artifact-state",
+        ok=True,
+        next_step=next_safe_step,
+        target_artifact={
+            "file_id": file_id,
+            "name": name,
+            "mime_type": file_meta.get("mimeType"),
+            "web_view_link": file_meta.get("webViewLink"),
+        },
+        artifact_state=artifact_state,
+        review_status=review_status,
+        placement=placement,
+        next_safe_step=next_safe_step,
+        lookup_result=file_payload,
+    )
+
+
+def cmd_capabilities(json_output: bool = False) -> int:
+    payload = capabilities_payload()
+    if json_output:
+        print_json(payload)
+        return EXIT_OK
+
+    print("CAPABILITIES OK")
+    print(f"Safety mode: {payload['safety'].get('mode')}")
+    print(f"Default dry run: {payload['safety'].get('default_dry_run')}")
+    print("")
+    for category, routes in payload["categories"].items():
+        print(f"[{category}]")
+        for route in routes:
+            print(f"- {route}")
+        print("")
+    return EXIT_OK
+
+
+def cmd_assemble_context(profile: str, json_output: bool = False) -> int:
+    payload = assemble_context_payload(profile)
+    if json_output:
+        print_json(payload)
+        return resolve_command_exit_code(payload)
+
+    if payload.get("ok"):
+        print("ASSEMBLE CONTEXT OK")
+        print(f"Profile: {payload.get('profile')}")
+        print(
+            f"Resolved sources: {(payload.get('context_summary') or {}).get('resolved_count')}"
+        )
+        print(
+            f"Unresolved sources: {(payload.get('context_summary') or {}).get('unresolved_count')}"
+        )
+        print(
+            f"Recommended generation mode: {payload.get('recommended_generation_mode')}"
+        )
+        return EXIT_OK
+
+    print_compact_error(payload)
+    return resolve_command_exit_code(payload)
+
+
+def cmd_doc_body_only(
+    profile: str,
+    document_type: str,
+    title: str,
+    json_output: bool = False,
+) -> int:
+    payload = doc_body_only_payload(profile, document_type, title)
+    if json_output:
+        print_json(payload)
+        return resolve_command_exit_code(payload)
+
+    if payload.get("ok"):
+        print("DOC BODY ONLY OK")
+        print(f"Profile: {payload.get('profile')}")
+        print(f"Document type: {payload.get('document_type')}")
+        print(f"Title: {payload.get('title')}")
+        print("")
+        print(payload.get("body", ""))
+        return EXIT_OK
+
+    print_compact_error(payload)
+    return resolve_command_exit_code(payload)
+
+
+def cmd_artifact_state(file_id: str, json_output: bool = False) -> int:
+    payload = artifact_state_payload(file_id)
+    if json_output:
+        print_json(payload)
+        return resolve_command_exit_code(payload)
+
+    if payload.get("ok"):
+        print("ARTIFACT STATE OK")
+        print(f"File ID: {(payload.get('target_artifact') or {}).get('file_id')}")
+        print(f"Name: {(payload.get('target_artifact') or {}).get('name')}")
+        print(f"Artifact state: {payload.get('artifact_state')}")
+        print(f"Review status: {payload.get('review_status')}")
+        print(f"Next safe step: {payload.get('next_safe_step')}")
+        return EXIT_OK
+
+    print_compact_error(payload)
+    return resolve_command_exit_code(payload)
+
+
+def cmd_doctor_lite(json_output: bool = False) -> int:
+    payload = doctor_lite_payload()
+    if json_output:
+        print_json(payload)
+    else:
+        print_compact_doctor_lite(payload)
+    return resolve_command_exit_code(payload)
+
+
+def cmd_ask(query: str, json_output: bool = False) -> int:
+    payload = ask_payload(query)
+    if json_output:
+        print_json(payload)
+    else:
+        print_human_lines(build_compact_ask_output(payload))
+    return resolve_command_exit_code(payload)
+
+
+def emit_mutation_result(payload: dict, json_output: bool = False) -> int:
+    """Foundation helper for bounded mutation result handling."""
+    print(json.dumps(payload, ensure_ascii=False, indent=2))
+    return 0 if bool(payload.get("ok", True)) else 1
+
+
+def build_mutation_envelope(
+    *,
+    command: str,
+    ok: bool = True,
+    dry_run: bool | None = None,
+    safety: dict | None = None,
+    next_step: str | None = None,
+    error_message: str | None = None,
+    **extra,
+) -> dict:
+    """Foundation builder for bounded mutation payload contracts."""
+    payload = {
+        "command": command,
+        "ok": ok,
+    }
+    if dry_run is not None:
+        payload["dry_run"] = dry_run
+    if safety is not None:
+        payload["safety"] = safety
+    if next_step is not None:
+        payload["next_step"] = next_step
+    if error_message is not None:
+        payload["error_message"] = error_message
+    payload.update(extra)
+    return payload
+
+
+def parse_json_flag(argv: list[str]) -> tuple[bool, list[str]]:
+    json_output = False
+    args = argv[:]
+    if args and args[0] == "--json":
+        json_output = True
+        args = args[1:]
+    return json_output, args
+
+
+def require_query_args(
+    argv: list[str], allow_json_flag: bool = False
+) -> tuple[bool, list[str]] | None:
+    args = argv[:]
+    if allow_json_flag:
+        _, args = parse_json_flag(args)
+    if not args:
+        return None
+    return True, args
+
+
+def handle_query_command(
+    argv: list[str],
+    handler,
+    *,
+    allow_json_flag: bool = False,
+) -> int:
+    if allow_json_flag:
+        json_output, args = parse_json_flag(argv)
+    else:
+        json_output, args = False, argv[:]
+
+    if not args:
+        print_usage_error("Missing query argument.")
+        return EXIT_USAGE_ERROR
+
+    value = " ".join(args)
+    if allow_json_flag:
+        return handler(value, json_output=json_output)
+    return handler(value)
+
+
+def run_query_command(
+    argv: list[str],
+    handler,
+) -> int:
+    json_output, args = parse_json_flag(argv)
+    if not args:
+        usage()
+        return 1
+    value = " ".join(args)
+    handler(value, json_output=json_output)
+    return 0
+
+
+def usage() -> None:
+    print(
+        "Usage:\n"
+        "  python agent_cli.py status [--json]\n  python agent_cli.py repo-state [--json]    | rs [--json]\n"
+        "  python agent_cli.py doctor [--json]        | diagnose [--json]\n"
+        "  python agent_cli.py assemble-context [--json] --profile <profile>\n"
+        "  python agent_cli.py doc-body-only [--json] --profile <profile> --document-type <type> --title <title>\n"
+        "  python agent_cli.py artifact-state [--json] --file-id <google_drive_file_id>\n"
+        "  python agent_cli.py find-doc-id <DOC-XXXX>\n"
+        "  python agent_cli.py find-doc-name <document name>\n"
+        "  python agent_cli.py find-link <drive_id_or_url_fragment>\n"
+        "  python agent_cli.py find-doc-any [--json] <query>        | f [--json] <query>\n"
+        "  python agent_cli.py open-doc-from-query [--json] <query> | o [--json] <query>\n"
+        "  python agent_cli.py read-doc-from-query [--json] <query> | r [--json] <query>\n"
+        "  python agent_cli.py get-file <google_drive_file_id>\n"
+        "  python agent_cli.py read-doc <google_doc_id>\n"
+        "  python agent_cli.py ask [--json] <free text query>       | q [--json] <query>\n"
+        "\n"
+        "Examples:\n"
+        "  python agent_cli.py status\n"
+        "  python agent_cli.py status --json\n  python agent_cli.py repo-state\n  python agent_cli.py repo-state --json\n"
+        "  python agent_cli.py f DOC-0001\n"
+        "  python agent_cli.py o DOC-0002\n"
+        "  python agent_cli.py r DOC-0002\n"
+        '  python agent_cli.py r "00_PROJECT_AI_OPERATING_PROMPT_АСТЦВ"\n'
+        '  python agent_cli.py q "прочитай DOC-0002"\n'
+        '  python agent_cli.py q --json "прочитай 00_PROJECT_AI_OPERATING_PROMPT_АСТЦВ"\n'
+        "  python agent_cli.py doctor\n"
+        "  python agent_cli.py doctor --json\n"
+    )
+
+
+def run_query_handler(argv: list[str], handler) -> int:
+    json_output, args = parse_json_flag(argv)
+    if not args:
+        usage()
+        return 1
+
+    value = " ".join(args)
+    handler(value, json_output=json_output)
+    return 0
+
+
+def main() -> int:
+    if len(sys.argv) < 2:
+        print_usage_error("Missing command.")
+        return EXIT_USAGE_ERROR
+
+    cmd = sys.argv[1]
+    argv = sys.argv[2:]
+
+    try:
+        if cmd == "status":
+            json_output, args = parse_json_flag(argv)
+            if args:
+                print_usage_error("status does not accept positional arguments.")
+                return EXIT_USAGE_ERROR
+            return cmd_status(json_output=json_output)
+
+        if cmd in {"repo-state", "rs"}:
+            json_output, args = parse_json_flag(argv)
+            if args:
+                print_usage_error("repo-state does not accept positional arguments.")
+                return EXIT_USAGE_ERROR
+            return cmd_repo_state(json_output=json_output)
+
+        if cmd in {"doctor-lite", "diagnose-lite"}:
+            json_output, args = parse_json_flag(argv)
+            if args:
+                print_usage_error("doctor-lite does not accept positional arguments.")
+                return EXIT_USAGE_ERROR
+            return cmd_doctor_lite(json_output=json_output)
+
+        if cmd == "capabilities":
+            json_output, args = parse_json_flag(argv)
+            if args:
+                print_usage_error("capabilities does not accept positional arguments.")
+                return EXIT_USAGE_ERROR
+            return cmd_capabilities(json_output=json_output)
+
+        if cmd in {"doctor", "diagnose"}:
+            json_output, args = parse_json_flag(argv)
+            if args:
+                print_usage_error("doctor does not accept positional arguments.")
+                return EXIT_USAGE_ERROR
+            return cmd_doctor(json_output=json_output)
+
+        if cmd == "assemble-context":
+            json_output, args = parse_json_flag(argv)
+            if len(args) != 2 or args[0] != "--profile":
+                print_usage_error("assemble-context requires: --profile <profile>")
+                return EXIT_USAGE_ERROR
+            return cmd_assemble_context(args[1], json_output=json_output)
+
+        if cmd == "doc-body-only":
+            json_output, args = parse_json_flag(argv)
+            if len(args) != 6:
+                print_usage_error(
+                    "doc-body-only requires: --profile <profile> --document-type <type> --title <title>"
+                )
+                return EXIT_USAGE_ERROR
+            if (
+                args[0] != "--profile"
+                or args[2] != "--document-type"
+                or args[4] != "--title"
+            ):
+                print_usage_error(
+                    "doc-body-only requires: --profile <profile> --document-type <type> --title <title>"
+                )
+                return EXIT_USAGE_ERROR
+            return cmd_doc_body_only(
+                args[1],
+                args[3],
+                args[5],
+                json_output=json_output,
+            )
+
+        if cmd == "artifact-state":
+            json_output, args = parse_json_flag(argv)
+            if len(args) != 2 or args[0] != "--file-id":
+                print_usage_error(
+                    "artifact-state requires: --file-id <google_drive_file_id>"
+                )
+                return EXIT_USAGE_ERROR
+            return cmd_artifact_state(args[1], json_output=json_output)
+
+        if cmd in {"doctor", "diagnose"}:
+            json_output, args = parse_json_flag(argv)
+            if args:
+                print_usage_error("doctor does not accept positional arguments.")
+                return EXIT_USAGE_ERROR
+            return cmd_doctor(json_output=json_output)
+
+        if cmd == "find-doc-id":
+            if len(argv) < 1:
+                print_usage_error("Missing DOC-XXXX argument.")
+                return EXIT_USAGE_ERROR
+            cmd_find_doc_id(argv[0])
+            return EXIT_OK
+
+        if cmd == "find-doc-name":
+            return handle_query_command(argv, cmd_find_doc_name)
+
+        if cmd == "find-link":
+            return handle_query_command(argv, cmd_find_link)
+
+        if cmd in {"find-doc-any", "f"}:
+            return handle_query_command(argv, cmd_find_doc_any, allow_json_flag=True)
+
+        if cmd in {"open-doc-from-query", "o"}:
+            return handle_query_command(
+                argv, cmd_open_doc_from_query, allow_json_flag=True
+            )
+
+        if cmd in {"read-doc-from-query", "r"}:
+            return handle_query_command(
+                argv, cmd_read_doc_from_query, allow_json_flag=True
+            )
+
+        if cmd == "get-file":
+            if len(argv) < 1:
+                print_usage_error("Missing google_drive_file_id argument.")
+                return EXIT_USAGE_ERROR
+            cmd_get_file(argv[0])
+            return EXIT_OK

@@ -1,0 +1,95 @@
+def capabilities_payload() -> dict:
+    status_payload = cmd_status_payload()
+
+    diagnostics = [
+        "status",
+        "doctor-lite",
+        "doctor",
+        "repo-state",
+        "ask",
+    ]
+    read_only = [
+        "find-doc-any",
+        "open-doc-from-query",
+        "read-doc-from-query",
+        "read-doc",
+        "get-file",
+    ]
+    bounded_write = [
+        "create-temp-doc",
+        "create-staging-copy",
+        "create-doc-in-folder",
+        "replace-doc-text-safe",
+        "move-file-with-log",
+    ]
+    registry_and_sheet_helpers = [
+        "read-sheet-values",
+        "read-sheet-header",
+        "get-sheet-rows",
+        "find-row-by-column",
+        "find-row-by-link-fragment",
+        "append-log",
+        "append-master-index-row",
+        "update-master-index-row",
+    ]
+    config_and_safety = [
+        "show-config-status",
+        "show-safety-mode",
+        "set-safety-mode",
+    ]
+
+    safety = {
+        "mode": ((status_payload.get("safety") or {}).get("mode")),
+        "default_dry_run": (
+            (status_payload.get("safety") or {}).get("default_dry_run")
+        ),
+        "forbid_master_index_write": (
+            (status_payload.get("safety") or {}).get("forbid_master_index_write")
+        ),
+        "forbid_delete": ((status_payload.get("safety") or {}).get("forbid_delete")),
+        "default_test_folder": (
+            (status_payload.get("safety") or {}).get("default_test_folder")
+        ),
+    }
+
+    capabilities = {
+        "can_find_docs": True,
+        "can_read_docs": True,
+        "can_read_sheets": True,
+        "can_list_folders": True,
+        "can_get_file_meta": True,
+        "can_create_draft_doc": True,
+        "can_create_staging_copy": True,
+        "can_safe_replace": True,
+        "can_move_with_log": True,
+        "can_update_registry": True,
+        "can_patch_doc": True,
+        "patch_doc_autonomous_mode_allowed": False,
+        "master_index_write_allowed": not bool(safety.get("forbid_master_index_write")),
+        "delete_allowed": not bool(safety.get("forbid_delete")),
+    }
+
+    notes = [
+        "Capability discovery is descriptive and reflects currently surfaced CLI/document operations.",
+        "Safe autonomous mode should prefer read-only, draft-first, create-staging-copy, and replace-doc-text-safe.",
+        "patch-doc exists but should be treated as supervised-only for autonomous agent workflows.",
+        "Master Index writes and delete operations remain constrained by current safety settings.",
+    ]
+
+    return {
+        "ok": True,
+        "command": "capabilities",
+        "categories": {
+            "diagnostics": diagnostics,
+            "read_only": read_only,
+            "bounded_write": bounded_write,
+            "registry_and_sheet_helpers": registry_and_sheet_helpers,
+            "config_and_safety": config_and_safety,
+        },
+        "capabilities": capabilities,
+        "safety": safety,
+        "status_snapshot_ok": bool(status_payload.get("ok")),
+        "notes": notes,
+    }
+
+

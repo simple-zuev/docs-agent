@@ -1,0 +1,47 @@
+Bounded write capability drift audit after mutation envelope migration
+
+Scope
+- agent_cli.py on branch feature/review-draft-envelope-audit
+- baseline: origin/feature/unified-mutation-surface-foundation
+
+What was reviewed
+- surfaced bounded mutation envelope routes
+- capability inventory in capabilities_payload()
+- nearby generation/orchestration routes:
+  - assemble-context
+  - doc-body-only
+  - artifact-state
+
+Confirmed bounded mutation envelope migrations already present
+- artifact-state uses build_mutation_envelope(...)
+- doc-body-only uses build_mutation_envelope(...)
+
+Observed capability declarations
+- capabilities_payload() advertises bounded write routes including:
+  - create-temp-doc
+  - create-staging-copy
+  - create-doc-in-folder
+  - replace-doc-text-safe
+  - move-file-with-log
+- notes additionally reference:
+  - draft-doc
+  - patch-doc
+
+Audit finding
+- literal search in agent_cli.py did not locate surfaced CLI route implementations for:
+  - create-staging-copy
+  - replace-doc-text-safe
+  - patch-doc
+  - draft-doc
+- these names are currently descriptive/discovery-level references, not confirmed bounded route implementations in the active CLI surface reviewed here
+
+Conclusion
+- a third bounded migration candidate on the currently surfaced unified mutation route family was not established
+- selecting a third migration now would risk speculative scope expansion or mixing implementation work with audit-only migration work
+- the safe next step is audit-only reconciliation of capability declarations vs actual CLI implementation surface
+
+Recommended next step
+- create an audit-only PR documenting bounded write capability drift
+- only after that, choose either:
+  1. a new minimal implementation PR that surfaces exactly one bounded write route, or
+  2. a later migration PR once such a surfaced route exists

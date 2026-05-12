@@ -1,0 +1,281 @@
+====================================================================================================
+create-staging-copy
+Lines 1860-1896
+        "repo-state",
+        "ask",
+    ]
+    read_only = [
+        "find-doc-any",
+        "open-doc-from-query",
+        "read-doc-from-query",
+        "read-doc",
+        "get-file",
+    ]
+    bounded_write = [
+        "create-temp-doc",
+        "create-staging-copy",
+        "create-doc-in-folder",
+        "replace-doc-text-safe",
+        "move-file-with-log",
+    ]
+    registry_and_sheet_helpers = [
+        "read-sheet-values",
+        "read-sheet-header",
+        "get-sheet-rows",
+        "find-row-by-column",
+        "find-row-by-link-fragment",
+        "append-log",
+        "append-master-index-row",
+        "update-master-index-row",
+    ]
+    config_and_safety = [
+        "show-config-status",
+        "show-safety-mode",
+        "set-safety-mode",
+    ]
+
+    safety = {
+        "mode": ((status_payload.get("safety") or {}).get("mode")),
+        "default_dry_run": (
+            (status_payload.get("safety") or {}).get("default_dry_run")
+----------------------------------------------------------------------------------------------------
+Lines 1914-1950
+        "can_create_staging_copy": True,
+        "can_safe_replace": True,
+        "can_move_with_log": True,
+        "can_update_registry": True,
+        "can_patch_doc": True,
+        "patch_doc_autonomous_mode_allowed": False,
+        "master_index_write_allowed": not bool(safety.get("forbid_master_index_write")),
+        "delete_allowed": not bool(safety.get("forbid_delete")),
+    }
+
+    notes = [
+        "Capability discovery is descriptive and reflects currently surfaced CLI/document operations.",
+        "Safe autonomous mode should prefer read-only, draft-first, create-staging-copy, and replace-doc-text-safe.",
+        "patch-doc exists but should be treated as supervised-only for autonomous agent workflows.",
+        "Master Index writes and delete operations remain constrained by current safety settings.",
+    ]
+
+    return {
+        "ok": True,
+        "command": "capabilities",
+        "categories": {
+            "diagnostics": diagnostics,
+            "read_only": read_only,
+            "bounded_write": bounded_write,
+            "registry_and_sheet_helpers": registry_and_sheet_helpers,
+            "config_and_safety": config_and_safety,
+        },
+        "capabilities": capabilities,
+        "safety": safety,
+        "status_snapshot_ok": bool(status_payload.get("ok")),
+        "notes": notes,
+    }
+
+
+def assemble_context_payload(profile: str) -> dict:
+    if profile != "exchange-docs":
+        return build_error_payload(
+----------------------------------------------------------------------------------------------------
+====================================================================================================
+replace-doc-text-safe
+Lines 1862-1898
+    ]
+    read_only = [
+        "find-doc-any",
+        "open-doc-from-query",
+        "read-doc-from-query",
+        "read-doc",
+        "get-file",
+    ]
+    bounded_write = [
+        "create-temp-doc",
+        "create-staging-copy",
+        "create-doc-in-folder",
+        "replace-doc-text-safe",
+        "move-file-with-log",
+    ]
+    registry_and_sheet_helpers = [
+        "read-sheet-values",
+        "read-sheet-header",
+        "get-sheet-rows",
+        "find-row-by-column",
+        "find-row-by-link-fragment",
+        "append-log",
+        "append-master-index-row",
+        "update-master-index-row",
+    ]
+    config_and_safety = [
+        "show-config-status",
+        "show-safety-mode",
+        "set-safety-mode",
+    ]
+
+    safety = {
+        "mode": ((status_payload.get("safety") or {}).get("mode")),
+        "default_dry_run": (
+            (status_payload.get("safety") or {}).get("default_dry_run")
+        ),
+        "forbid_master_index_write": (
+----------------------------------------------------------------------------------------------------
+Lines 1914-1950
+        "can_create_staging_copy": True,
+        "can_safe_replace": True,
+        "can_move_with_log": True,
+        "can_update_registry": True,
+        "can_patch_doc": True,
+        "patch_doc_autonomous_mode_allowed": False,
+        "master_index_write_allowed": not bool(safety.get("forbid_master_index_write")),
+        "delete_allowed": not bool(safety.get("forbid_delete")),
+    }
+
+    notes = [
+        "Capability discovery is descriptive and reflects currently surfaced CLI/document operations.",
+        "Safe autonomous mode should prefer read-only, draft-first, create-staging-copy, and replace-doc-text-safe.",
+        "patch-doc exists but should be treated as supervised-only for autonomous agent workflows.",
+        "Master Index writes and delete operations remain constrained by current safety settings.",
+    ]
+
+    return {
+        "ok": True,
+        "command": "capabilities",
+        "categories": {
+            "diagnostics": diagnostics,
+            "read_only": read_only,
+            "bounded_write": bounded_write,
+            "registry_and_sheet_helpers": registry_and_sheet_helpers,
+            "config_and_safety": config_and_safety,
+        },
+        "capabilities": capabilities,
+        "safety": safety,
+        "status_snapshot_ok": bool(status_payload.get("ok")),
+        "notes": notes,
+    }
+
+
+def assemble_context_payload(profile: str) -> dict:
+    if profile != "exchange-docs":
+        return build_error_payload(
+----------------------------------------------------------------------------------------------------
+====================================================================================================
+patch-doc
+Lines 1915-1951
+        "can_safe_replace": True,
+        "can_move_with_log": True,
+        "can_update_registry": True,
+        "can_patch_doc": True,
+        "patch_doc_autonomous_mode_allowed": False,
+        "master_index_write_allowed": not bool(safety.get("forbid_master_index_write")),
+        "delete_allowed": not bool(safety.get("forbid_delete")),
+    }
+
+    notes = [
+        "Capability discovery is descriptive and reflects currently surfaced CLI/document operations.",
+        "Safe autonomous mode should prefer read-only, draft-first, create-staging-copy, and replace-doc-text-safe.",
+        "patch-doc exists but should be treated as supervised-only for autonomous agent workflows.",
+        "Master Index writes and delete operations remain constrained by current safety settings.",
+    ]
+
+    return {
+        "ok": True,
+        "command": "capabilities",
+        "categories": {
+            "diagnostics": diagnostics,
+            "read_only": read_only,
+            "bounded_write": bounded_write,
+            "registry_and_sheet_helpers": registry_and_sheet_helpers,
+            "config_and_safety": config_and_safety,
+        },
+        "capabilities": capabilities,
+        "safety": safety,
+        "status_snapshot_ok": bool(status_payload.get("ok")),
+        "notes": notes,
+    }
+
+
+def assemble_context_payload(profile: str) -> dict:
+    if profile != "exchange-docs":
+        return build_error_payload(
+            command="assemble-context",
+----------------------------------------------------------------------------------------------------
+====================================================================================================
+draft-doc
+Lines 2069-2105
+                )
+            else:
+                unresolved_sources.append(
+                    {
+                        "group": group_name,
+                        "query": item,
+                        "reason": "CacheMiss",
+                        "error_message": "Source was not available through current cache-only lookup.",
+                    }
+                )
+
+    recommended_generation_mode = (
+        "draft-doc" if len(unresolved_sources) == 0 else "doc-body-only"
+    )
+
+    return {
+        "ok": True,
+        "command": "assemble-context",
+        "profile": profile,
+        "source_groups": source_groups,
+        "resolved_sources": resolved_sources,
+        "unresolved_sources": unresolved_sources,
+        "capabilities_snapshot": capabilities,
+        "safety_snapshot": status_payload,
+        "context_summary": {
+            "resolved_count": len(resolved_sources),
+            "unresolved_count": len(unresolved_sources),
+            "partial_context": len(unresolved_sources) > 0,
+        },
+        "recommended_generation_mode": recommended_generation_mode,
+        "next_safe_step": (
+            "Use draft-doc when all critical sources are resolved; otherwise prefer doc-body-only and avoid direct mutation."
+        ),
+    }
+
+
+def doc_body_only_outline(document_type: str) -> list[str]:
+----------------------------------------------------------------------------------------------------
+Lines 2088-2124
+        "source_groups": source_groups,
+        "resolved_sources": resolved_sources,
+        "unresolved_sources": unresolved_sources,
+        "capabilities_snapshot": capabilities,
+        "safety_snapshot": status_payload,
+        "context_summary": {
+            "resolved_count": len(resolved_sources),
+            "unresolved_count": len(unresolved_sources),
+            "partial_context": len(unresolved_sources) > 0,
+        },
+        "recommended_generation_mode": recommended_generation_mode,
+        "next_safe_step": (
+            "Use draft-doc when all critical sources are resolved; otherwise prefer doc-body-only and avoid direct mutation."
+        ),
+    }
+
+
+def doc_body_only_outline(document_type: str) -> list[str]:
+    outlines = {
+        "operating-model": [
+            "Назначение",
+            "Область применения",
+            "Роли и ответственность",
+            "Основные процессы",
+            "Контрольные точки",
+            "Ограничения и риски",
+            "Следующие шаги",
+        ],
+        "instruction": [
+            "Назначение инструкции",
+            "Область применения",
+            "Предварительные условия",
+            "Порядок действий",
+            "Контрольные проверки",
+            "Ограничения",
+            "Следующие шаги",
+        ],
+----------------------------------------------------------------------------------------------------

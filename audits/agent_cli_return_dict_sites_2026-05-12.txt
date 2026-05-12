@@ -1,0 +1,792 @@
+====================================================================================================
+Lines 116-157
+    q = normalize_cell(query)
+    ql = q.lower()
+
+    if safe_lower(document_id) == ql:
+        matched_by = "Document ID"
+    elif safe_lower(document_name) == ql:
+        matched_by = "Document Name"
+    elif ql and ql in safe_lower(link):
+        matched_by = "Link fragment"
+    else:
+        matched_by = "Cache local search"
+
+    return {
+        "ok": True,
+        "command": "find-doc-any",
+        "query": q,
+        "matched_by": matched_by,
+        "result": {
+            "ok": True,
+            "command": "master-index-cache-local-search",
+            "matches_found": 1,
+            "matches": [
+                {
+                    "row_number": row_number,
+                    "row_values": row,
+                }
+            ],
+        },
+        "summary": {
+            "document_id": document_id,
+            "document_name": document_name,
+            "link": link,
+            "folder": folder,
+        },
+        "attempts": [
+            {
+                "strategy": matched_by,
+                "ok": True,
+                "matches_found": 1,
+                "error_type": None,
+                "error_message": None,
+            }
+====================================================================================================
+Lines 156-197
+                "error_message": None,
+            }
+        ],
+        "cache": {
+            "used": True,
+            "cache_file": str(MASTER_INDEX_CACHE_FILE),
+            "ttl_sec": MASTER_INDEX_CACHE_TTL_SEC,
+        },
+    }
+
+
+def _build_find_doc_any_not_found_from_cache(query):
+    return {
+        "ok": False,
+        "command": "find-doc-any",
+        "query": normalize_cell(query),
+        "error_type": "NotFound",
+        "error_message": "No matches found by Document ID, Document Name, or Link fragment.",
+        "retryable": False,
+        "auth_related": False,
+        "network_related": False,
+        "explanation": "Похоже, документ или объект не найден в MASTER_INDEX по идентификатору, имени или фрагменту ссылки.",
+        "next_step": "Проверь точное Document ID, точное имя документа или сначала выполни find-doc-any.",
+        "attempts": [
+            {
+                "strategy": "MASTER_INDEX cache local search",
+                "ok": False,
+                "matches_found": 0,
+                "error_type": "NotFound",
+                "error_message": "No matches found by Document ID, Document Name, or Link fragment.",
+            }
+        ],
+        "cache": {
+            "used": True,
+            "cache_file": str(MASTER_INDEX_CACHE_FILE),
+            "ttl_sec": MASTER_INDEX_CACHE_TTL_SEC,
+        },
+    }
+
+
+def load_master_index_cache():
+    import json
+====================================================================================================
+Lines 276-317
+        "Link",
+    ]
+
+    save_master_index_cache(
+        {
+            "fetched_at_epoch": now_epoch_int(),
+            "header": header_guess,
+            "rows": [row],
+            "mode": "stage29-seed-cache",
+        }
+    )
+
+    return {
+        "ok": True,
+        "command": "master-index-cache-refresh",
+        "rows_cached": 1,
+        "cache_file": str(MASTER_INDEX_CACHE_FILE),
+        "mode": "stage29-seed-cache",
+    }
+
+
+def extend_master_index_cache_from_success(payload):
+    cache = load_master_index_cache()
+    if cache is None:
+        return
+
+    row = _parse_master_index_rows_from_live_result(payload)
+    if not row:
+        return
+
+    rows = cache.get("rows") or []
+    existing = {tuple(r) for r in rows if isinstance(r, list)}
+    t = tuple(row)
+    if t in existing:
+        return
+
+    rows.append(row)
+    cache["rows"] = rows
+    cache["fetched_at_epoch"] = now_epoch_int()
+    save_master_index_cache(cache)
+
+
+====================================================================================================
+Lines 530-571
+    smoke_probe = run_smoke_explain_payload()
+
+    checks = {
+        "environment": env,
+        "status": status,
+        "master_index_lookup": master_index_lookup,
+        "smoke_probe": smoke_probe,
+    }
+
+    failed = [k for k, v in checks.items() if not v.get("ok")]
+
+    if not failed:
+        return {
+            "ok": True,
+            "command": "doctor",
+            "checks": checks,
+            "summary": "CLI выглядит работоспособным: окружение, status, доступ к MASTER_INDEX и smoke-проверка прошли успешно.",
+            "next_step": "Можно начинать штатную работу.",
+            "diagnosis": "healthy",
+            "likely_cause": "Проблем не обнаружено.",
+            "recommended_action": "Можно начинать штатную работу.",
+        }
+
+    sample = checks[failed[0]]
+
+    diagnosis = str(sample.get("diagnosis") or "internal")
+    likely_cause = str(
+        sample.get("likely_cause")
+        or "Похоже на внутренний сбой CLI или дочернего docs_agent.py."
+    )
+    recommended_action = str(
+        sample.get("recommended_action")
+        or "Проверь debug-вывод и отдельно запусти doctor --json."
+    )
+    error_type = str(sample.get("error_type") or "DoctorCheckFailed")
+    error_message = str(sample.get("error_message") or "doctor check failed")
+
+    return {
+        "ok": False,
+        "command": "doctor",
+        "checks": checks,
+        "summary": f"Обнаружены проблемы в следующих зонах: {', '.join(failed)}.",
+====================================================================================================
+Lines 555-596
+    diagnosis = str(sample.get("diagnosis") or "internal")
+    likely_cause = str(
+        sample.get("likely_cause")
+        or "Похоже на внутренний сбой CLI или дочернего docs_agent.py."
+    )
+    recommended_action = str(
+        sample.get("recommended_action")
+        or "Проверь debug-вывод и отдельно запусти doctor --json."
+    )
+    error_type = str(sample.get("error_type") or "DoctorCheckFailed")
+    error_message = str(sample.get("error_message") or "doctor check failed")
+
+    return {
+        "ok": False,
+        "command": "doctor",
+        "checks": checks,
+        "summary": f"Обнаружены проблемы в следующих зонах: {', '.join(failed)}.",
+        "next_step": "Проверь diagnosis / likely_cause / recommended_action или запусти bash scripts/regression_smoke_explain.sh.",
+        "diagnosis": diagnosis,
+        "likely_cause": likely_cause,
+        "recommended_action": recommended_action,
+        "error_type": error_type,
+        "error_message": error_message,
+        "retryable": bool(sample.get("retryable")),
+        "auth_related": bool(sample.get("auth_related")),
+        "network_related": bool(sample.get("network_related")),
+    }
+
+
+def doctor_lite_payload() -> dict:
+    env = {
+        "ok": bool(Path(PYTHON_BIN).exists() and DOCS_AGENT.exists() and BASE.exists()),
+        "details": {
+            "python_bin": str(PYTHON_BIN),
+            "python_bin_source": PYTHON_BIN_SOURCE,
+            "docs_agent_path": str(DOCS_AGENT),
+            "base_path": str(BASE),
+            "python_exists": Path(PYTHON_BIN).exists(),
+            "docs_agent_exists": DOCS_AGENT.exists(),
+            "base_exists": BASE.exists(),
+        },
+    }
+====================================================================================================
+Lines 598-639
+    status = cmd_status_payload()
+    master_index_lookup = find_doc_any_payload("DOC-0001")
+
+    checks = {
+        "environment": env,
+        "status": status,
+        "master_index_lookup": master_index_lookup,
+    }
+
+    failed = [k for k, v in checks.items() if not v.get("ok")]
+
+    if not failed:
+        return {
+            "ok": True,
+            "command": "doctor-lite",
+            "checks": checks,
+            "summary": "CLI выглядит работоспособным для рутинного старта: окружение, status и доступ к MASTER_INDEX проверены.",
+            "next_step": "Можно начинать штатную работу. Для углубленной проверки при необходимости запусти doctor.",
+            "diagnosis": "healthy",
+            "likely_cause": "Проблем не обнаружено.",
+            "recommended_action": "Можно начинать штатную работу.",
+        }
+
+    sample = checks[failed[0]]
+    diagnosis = "internal"
+    likely_cause = "Похоже на внутренний сбой CLI или дочернего docs_agent.py."
+    recommended_action = "Проверь debug-вывод и отдельно запусти doctor --json."
+
+    if sample.get("auth_related"):
+        diagnosis = "auth"
+        likely_cause = (
+            "Похоже на проблему доступа, авторизации или прав к внешним сервисам."
+        )
+        recommended_action = "Проверь credentials, доступы и авторизацию."
+    elif sample.get("network_related") or sample.get("retryable"):
+        diagnosis = "network"
+        likely_cause = "Похоже на временную сетевую проблему или квоту внешнего API."
+        recommended_action = "Подожди 60-90 секунд и повтори doctor-lite/doctor."
+    elif str(sample.get("error_type") or "") in {"NotFound", "LinkParseError"}:
+        diagnosis = "not_found"
+        likely_cause = "Похоже, обязательный объект не найден."
+        recommended_action = "Проверь MASTER_INDEX и доступность ожидаемых объектов."
+====================================================================================================
+Lines 629-670
+            "Похоже на проблему доступа, авторизации или прав к внешним сервисам."
+        )
+        recommended_action = "Проверь credentials, доступы и авторизацию."
+    elif sample.get("network_related") or sample.get("retryable"):
+        diagnosis = "network"
+        likely_cause = "Похоже на временную сетевую проблему или квоту внешнего API."
+        recommended_action = "Подожди 60-90 секунд и повтори doctor-lite/doctor."
+    elif str(sample.get("error_type") or "") in {"NotFound", "LinkParseError"}:
+        diagnosis = "not_found"
+        likely_cause = "Похоже, обязательный объект не найден."
+        recommended_action = "Проверь MASTER_INDEX и доступность ожидаемых объектов."
+
+    return {
+        "ok": False,
+        "command": "doctor-lite",
+        "checks": checks,
+        "summary": f"Обнаружены проблемы в следующих зонах: {', '.join(failed)}.",
+        "next_step": "Запусти doctor --json для расширенной диагностики.",
+        "diagnosis": diagnosis,
+        "likely_cause": likely_cause,
+        "recommended_action": recommended_action,
+        "error_type": str(sample.get("error_type") or "DoctorLiteCheckFailed"),
+        "error_message": str(sample.get("error_message") or "doctor-lite check failed"),
+        "retryable": bool(sample.get("retryable")),
+        "auth_related": bool(sample.get("auth_related")),
+        "network_related": bool(sample.get("network_related")),
+    }
+
+
+def run_smoke_explain_payload() -> dict:
+    script = BASE / "scripts" / "regression_smoke_explain.sh"
+    if not script.exists():
+        return build_error_payload(
+            command="smoke-explain",
+            error_type="ScriptNotFound",
+            error_message="scripts/regression_smoke_explain.sh not found.",
+            retryable=False,
+            auth_related=False,
+            network_related=False,
+        )
+
+    cmd = ["bash", str(script)]
+====================================================================================================
+Lines 1136-1177
+
+def extract_first_match_value(payload: dict, idx: int):
+    matches = payload.get("matches") or []
+    if not matches:
+        return None
+    row = matches[0].get("row_values") or []
+    if idx < len(row):
+        return row[idx]
+    return None
+
+
+def summarize_attempt(strategy: str, payload: dict) -> dict:
+    return {
+        "strategy": strategy,
+        "ok": payload.get("ok"),
+        "matches_found": payload.get("matches_found", 0),
+        "error_type": payload.get("error_type"),
+        "error_message": payload.get("error_message"),
+        "debug": payload.get("_debug", {}),
+    }
+
+
+def extract_google_id_from_link(link: str | None) -> str | None:
+    if not link:
+        return None
+
+    patterns = [
+        r"/document/d/([a-zA-Z0-9_-]+)",
+        r"/spreadsheets/d/([a-zA-Z0-9_-]+)",
+        r"/file/d/([a-zA-Z0-9_-]+)",
+        r"/folders/([a-zA-Z0-9_-]+)",
+    ]
+    for pat in patterns:
+        m = re.search(pat, link)
+        if m:
+            return m.group(1)
+
+    if re.fullmatch(r"[a-zA-Z0-9_-]{20,}", link):
+        return link
+
+    return None
+
+====================================================================================================
+Lines 1204-1245
+        for prefix in prefixes:
+            if ql.startswith(prefix):
+                q = q[len(prefix) :].strip()
+                ql = q.lower()
+                changed = True
+
+    return q
+
+
+def cmd_status_payload() -> dict:
+    safety = run_docs_agent_with_retry(["show-safety-mode"])
+    config = run_docs_agent_with_retry(["show-config-status"])
+    return {
+        "ok": bool(safety.get("ok")) and bool(config.get("ok")),
+        "command": "status",
+        "safety": safety,
+        "config": config,
+    }
+
+
+def repo_state_payload() -> dict:
+    payload = branch_safety_snapshot(BASE)
+
+    if payload.get("ok"):
+        return payload
+
+    return {
+        "ok": False,
+        "command": "repo-state",
+        "error_type": payload.get("error_type", "RepoStateError"),
+        "error_message": payload.get(
+            "error_message", "Failed to build repo state snapshot."
+        ),
+        "retryable": bool(payload.get("retryable")),
+        "auth_related": False,
+        "network_related": False,
+        "details": payload,
+    }
+
+
+def cmd_repo_state(json_output: bool = False) -> int:
+    payload = repo_state_payload()
+====================================================================================================
+Lines 1218-1259
+        "command": "status",
+        "safety": safety,
+        "config": config,
+    }
+
+
+def repo_state_payload() -> dict:
+    payload = branch_safety_snapshot(BASE)
+
+    if payload.get("ok"):
+        return payload
+
+    return {
+        "ok": False,
+        "command": "repo-state",
+        "error_type": payload.get("error_type", "RepoStateError"),
+        "error_message": payload.get(
+            "error_message", "Failed to build repo state snapshot."
+        ),
+        "retryable": bool(payload.get("retryable")),
+        "auth_related": False,
+        "network_related": False,
+        "details": payload,
+    }
+
+
+def cmd_repo_state(json_output: bool = False) -> int:
+    payload = repo_state_payload()
+    if json_output:
+        print_json(payload)
+    else:
+        if payload.get("ok"):
+            print_compact_repo_state(payload)
+        else:
+            print_compact_error(payload)
+    return resolve_command_exit_code(payload)
+
+
+def cmd_status(json_output: bool = False) -> int:
+    payload = cmd_status_payload()
+    if json_output:
+        print_json(payload)
+====================================================================================================
+Lines 1494-1535
+        "error_message": error_message,
+        "retryable": retryable,
+        "auth_related": auth_related,
+        "network_related": network_related,
+    }
+    if query is not None:
+        payload["query"] = query
+    payload.update(extra)
+    return payload
+
+
+def build_doc_summary(result: dict) -> dict:
+    return {
+        "document_id": extract_first_match_value(result, COL_DOCUMENT_ID),
+        "document_name": extract_first_match_value(result, COL_DOCUMENT_NAME),
+        "link": extract_first_match_value(result, COL_LINK),
+    }
+
+
+def build_find_doc_success_payload(
+    *,
+    query: str,
+    matched_by: str,
+    result: dict,
+    attempts: list[dict],
+) -> dict:
+    return {
+        "ok": True,
+        "command": "find-doc-any",
+        "query": query,
+        "matched_by": matched_by,
+        "result": result,
+        "summary": build_doc_summary(result),
+        "attempts": attempts,
+    }
+
+
+def open_doc_from_query_payload(query: str) -> dict:
+    found = find_doc_any_payload(query)
+    if not found.get("ok"):
+        return found
+
+====================================================================================================
+Lines 1508-1549
+        "document_name": extract_first_match_value(result, COL_DOCUMENT_NAME),
+        "link": extract_first_match_value(result, COL_LINK),
+    }
+
+
+def build_find_doc_success_payload(
+    *,
+    query: str,
+    matched_by: str,
+    result: dict,
+    attempts: list[dict],
+) -> dict:
+    return {
+        "ok": True,
+        "command": "find-doc-any",
+        "query": query,
+        "matched_by": matched_by,
+        "result": result,
+        "summary": build_doc_summary(result),
+        "attempts": attempts,
+    }
+
+
+def open_doc_from_query_payload(query: str) -> dict:
+    found = find_doc_any_payload(query)
+    if not found.get("ok"):
+        return found
+
+    link = (found.get("summary") or {}).get("link")
+    google_id = extract_google_id_from_link(link)
+
+    return {
+        "ok": True,
+        "command": "open-doc-from-query",
+        "query": query,
+        "matched_by": found.get("matched_by"),
+        "summary": found.get("summary"),
+        "google_object_id": google_id,
+        "find_result": found,
+    }
+
+
+====================================================================================================
+Lines 1527-1568
+        "attempts": attempts,
+    }
+
+
+def open_doc_from_query_payload(query: str) -> dict:
+    found = find_doc_any_payload(query)
+    if not found.get("ok"):
+        return found
+
+    link = (found.get("summary") or {}).get("link")
+    google_id = extract_google_id_from_link(link)
+
+    return {
+        "ok": True,
+        "command": "open-doc-from-query",
+        "query": query,
+        "matched_by": found.get("matched_by"),
+        "summary": found.get("summary"),
+        "google_object_id": google_id,
+        "find_result": found,
+    }
+
+
+def read_doc_from_query_payload(query: str) -> dict:
+    found = find_doc_any_payload(query)
+    if not found.get("ok"):
+        return found
+
+    link = (found.get("summary") or {}).get("link")
+    google_id = extract_google_id_from_link(link)
+
+    if not google_id:
+        return build_error_payload(
+            command="read-doc-from-query",
+            query=query,
+            error_type="LinkParseError",
+            error_message="Could not extract Google document ID from link.",
+            summary=found.get("summary"),
+        )
+
+    read_result = run_docs_agent_with_retry(["read-doc", google_id])
+
+====================================================================================================
+Lines 1557-1598
+
+    if not google_id:
+        return build_error_payload(
+            command="read-doc-from-query",
+            query=query,
+            error_type="LinkParseError",
+            error_message="Could not extract Google document ID from link.",
+            summary=found.get("summary"),
+        )
+
+    read_result = run_docs_agent_with_retry(["read-doc", google_id])
+
+    return {
+        "ok": bool(read_result.get("ok")),
+        "command": "read-doc-from-query",
+        "query": query,
+        "matched_by": found.get("matched_by"),
+        "summary": found.get("summary"),
+        "google_object_id": google_id,
+        "find_result": found,
+        "read_result": read_result,
+    }
+
+
+def cmd_find_doc_any(query: str, json_output: bool = False) -> int:
+    payload = find_doc_any_payload(query)
+    if json_output:
+        print_json(payload)
+    else:
+        if payload.get("ok"):
+            print_compact_find(payload)
+        else:
+            print_compact_error(payload)
+    return resolve_command_exit_code(payload)
+
+
+def cmd_open_doc_from_query(query: str, json_output: bool = False) -> int:
+    payload = open_doc_from_query_payload(query)
+    if json_output:
+        print_json(payload)
+    else:
+        if payload.get("ok"):
+====================================================================================================
+Lines 1662-1703
+
+def ask_read_payload(query: str, lookup_query: str) -> dict:
+    result = read_doc_from_query_payload(lookup_query)
+    return build_ask_result(query, "read-doc-from-query", result)
+
+
+def ask_google_id_payload(query: str, lookup_query: str) -> dict:
+    found = find_doc_any_payload(lookup_query)
+    if found.get("ok"):
+        return build_ask_result(query, "find-doc-any", found)
+
+    file_result = run_docs_agent_with_retry(["get-file", lookup_query])
+    return {
+        "ok": bool(file_result.get("ok")),
+        "command": "ask",
+        "query": query,
+        "routed_to": "get-file",
+        "result": file_result,
+        "fallback_from": found,
+    }
+
+
+def ask_find_payload(query: str, lookup_query: str) -> dict:
+    found = find_doc_any_payload(lookup_query)
+    return build_ask_result(query, "find-doc-any", found)
+
+
+def ask_payload(query: str) -> dict:
+    q = query.strip()
+    ql = q.lower()
+    lookup_query = normalize_query_for_lookup(q)
+
+    if is_status_query(ql):
+        return ask_status_payload(query)
+
+    if is_read_query(ql):
+        return ask_read_payload(query, lookup_query)
+
+    if looks_like_google_id(lookup_query):
+        return ask_google_id_payload(query, lookup_query)
+
+    return ask_find_payload(query, lookup_query)
+====================================================================================================
+Lines 1919-1960
+        "patch_doc_autonomous_mode_allowed": False,
+        "master_index_write_allowed": not bool(safety.get("forbid_master_index_write")),
+        "delete_allowed": not bool(safety.get("forbid_delete")),
+    }
+
+    notes = [
+        "Capability discovery is descriptive and reflects currently surfaced CLI/document operations.",
+        "Safe autonomous mode should prefer read-only, draft-first, create-staging-copy, and replace-doc-text-safe.",
+        "patch-doc exists but should be treated as supervised-only for autonomous agent workflows.",
+        "Master Index writes and delete operations remain constrained by current safety settings.",
+    ]
+
+    return {
+        "ok": True,
+        "command": "capabilities",
+        "categories": {
+            "diagnostics": diagnostics,
+            "read_only": read_only,
+            "bounded_write": bounded_write,
+            "registry_and_sheet_helpers": registry_and_sheet_helpers,
+            "config_and_safety": config_and_safety,
+        },
+        "capabilities": capabilities,
+        "safety": safety,
+        "status_snapshot_ok": bool(status_payload.get("ok")),
+        "notes": notes,
+    }
+
+
+def assemble_context_payload(profile: str) -> dict:
+    if profile != "exchange-docs":
+        return build_error_payload(
+            command="assemble-context",
+            error_type="UnsupportedProfile",
+            error_message=f"Unsupported context profile: {profile}",
+            retryable=False,
+            auth_related=False,
+            network_related=False,
+            profile=profile,
+        )
+
+    capabilities = capabilities_payload()
+====================================================================================================
+Lines 2072-2113
+                    {
+                        "group": group_name,
+                        "query": item,
+                        "reason": "CacheMiss",
+                        "error_message": "Source was not available through current cache-only lookup.",
+                    }
+                )
+
+    recommended_generation_mode = (
+        "draft-doc" if len(unresolved_sources) == 0 else "doc-body-only"
+    )
+
+    return {
+        "ok": True,
+        "command": "assemble-context",
+        "profile": profile,
+        "source_groups": source_groups,
+        "resolved_sources": resolved_sources,
+        "unresolved_sources": unresolved_sources,
+        "capabilities_snapshot": capabilities,
+        "safety_snapshot": status_payload,
+        "context_summary": {
+            "resolved_count": len(resolved_sources),
+            "unresolved_count": len(unresolved_sources),
+            "partial_context": len(unresolved_sources) > 0,
+        },
+        "recommended_generation_mode": recommended_generation_mode,
+        "next_safe_step": (
+            "Use draft-doc when all critical sources are resolved; otherwise prefer doc-body-only and avoid direct mutation."
+        ),
+    }
+
+
+def doc_body_only_outline(document_type: str) -> list[str]:
+    outlines = {
+        "operating-model": [
+            "Назначение",
+            "Область применения",
+            "Роли и ответственность",
+            "Основные процессы",
+            "Контрольные точки",
+            "Ограничения и риски",
+====================================================================================================
+Lines 2243-2284
+    unresolved_dependencies = [
+        item.get("query")
+        for item in (context_payload.get("unresolved_sources") or [])
+        if item.get("query")
+    ]
+
+    assumptions = [
+        "Body is generated without direct mutation.",
+        "Body may be based on partial context when unresolved sources exist.",
+        "Further review is required before canonical or review-draft update.",
+    ]
+
+    return {
+        "ok": True,
+        "command": "doc-body-only",
+        "profile": profile,
+        "document_type": document_type,
+        "title": title,
+        "context_snapshot": {
+            "resolved_count": (context_payload.get("context_summary") or {}).get(
+                "resolved_count"
+            ),
+            "unresolved_count": (context_payload.get("context_summary") or {}).get(
+                "unresolved_count"
+            ),
+            "partial_context": (context_payload.get("context_summary") or {}).get(
+                "partial_context"
+            ),
+        },
+        "outline": outline,
+        "body": body,
+        "assumptions": assumptions,
+        "unresolved_dependencies": unresolved_dependencies,
+        "next_safe_step": "Create or select a draft document in review scope and use controlled write workflow to place this body.",
+    }
+
+
+def artifact_state_payload(file_id: str) -> dict:
+    file_payload = run_docs_agent_with_retry(["get-file", file_id])
+    if not isinstance(file_payload, dict) or not file_payload.get("ok"):
+        return build_error_payload(
+            command="artifact-state",

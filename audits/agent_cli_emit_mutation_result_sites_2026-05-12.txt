@@ -1,0 +1,62 @@
+====================================================================================================
+Lines 2449-2508
+
+
+def cmd_doctor_lite(json_output: bool = False) -> int:
+    payload = doctor_lite_payload()
+    if json_output:
+        print_json(payload)
+    else:
+        print_compact_doctor_lite(payload)
+    return resolve_command_exit_code(payload)
+
+
+def cmd_ask(query: str, json_output: bool = False) -> int:
+    payload = ask_payload(query)
+    if json_output:
+        print_json(payload)
+    else:
+        print_human_lines(build_compact_ask_output(payload))
+    return resolve_command_exit_code(payload)
+
+
+def emit_mutation_result(payload: dict, json_output: bool = False) -> int:
+    """Foundation helper for bounded mutation result handling."""
+    print(json.dumps(payload, ensure_ascii=False, indent=2))
+    return 0 if bool(payload.get("ok", True)) else 1
+
+
+def build_mutation_envelope(
+    *,
+    command: str,
+    ok: bool = True,
+    dry_run: bool | None = None,
+    safety: dict | None = None,
+    next_step: str | None = None,
+    error_message: str | None = None,
+    **extra,
+) -> dict:
+    """Foundation builder for bounded mutation payload contracts."""
+    payload = {
+        "command": command,
+        "ok": ok,
+    }
+    if dry_run is not None:
+        payload["dry_run"] = dry_run
+    if safety is not None:
+        payload["safety"] = safety
+    if next_step is not None:
+        payload["next_step"] = next_step
+    if error_message is not None:
+        payload["error_message"] = error_message
+    payload.update(extra)
+    return payload
+
+
+def parse_json_flag(argv: list[str]) -> tuple[bool, list[str]]:
+    json_output = False
+    args = argv[:]
+    if args and args[0] == "--json":
+        json_output = True
+        args = args[1:]
+    return json_output, args
