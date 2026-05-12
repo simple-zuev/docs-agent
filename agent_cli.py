@@ -1945,6 +1945,163 @@ def capabilities_payload() -> dict:
     }
 
 
+def assemble_context_payload(profile: str) -> dict:
+    if profile != "exchange-docs":
+        return build_error_payload(
+            command="assemble-context",
+            error_type="UnsupportedProfile",
+            error_message=f"Unsupported context profile: {profile}",
+            retryable=False,
+            auth_related=False,
+            network_related=False,
+            profile=profile,
+        )
+
+    capabilities = capabilities_payload()
+    status_payload = cmd_status_payload()
+
+    source_groups = {
+        "core_baseline_documents": [
+            "КБ ТЗ v2",
+            "КБ Архитектура v2",
+        ],
+        "stakeholder_flows": [
+            "Клиент ФЛ JTBD и CJM",
+            "Клиент ЮРЛ JTBD и CJM",
+            "Партнер JTBD и CJM",
+            "Админ JTBD и CJM",
+            "Комплаенс JTBD и CJM",
+            "Регулятор JTBD и CJM",
+            "Поддержка JTBD и CJM",
+        ],
+        "repository_governance_and_operator_context": [
+            "DOC-0001",
+            "Change Log Lite",
+            "status",
+            "capabilities",
+        ],
+        "working_drafts_and_review_artifacts": [
+            "13_Черновики_и_review",
+        ],
+    }
+
+    resolved_sources = []
+    unresolved_sources = []
+
+    for group_name, items in source_groups.items():
+        for item in items:
+            if item == "DOC-0001":
+                payload = find_doc_any_payload_from_cache("DOC-0001")
+                if payload.get("ok"):
+                    resolved_sources.append(
+                        {
+                            "group": group_name,
+                            "query": item,
+                            "matched_by": payload.get("matched_by"),
+                            "summary": payload.get("summary"),
+                        }
+                    )
+                else:
+                    unresolved_sources.append(
+                        {
+                            "group": group_name,
+                            "query": item,
+                            "reason": "CacheMiss",
+                            "error_message": "DOC-0001 was not available through current cache-only lookup.",
+                        }
+                    )
+                continue
+
+            if item in {"status", "capabilities"}:
+                resolved_sources.append(
+                    {
+                        "group": group_name,
+                        "query": item,
+                        "matched_by": "built-in",
+                        "summary": {"name": item},
+                    }
+                )
+                continue
+
+            if item == "Change Log Lite":
+                resolved_sources.append(
+                    {
+                        "group": group_name,
+                        "query": item,
+                        "matched_by": "config",
+                        "summary": {
+                            "name": "Change Log Lite",
+                            "spreadsheet_id": (
+                                (status_payload.get("config") or {}).get(
+                                    "change_log_spreadsheet_id"
+                                )
+                            ),
+                            "sheet_name": (
+                                (status_payload.get("config") or {}).get(
+                                    "change_log_sheet_name"
+                                )
+                            ),
+                        },
+                    }
+                )
+                continue
+
+            if item == "13_Черновики_и_review":
+                resolved_sources.append(
+                    {
+                        "group": group_name,
+                        "query": item,
+                        "matched_by": "known-folder",
+                        "summary": {"name": "13_Черновики_и_review"},
+                    }
+                )
+                continue
+
+            payload = find_doc_any_payload_from_cache(item)
+            if payload.get("ok"):
+                resolved_sources.append(
+                    {
+                        "group": group_name,
+                        "query": item,
+                        "matched_by": payload.get("matched_by"),
+                        "summary": payload.get("summary"),
+                    }
+                )
+            else:
+                unresolved_sources.append(
+                    {
+                        "group": group_name,
+                        "query": item,
+                        "reason": "CacheMiss",
+                        "error_message": "Source was not available through current cache-only lookup.",
+                    }
+                )
+
+    recommended_generation_mode = (
+        "draft-doc" if len(unresolved_sources) == 0 else "doc-body-only"
+    )
+
+    return {
+        "ok": True,
+        "command": "assemble-context",
+        "profile": profile,
+        "source_groups": source_groups,
+        "resolved_sources": resolved_sources,
+        "unresolved_sources": unresolved_sources,
+        "capabilities_snapshot": capabilities,
+        "safety_snapshot": status_payload,
+        "context_summary": {
+            "resolved_count": len(resolved_sources),
+            "unresolved_count": len(unresolved_sources),
+            "partial_context": len(unresolved_sources) > 0,
+        },
+        "recommended_generation_mode": recommended_generation_mode,
+        "next_safe_step": (
+            "Use draft-doc when all critical sources are resolved; otherwise prefer doc-body-only and avoid direct mutation."
+        ),
+    }
+
+
 def cmd_capabilities(json_output: bool = False) -> int:
     payload = capabilities_payload()
     if json_output:
@@ -1961,6 +2118,30 @@ def cmd_capabilities(json_output: bool = False) -> int:
             print(f"- {route}")
         print("")
     return EXIT_OK
+
+
+def cmd_assemble_context(profile: str, json_output: bool = False) -> int:
+    payload = assemble_context_payload(profile)
+    if json_output:
+        print_json(payload)
+        return resolve_command_exit_code(payload)
+
+    if payload.get("ok"):
+        print("ASSEMBLE CONTEXT OK")
+        print(f"Profile: {payload.get('profile')}")
+        print(
+            f"Resolved sources: {(payload.get('context_summary') or {}).get('resolved_count')}"
+        )
+        print(
+            f"Unresolved sources: {(payload.get('context_summary') or {}).get('unresolved_count')}"
+        )
+        print(
+            f"Recommended generation mode: {payload.get('recommended_generation_mode')}"
+        )
+        return EXIT_OK
+
+    print_compact_error(payload)
+    return resolve_command_exit_code(payload)
 
 
 def cmd_doctor_lite(json_output: bool = False) -> int:
@@ -2040,6 +2221,7 @@ def usage() -> None:
         "Usage:\n"
         "  python agent_cli.py status [--json]\n  python agent_cli.py repo-state [--json]    | rs [--json]\n"
         "  python agent_cli.py doctor [--json]        | diagnose [--json]\n"
+        "  python agent_cli.py assemble-context [--json] --profile <profile>\n"
         "  python agent_cli.py find-doc-id <DOC-XXXX>\n"
         "  python agent_cli.py find-doc-name <document name>\n"
         "  python agent_cli.py find-link <drive_id_or_url_fragment>\n"
@@ -2118,6 +2300,13 @@ def main() -> int:
                 print_usage_error("doctor does not accept positional arguments.")
                 return EXIT_USAGE_ERROR
             return cmd_doctor(json_output=json_output)
+
+        if cmd == "assemble-context":
+            json_output, args = parse_json_flag(argv)
+            if len(args) != 2 or args[0] != "--profile":
+                print_usage_error("assemble-context requires: --profile <profile>")
+                return EXIT_USAGE_ERROR
+            return cmd_assemble_context(args[1], json_output=json_output)
 
         if cmd in {"doctor", "diagnose"}:
             json_output, args = parse_json_flag(argv)
