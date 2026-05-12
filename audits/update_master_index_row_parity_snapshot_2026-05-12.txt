@@ -1,0 +1,175 @@
+==== docs_agent.py snapshot ====
+def update_master_index_row(
+    spreadsheet_id: str,
+    sheet_name: str,
+    match_column: str,
+    match_value: str,
+    payload_json: str,
+):
+    """Update exactly one row in Master Index-like sheet by matching one column."""
+    ensure_write_allowed(
+        "update-master-index-row", target=f"{spreadsheet_id}/{sheet_name}"
+    )
+    ensure_master_index_write_allowed()
+    s = services()
+    sheets = s["sheets"]
+
+    payload = json.loads(payload_json)
+    if not isinstance(payload, dict):
+        raise typer.BadParameter("payload_json must be a JSON object")
+
+    rows = get_sheet_rows(sheets, spreadsheet_id, sheet_name)
+    header, mapping = get_sheet_header_map(
+        sheets, spreadsheet_id, sheet_name, header_row=1
+    )
+
+    matches = find_rows_by_column(
+        rows=rows,
+        header_map=mapping,
+        column_name=match_column,
+        match_value=match_value,
+        header_row=1,
+    )
+
+    if len(matches) == 0:
+        raise RuntimeError(f"No rows found for {match_column}={match_value}")
+
+    if len(matches) > 1:
+        raise RuntimeError(
+            f"More than one row found for {match_column}={match_value}: {len(matches)}"
+        )
+
+    target = matches[0]
+    row_num = target["row_number"]
+    current_row = pad_row(target["row_values"], len(header))
+
+    unknown = [k for k in payload.keys() if k not in mapping]
+    if unknown:
+        raise RuntimeError(f"Unknown columns in payload: {unknown}")
+
+    new_row = list(current_row)
+    for key, value in payload.items():
+        new_row[mapping[key] - 1] = "" if value is None else str(value)
+
+    end_col = col_to_a1(len(header))
+    target_range = f"'{sheet_name}'!A{row_num}:{end_col}{row_num}"
+
+    result = (
+        sheets.spreadsheets()
+        .values()
+        .update(
+            spreadsheetId=spreadsheet_id,
+            range=target_range,
+            valueInputOption="USER_ENTERED",
+            body={"values": [new_row]},
+        )
+        .execute()
+    )
+
+    print("UPDATE MASTER INDEX ROW OK")
+    print(f"Spreadsheet ID: {spreadsheet_id}")
+    print(f"Sheet: {sheet_name}")
+    print(f"Match column: {match_column}")
+    print(f"Match value: {match_value}")
+    print(f"Row number: {row_num}")
+    print("")
+    print("Old row:")
+    print(json.dumps(current_row, ensure_ascii=False, indent=2))
+    print("")
+    print("Patch payload:")
+    print(json.dumps(payload, ensure_ascii=False, indent=2))
+    print("")
+    print("New row:")
+    print(json.dumps(new_row, ensure_ascii=False, indent=2))
+    print("")
+    print(f"Updated range: {result.get('updatedRange')}")
+    print(f"Updated cells: {result.get('updatedCells')}")
+
+==== docs_agent_v2.py snapshot ====
+def update_master_index_row(
+    spreadsheet_id: str,
+    sheet_name: str,
+    match_column: str,
+    match_value: str,
+    payload_json: str,
+):
+    """Update exactly one row in Master Index-like sheet by matching one column."""
+    ensure_write_allowed(
+        "update-master-index-row", target=f"{spreadsheet_id}/{sheet_name}"
+    )
+    ensure_master_index_write_allowed()
+    s = services()
+    sheets = s["sheets"]
+
+    payload = json.loads(payload_json)
+    if not isinstance(payload, dict):
+        raise typer.BadParameter("payload_json must be a JSON object")
+
+    rows = get_sheet_rows(sheets, spreadsheet_id, sheet_name)
+    header, mapping = get_sheet_header_map(
+        sheets, spreadsheet_id, sheet_name, header_row=1
+    )
+
+    matches = find_rows_by_column(
+        rows=rows,
+        header_map=mapping,
+        column_name=match_column,
+        match_value=match_value,
+        header_row=1,
+    )
+
+    if len(matches) == 0:
+        raise RuntimeError(f"No rows found for {match_column}={match_value}")
+
+    if len(matches) > 1:
+        raise RuntimeError(
+            f"More than one row found for {match_column}={match_value}: {len(matches)}"
+        )
+
+    target = matches[0]
+    row_num = target["row_number"]
+    current_row = pad_row(target["row_values"], len(header))
+
+    unknown = [k for k in payload.keys() if k not in mapping]
+    if unknown:
+        raise RuntimeError(f"Unknown columns in payload: {unknown}")
+
+    new_row = list(current_row)
+    for key, value in payload.items():
+        new_row[mapping[key] - 1] = "" if value is None else str(value)
+
+    end_col = col_to_a1(len(header))
+    target_range = f"'{sheet_name}'!A{row_num}:{end_col}{row_num}"
+
+    result = (
+        sheets.spreadsheets()
+        .values()
+        .update(
+            spreadsheetId=spreadsheet_id,
+            range=target_range,
+            valueInputOption="USER_ENTERED",
+            body={"values": [new_row]},
+        )
+        .execute()
+    )
+
+    print("UPDATE MASTER INDEX ROW OK")
+    print(f"Spreadsheet ID: {spreadsheet_id}")
+    print(f"Sheet: {sheet_name}")
+    print(f"Match column: {match_column}")
+    print(f"Match value: {match_value}")
+    print(f"Row number: {row_num}")
+    print("")
+    print("Old row:")
+    print(json.dumps(current_row, ensure_ascii=False, indent=2))
+    print("")
+    print("Patch payload:")
+    print(json.dumps(payload, ensure_ascii=False, indent=2))
+    print("")
+    print("New row:")
+    print(json.dumps(new_row, ensure_ascii=False, indent=2))
+    print("")
+    print(f"Updated range: {result.get('updatedRange')}")
+    print(f"Updated cells: {result.get('updatedCells')}")
+
+==== unified diff ====

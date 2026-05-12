@@ -1,0 +1,11 @@
+update_master_index_row exhaustion conclusion
+
+Result
+- update_master_index_row is already aligned relative to docs_agent.py at targeted function-body level
+- safe next action is exhaustion of this surface, not implementation
+
+Implication
+- read/verify/export line remains exhausted
+- file-operation line remains exhausted
+- append_master_index_row remains exhausted/aligned
+- update_master_index_row can be marked exhausted after this audit note
