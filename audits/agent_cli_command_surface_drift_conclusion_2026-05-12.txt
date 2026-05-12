@@ -1,0 +1,6 @@
+Conclusion
+- Alias / command-surface drift audit is complete.
+- A concrete drift artifact was found in agent_cli.py main(): duplicated explicit branch for {"doctor", "diagnose"}.
+- The duplicate appears as an unreachable later dispatch block because an earlier identical branch already returns.
+- No broader command-surface redesign is justified from this audit alone.
+- Recommended next step: separate narrow cleanup iteration to remove only the later duplicate doctor/diagnose branch, then verify help/dispatch consistency remains unchanged.

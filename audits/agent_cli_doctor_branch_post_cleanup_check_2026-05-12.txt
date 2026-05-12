@@ -1,0 +1,6 @@
+POST-CLEANUP DOCTOR BRANCH CHECK
+date: 2026-05-12
+file: agent_cli.py
+
+doctor_branch_count: 1
+2602:         if cmd in {"doctor", "diagnose"}:

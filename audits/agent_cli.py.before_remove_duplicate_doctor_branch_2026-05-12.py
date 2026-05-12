@@ -2645,6 +2645,13 @@ def main() -> int:
                 return EXIT_USAGE_ERROR
             return cmd_artifact_state(args[1], json_output=json_output)
 
+        if cmd in {"doctor", "diagnose"}:
+            json_output, args = parse_json_flag(argv)
+            if args:
+                print_usage_error("doctor does not accept positional arguments.")
+                return EXIT_USAGE_ERROR
+            return cmd_doctor(json_output=json_output)
+
         if cmd == "find-doc-id":
             if len(argv) < 1:
                 print_usage_error("Missing DOC-XXXX argument.")

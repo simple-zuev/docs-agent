@@ -1,0 +1,25 @@
+AGENT CLI DUPLICATE DOCTOR BRANCH CLEANUP REVIEW
+date: 2026-05-12
+scope: narrow clean refactor
+file: agent_cli.py
+
+Objective
+- remove only the later unreachable duplicate dispatch branch for {"doctor", "diagnose"} in main()
+
+Inputs
+- audits/agent_cli_command_surface_drift_review_2026-05-12.txt
+- audits/agent_cli_command_surface_drift_conclusion_2026-05-12.txt
+
+Change applied
+- removed the later duplicate explicit dispatch block for {"doctor", "diagnose"} from main()
+- preserved the earlier reachable doctor/diagnose dispatch block
+- no other command branches changed
+
+Verification
+- py_compile passes
+- post-cleanup branch count check confirms exactly one doctor/diagnose dispatch block remains
+- no broader command-surface mutation applied
+
+Conclusion
+- duplicate unreachable dispatch residue removed
+- cleanup is narrow, reversible, and behavior-preserving

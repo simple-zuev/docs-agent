@@ -1,0 +1,39 @@
+AGENT CLI COMMAND SURFACE DRIFT REVIEW
+date: 2026-05-12
+scope: audit-only
+file: agent_cli.py
+
+Objective
+- verify coherence of CLI command surface after PR #23 scope
+- compare reachable dispatch surface against expected explicit command structure
+- inspect alias/help/dispatch consistency at main() level
+
+Artifacts reviewed
+- audits/agent_cli_command_surface_inventory_2026-05-12.txt
+- audits/agent_cli_command_surface_snapshot_2026-05-12.txt
+
+Findings
+1. cmd_* inventory remains compact and reviewable.
+2. handle_* wrapper inventory remains narrow; only handle_query_command is present.
+3. Explicit CLI leaf branches remain present for:
+   - find-doc-id
+   - find-doc-name
+   - find-link
+   - get-file
+   - read-doc
+4. Query-wrapper based routes remain present for:
+   - find-doc-any / f
+   - open-doc-from-query / o
+   - read-doc-from-query / r
+   - ask / q
+5. Duplicate explicit dispatch branch for {"doctor", "diagnose"} is present in main():
+   - first occurrence: lines 2602-2607
+   - second occurrence: lines 2648-2653
+6. This indicates command-surface drift / duplicate dispatch artifact remains present on current main baseline.
+7. Because the duplicated branch returns immediately, the later duplicate is unreachable and should be treated as dead dispatch residue.
+8. No additional command-surface drift is confirmed yet from this audit beyond the duplicate doctor/diagnose branch.
+
+Conclusion
+- command surface is mostly coherent
+- one concrete duplicate-dispatch defect is present
+- next safe iteration can be a narrow clean refactor removing only the later unreachable duplicate doctor/diagnose branch

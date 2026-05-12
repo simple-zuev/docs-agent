@@ -1,0 +1,34 @@
+AGENT CLI COMMAND SURFACE DRIFT AUDIT INVENTORY
+date: 2026-05-12
+scope: audit-only
+file: agent_cli.py
+
+== def cmd_* inventory ==
+cmd_artifact_state
+cmd_ask
+cmd_assemble_context
+cmd_capabilities
+cmd_doc_body_only
+cmd_doctor
+cmd_doctor_lite
+cmd_find_doc_any
+cmd_find_doc_id
+cmd_find_doc_name
+cmd_find_link
+cmd_get_file
+cmd_open_doc_from_query
+cmd_read_doc
+cmd_read_doc_from_query
+cmd_repo_state
+cmd_status
+cmd_status_payload
+
+== def handle_* inventory ==
+handle_query_command
+
+== uppercase alias/set constants inventory ==
+
+== direct membership tests in main-style dispatch ==
+
+== explicit argv[0] equality checks ==
+
