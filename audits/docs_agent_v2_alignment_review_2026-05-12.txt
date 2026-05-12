@@ -1,0 +1,4 @@
+Review: docs_agent.py vs docs_agent_v2.py after helper-alignment cycle
+Finding: remaining divergence is now concentrated in higher-level surface, not in the recently aligned insertText/replaceAllText mutation helpers
+Safe conclusion: stop helper refactors here; next step should be a separately scoped audit for shared read/error/output infrastructure
+Status: baseline remains clean and healthy after PR #21
