@@ -2674,11 +2674,29 @@ def main() -> int:
             )
 
         if cmd in {"read-doc-from-query", "r"}:
+            if argv in (["--help"], ["-h"]):
+                print(
+                    "Usage:\n"
+                    "  python agent_cli.py read-doc-from-query [--json] <query>\n"
+                    "  python agent_cli.py r [--json] <query>\n\n"
+                    "Examples:\n"
+                    "  python agent_cli.py read-doc-from-query DOC-0001\n"
+                    "  python agent_cli.py r DOC-0001"
+                )
+                return EXIT_OK
             return handle_query_command(
                 argv, cmd_read_doc_from_query, allow_json_flag=True
             )
 
         if cmd == "get-file":
+            if argv in (["--help"], ["-h"]):
+                print(
+                    "Usage:\n"
+                    "  python agent_cli.py get-file <google_drive_file_id>\n\n"
+                    "Examples:\n"
+                    "  python agent_cli.py get-file 1hyWNNzsIHRLGJ65urOQUA0x_kOqCP61OkXcM3MMyedw"
+                )
+                return EXIT_OK
             if len(argv) < 1:
                 print_usage_error("Missing google_drive_file_id argument.")
                 return EXIT_USAGE_ERROR
@@ -2686,6 +2704,14 @@ def main() -> int:
             return EXIT_OK
 
         if cmd == "read-doc":
+            if argv in (["--help"], ["-h"]):
+                print(
+                    "Usage:\n"
+                    "  python agent_cli.py read-doc <google_doc_id>\n\n"
+                    "Examples:\n"
+                    "  python agent_cli.py read-doc DOC-0001"
+                )
+                return EXIT_OK
             if len(argv) < 1:
                 print_usage_error("Missing google_doc_id argument.")
                 return EXIT_USAGE_ERROR
