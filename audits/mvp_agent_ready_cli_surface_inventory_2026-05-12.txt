@@ -1,0 +1,52 @@
+MVP agent-ready CLI surface inventory
+
+Purpose
+- define the minimum viable command surface required to connect a ChatGPT-based agent operating under explicit instructions and bounded execution rules
+- prioritize the command surface needed for early practical utility over full CLI completeness
+
+Current callable command catalog from usage/help surface
+- status
+- repo-state / rs
+- doctor / diagnose
+- assemble-context
+- doc-body-only
+- artifact-state
+- find-doc-id
+- find-doc-name
+- find-link
+- find-doc-any / f
+- open-doc-from-query / o
+- read-doc-from-query / r
+- get-file
+- read-doc
+- ask / q
+
+MVP command group A - read / inspect foundation
+- status
+- repo-state
+- doctor
+- find-doc-id
+- find-doc-name
+- find-link
+
+MVP command group B - document access foundation
+- read-doc
+- get-file
+- read-doc-from-query
+
+MVP command group C - minimum mutation contour
+- artifact-state
+- doc-body-only
+
+Deferred / later / orchestration-heavier
+- ask
+- assemble-context
+- find-doc-any
+- open-doc-from-query
+
+Selection criteria
+- live in current callable surface
+- bounded
+- reviewable
+- useful for ChatGPT-agent operation
+- preferably predictable and machine-usable

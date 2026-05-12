@@ -1,0 +1,9 @@
+Conclusion
+- the application should be driven toward a minimum viable agent-ready CLI rather than broad full-surface hardening
+- the recommended MVP surface consists of:
+  - read / inspect foundation: status, repo-state, doctor, find-doc-id, find-doc-name, find-link
+  - document access foundation: read-doc, get-file, read-doc-from-query
+  - minimum mutation contour: artifact-state, doc-body-only
+
+Recommended next step
+- perform a bounded audit wave across the read / inspect foundation first

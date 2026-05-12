@@ -1,0 +1,56 @@
+Review purpose
+- define the minimum viable agent-ready CLI surface for a ChatGPT-based agent working under explicit instructions and bounded execution rules
+
+Why this matters
+- the project needs a practical path to agent-readiness
+- full CLI hardening is not required before first useful agent operation
+- a smaller validated surface is more valuable than a broad but unstable command set
+
+Recommended MVP surface
+
+Group A - read / inspect foundation
+- status
+- repo-state
+- doctor
+- find-doc-id
+- find-doc-name
+- find-link
+
+Why
+- supports state inspection, repository awareness, and direct lookup-style navigation
+- low mutation risk
+- high utility for bounded agent workflows
+
+Group B - document access foundation
+- read-doc
+- get-file
+- read-doc-from-query
+
+Why
+- allows the agent to retrieve source material needed for bounded work
+- enables controlled reading without immediately requiring broad orchestration
+
+Group C - minimum mutation contour
+- artifact-state
+- doc-body-only
+
+Why
+- likely enough to establish the first narrow write-capable path for the agent
+- better fit for bounded mutation than broad orchestration routes
+
+Deferred until MVP surface is stabilized
+- ask
+- assemble-context
+- find-doc-any
+- open-doc-from-query
+
+Reason for deferral
+- more orchestration-heavy
+- likely broader behavior surface
+- less suitable for urgent minimum viable agent-readiness
+
+Recommended hardening order
+1. group A
+2. group B
+3. group C
+4. unify agent-facing success/error/result behavior across the MVP surface
