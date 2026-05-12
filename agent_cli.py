@@ -2102,6 +2102,181 @@ def assemble_context_payload(profile: str) -> dict:
     }
 
 
+def doc_body_only_outline(document_type: str) -> list[str]:
+    outlines = {
+        "operating-model": [
+            "Назначение",
+            "Область применения",
+            "Роли и ответственность",
+            "Основные процессы",
+            "Контрольные точки",
+            "Ограничения и риски",
+            "Следующие шаги",
+        ],
+        "instruction": [
+            "Назначение инструкции",
+            "Область применения",
+            "Предварительные условия",
+            "Порядок действий",
+            "Контрольные проверки",
+            "Ограничения",
+            "Следующие шаги",
+        ],
+        "policy": [
+            "Цель policy",
+            "Область действия",
+            "Обязательные правила",
+            "Запрещённые действия",
+            "Контроль соблюдения",
+            "Исключения",
+            "Следующие шаги",
+        ],
+        "architecture-note": [
+            "Контекст",
+            "Проблема",
+            "Принятое решение",
+            "Альтернативы",
+            "Ограничения",
+            "Риски",
+            "Следующие шаги",
+        ],
+        "draft-spec": [
+            "Назначение",
+            "Контекст",
+            "Функциональные требования",
+            "Нефункциональные требования",
+            "Ограничения",
+            "Риски и допущения",
+            "Следующие шаги",
+        ],
+    }
+    return outlines.get(
+        document_type,
+        [
+            "Назначение",
+            "Контекст",
+            "Основное содержание",
+            "Ограничения",
+            "Риски и допущения",
+            "Следующие шаги",
+        ],
+    )
+
+
+def build_doc_body_only_body(
+    *,
+    profile: str,
+    document_type: str,
+    title: str,
+    context_payload: dict,
+) -> str:
+    outline = doc_body_only_outline(document_type)
+    summary = context_payload.get("context_summary") or {}
+    partial = bool(summary.get("partial_context"))
+    resolved_count = int(summary.get("resolved_count") or 0)
+    unresolved_count = int(summary.get("unresolved_count") or 0)
+
+    lines = [
+        f"# {title}",
+        "",
+        f"Профиль контекста: {profile}",
+        f"Тип документа: {document_type}",
+        "",
+        "## Контекст подготовки",
+        f"- resolved sources: {resolved_count}",
+        f"- unresolved sources: {unresolved_count}",
+        f"- partial context: {'yes' if partial else 'no'}",
+        "",
+        "## Важно",
+        "Документ подготовлен в режиме doc-body-only.",
+        "Это означает, что сформировано безопасное структурированное содержимое без автоматической записи в целевой артефакт.",
+        "",
+    ]
+
+    if partial:
+        lines.extend(
+            [
+                "## Ограничения текущего контекста",
+                "- Не все источники были разрешены через текущий read-only lookup path.",
+                "- Содержимое ниже является безопасным черновым телом документа и требует последующей валидации.",
+                "",
+            ]
+        )
+
+    for section in outline:
+        lines.extend(
+            [
+                f"## {section}",
+                f"[Черновое содержимое для раздела '{section}'. Заполнить и уточнить по материалам профиля {profile}.]",
+                "",
+            ]
+        )
+
+    lines.extend(
+        [
+            "## Допущения",
+            "- Использован только подтверждённый и частично разрешённый контекст текущего agent workflow.",
+            "- При появлении дополнительных canonical sources документ должен быть уточнён.",
+            "",
+            "## Следующий безопасный шаг",
+            "Создать или выбрать draft document в review-контуре и перенести это тело документа в controlled write workflow.",
+            "",
+        ]
+    )
+
+    return "\n".join(lines)
+
+
+def doc_body_only_payload(profile: str, document_type: str, title: str) -> dict:
+    context_payload = assemble_context_payload(profile)
+    if not context_payload.get("ok"):
+        return context_payload
+
+    outline = doc_body_only_outline(document_type)
+    body = build_doc_body_only_body(
+        profile=profile,
+        document_type=document_type,
+        title=title,
+        context_payload=context_payload,
+    )
+
+    unresolved_dependencies = [
+        item.get("query")
+        for item in (context_payload.get("unresolved_sources") or [])
+        if item.get("query")
+    ]
+
+    assumptions = [
+        "Body is generated without direct mutation.",
+        "Body may be based on partial context when unresolved sources exist.",
+        "Further review is required before canonical or review-draft update.",
+    ]
+
+    return {
+        "ok": True,
+        "command": "doc-body-only",
+        "profile": profile,
+        "document_type": document_type,
+        "title": title,
+        "context_snapshot": {
+            "resolved_count": (context_payload.get("context_summary") or {}).get(
+                "resolved_count"
+            ),
+            "unresolved_count": (context_payload.get("context_summary") or {}).get(
+                "unresolved_count"
+            ),
+            "partial_context": (context_payload.get("context_summary") or {}).get(
+                "partial_context"
+            ),
+        },
+        "outline": outline,
+        "body": body,
+        "assumptions": assumptions,
+        "unresolved_dependencies": unresolved_dependencies,
+        "next_safe_step": "Create or select a draft document in review scope and use controlled write workflow to place this body.",
+    }
+
+
 def cmd_capabilities(json_output: bool = False) -> int:
     payload = capabilities_payload()
     if json_output:
@@ -2138,6 +2313,30 @@ def cmd_assemble_context(profile: str, json_output: bool = False) -> int:
         print(
             f"Recommended generation mode: {payload.get('recommended_generation_mode')}"
         )
+        return EXIT_OK
+
+    print_compact_error(payload)
+    return resolve_command_exit_code(payload)
+
+
+def cmd_doc_body_only(
+    profile: str,
+    document_type: str,
+    title: str,
+    json_output: bool = False,
+) -> int:
+    payload = doc_body_only_payload(profile, document_type, title)
+    if json_output:
+        print_json(payload)
+        return resolve_command_exit_code(payload)
+
+    if payload.get("ok"):
+        print("DOC BODY ONLY OK")
+        print(f"Profile: {payload.get('profile')}")
+        print(f"Document type: {payload.get('document_type')}")
+        print(f"Title: {payload.get('title')}")
+        print("")
+        print(payload.get("body", ""))
         return EXIT_OK
 
     print_compact_error(payload)
@@ -2222,6 +2421,7 @@ def usage() -> None:
         "  python agent_cli.py status [--json]\n  python agent_cli.py repo-state [--json]    | rs [--json]\n"
         "  python agent_cli.py doctor [--json]        | diagnose [--json]\n"
         "  python agent_cli.py assemble-context [--json] --profile <profile>\n"
+        "  python agent_cli.py doc-body-only [--json] --profile <profile> --document-type <type> --title <title>\n"
         "  python agent_cli.py find-doc-id <DOC-XXXX>\n"
         "  python agent_cli.py find-doc-name <document name>\n"
         "  python agent_cli.py find-link <drive_id_or_url_fragment>\n"
@@ -2307,6 +2507,29 @@ def main() -> int:
                 print_usage_error("assemble-context requires: --profile <profile>")
                 return EXIT_USAGE_ERROR
             return cmd_assemble_context(args[1], json_output=json_output)
+
+        if cmd == "doc-body-only":
+            json_output, args = parse_json_flag(argv)
+            if len(args) != 6:
+                print_usage_error(
+                    "doc-body-only requires: --profile <profile> --document-type <type> --title <title>"
+                )
+                return EXIT_USAGE_ERROR
+            if (
+                args[0] != "--profile"
+                or args[2] != "--document-type"
+                or args[4] != "--title"
+            ):
+                print_usage_error(
+                    "doc-body-only requires: --profile <profile> --document-type <type> --title <title>"
+                )
+                return EXIT_USAGE_ERROR
+            return cmd_doc_body_only(
+                args[1],
+                args[3],
+                args[5],
+                json_output=json_output,
+            )
 
         if cmd in {"doctor", "diagnose"}:
             json_output, args = parse_json_flag(argv)
