@@ -864,6 +864,187 @@ def create_draft_doc(
     print(f"Change Log: {change_id} | {updated_range}")
 
 
+@app.command("append-review-note")
+def append_review_note(
+    document_id: str,
+    note_text: str,
+    dry_run: bool = False,
+    confirm: bool = False,
+):
+    """Append bounded review note to an existing review-scoped draft and log it."""
+    target_folder_name = "13_Черновики_и_review"
+    target_folder_id = "1rZtuXOyThzFf_LFWaD4w5nHwuXCDIHQh"
+
+    if should_dry_run(dry_run):
+        print_dry_run(
+            {
+                "command": "append-review-note",
+                "document_id": document_id,
+                "target_folder": target_folder_name,
+                "note_chars": len(note_text),
+                "write_mode_required": True,
+            }
+        )
+        return
+
+    ensure_write_allowed("append-review-note", target=document_id)
+    ensure_confirmed(confirm, "append-review-note")
+    s = services()
+    docs = s["docs"]
+    drive = s["drive"]
+    sheets = s["sheets"]
+
+    meta = get_file_meta(drive, document_id)
+    parents = meta.get("parents", []) or []
+
+    if target_folder_id not in parents:
+        raise RuntimeError(
+            f"append-review-note blocked: target document is outside Cass / {target_folder_name}"
+        )
+
+    doc = docs.documents().get(documentId=document_id).execute()
+    content = doc.get("body", {}).get("content", [])
+
+    end_index = 1
+    if content:
+        end_index = max(1, content[-1].get("endIndex", 1) - 1)
+
+    formatted_note = f"\n\n--- REVIEW NOTE ---\n{note_text}\n--- END REVIEW NOTE ---\n"
+
+    docs.documents().batchUpdate(
+        documentId=document_id,
+        body={
+            "requests": [
+                {
+                    "insertText": {
+                        "location": {"index": end_index},
+                        "text": formatted_note,
+                    }
+                }
+            ]
+        },
+    ).execute()
+
+    change_id, updated_range = append_log(
+        sheets=sheets,
+        action="Append Review Note",
+        obj=meta["name"],
+        from_="Review note",
+        to=meta.get("webViewLink", document_id),
+        reason="Добавление review-note в review-scoped draft через CLI docs_agent.py",
+        impact="Low",
+        status="Done",
+        notes=f"Document ID: {document_id} | Appended chars: {len(formatted_note)}",
+    )
+
+    print("APPEND REVIEW NOTE OK")
+    print(f"Document: {meta['name']}")
+    print(f"ID: {document_id}")
+    print(f"URL: {meta.get('webViewLink')}")
+    print(f"Appended chars: {len(formatted_note)}")
+    print("Artifact state: Draft")
+    print(
+        "Next safe step: Review accumulated notes and decide whether another bounded draft update is needed."
+    )
+    print(f"Change Log: {change_id} | {updated_range}")
+
+
+@app.command("write-draft-doc")
+def write_draft_doc(
+    document_id: str,
+    body_text: str,
+    dry_run: bool = False,
+    confirm: bool = False,
+):
+    """Write prepared body into an existing review-scoped draft document and log it."""
+    target_folder_name = "13_Черновики_и_review"
+    target_folder_id = "1rZtuXOyThzFf_LFWaD4w5nHwuXCDIHQh"
+
+    if should_dry_run(dry_run):
+        print_dry_run(
+            {
+                "command": "write-draft-doc",
+                "document_id": document_id,
+                "target_folder": target_folder_name,
+                "body_chars": len(body_text),
+                "write_mode_required": True,
+            }
+        )
+        return
+
+    ensure_write_allowed("write-draft-doc", target=document_id)
+    ensure_confirmed(confirm, "write-draft-doc")
+    s = services()
+    docs = s["docs"]
+    drive = s["drive"]
+    sheets = s["sheets"]
+
+    meta = get_file_meta(drive, document_id)
+    parents = meta.get("parents", []) or []
+
+    if target_folder_id not in parents:
+        raise RuntimeError(
+            f"write-draft-doc blocked: target document is outside Cass / {target_folder_name}"
+        )
+
+    doc = docs.documents().get(documentId=document_id).execute()
+    content = doc.get("body", {}).get("content", [])
+
+    end_index = 1
+    if content:
+        end_index = content[-1].get("endIndex", 1)
+
+    requests = []
+    if end_index and end_index > 2:
+        requests.append(
+            {
+                "deleteContentRange": {
+                    "range": {
+                        "startIndex": 1,
+                        "endIndex": end_index - 1,
+                    }
+                }
+            }
+        )
+
+    requests.append(
+        {
+            "insertText": {
+                "location": {"index": 1},
+                "text": body_text,
+            }
+        }
+    )
+
+    docs.documents().batchUpdate(
+        documentId=document_id,
+        body={"requests": requests},
+    ).execute()
+
+    change_id, updated_range = append_log(
+        sheets=sheets,
+        action="Write Draft Body",
+        obj=meta["name"],
+        from_="Prepared body content",
+        to=meta.get("webViewLink", document_id),
+        reason="Запись подготовленного тела документа в review-scoped draft через CLI docs_agent.py",
+        impact="Medium",
+        status="Done",
+        notes=f"Document ID: {document_id} | Inserted chars: {len(body_text)}",
+    )
+
+    print("WRITE DRAFT DOC OK")
+    print(f"Document: {meta['name']}")
+    print(f"ID: {document_id}")
+    print(f"URL: {meta.get('webViewLink')}")
+    print(f"Body chars: {len(body_text)}")
+    print("Artifact state: Draft")
+    print(
+        "Next safe step: Review resulting draft content and decide whether review note or further bounded update is needed."
+    )
+    print(f"Change Log: {change_id} | {updated_range}")
+
+
 @app.command("list-folder")
 def list_folder_cmd(
     folder_name: str,
