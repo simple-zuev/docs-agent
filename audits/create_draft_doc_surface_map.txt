@@ -1,0 +1,14 @@
+
+## docs_agent.py
+find_folder(drive, name, parent_id) line=263
+append_log(sheets, action, obj, from_, to, reason, impact, status, notes) line=394
+create_temp_doc() line=467
+create_doc_in_folder(target_folder, title_prefix, dry_run, confirm) line=695
+
+## drive_write_api.py
+get_write_services() line=39
+create_doc_in_folder_writeonly() line=135
+
+## runtime_config.py
+ensure_write_allowed(operation_name, target) line=35
+ensure_confirmed(confirm, operation_name) line=95
