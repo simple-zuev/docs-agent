@@ -10,6 +10,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseDownload
 from doc_text_mutation import insert_text_at_index, replace_all_text
+from docs_agent_output import emit_json
 from runtime_config import (
     CONFIG_PATH,
     config_get,
@@ -51,7 +52,7 @@ def ensure_master_index_write_allowed():
 
 def print_dry_run(payload: dict):
     print("DRY RUN OK")
-    print(json.dumps(payload, ensure_ascii=False, indent=2))
+    emit_json(payload)
 
 
 def get_creds():
@@ -1074,7 +1075,7 @@ def get_file(
     meta = get_file_meta(drive, file_id)
 
     print("GET FILE OK")
-    print(json.dumps(meta, ensure_ascii=False, indent=2))
+    emit_json(meta)
 
 
 @app.command("list-folder-by-id")
