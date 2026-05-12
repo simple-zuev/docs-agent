@@ -1,0 +1,14 @@
+Post-review conclusion
+- PR #49 established export_doc() as the next adjacent candidate to inspect
+- docs_agent_v2.py::export_doc() is already behaviorally aligned with docs_agent.py::export_doc()
+- verify_doc_text() had already been parity-aligned on the stacked base
+- read_doc() was aligned in PR #45
+
+Line status
+- current read/verify/export local line is exhausted
+- no further safe narrow implementation step is justified in this exact surface without widening scope
+
+Implication
+- do not open an export_doc implementation PR
+- next work item should move to a different bounded surface
+- safest next discovery should be a new audit-only candidate selection outside the exhausted read/verify/export line
