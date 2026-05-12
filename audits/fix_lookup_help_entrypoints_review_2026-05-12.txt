@@ -1,0 +1,18 @@
+Scope
+- narrow production fix for explicit help handling on lookup command entrypoints
+- commands covered: find-doc-id, find-doc-name, find-link
+
+Problem
+- lookup command help requests were routed into subprocess JSON-output paths
+- downstream wrapper attempted to parse text help output as JSON
+- result: JSONDecodeError instead of stable help behavior
+
+Applied change
+- add explicit local help handling for lookup commands before subprocess execution
+- keep normal lookup execution path unchanged
+
+Expected effect
+- find-doc-id --help returns stable local usage/help
+- find-doc-name --help returns stable local usage/help
+- find-link --help returns stable local usage/help
+- successful lookup execution remains unchanged

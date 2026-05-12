@@ -1,0 +1,444 @@
+Target snapshot for lookup help entrypoint fix
+
+=== "find-doc-id" @ line 2655 ===
+02635:                 args[5],
+02636:                 json_output=json_output,
+02637:             )
+02638: 
+02639:         if cmd == "artifact-state":
+02640:             json_output, args = parse_json_flag(argv)
+02641:             if len(args) != 2 or args[0] != "--file-id":
+02642:                 print_usage_error(
+02643:                     "artifact-state requires: --file-id <google_drive_file_id>"
+02644:                 )
+02645:                 return EXIT_USAGE_ERROR
+02646:             return cmd_artifact_state(args[1], json_output=json_output)
+02647: 
+02648:         if cmd in {"doctor", "diagnose"}:
+02649:             json_output, args = parse_json_flag(argv)
+02650:             if args:
+02651:                 print_usage_error("doctor does not accept positional arguments.")
+02652:                 return EXIT_USAGE_ERROR
+02653:             return cmd_doctor(json_output=json_output)
+02654: 
+02655:         if cmd == "find-doc-id":
+02656:             if len(argv) < 1:
+02657:                 print_usage_error("Missing DOC-XXXX argument.")
+02658:                 return EXIT_USAGE_ERROR
+02659:             cmd_find_doc_id(argv[0])
+02660:             return EXIT_OK
+02661: 
+02662:         if cmd == "find-doc-name":
+02663:             return handle_query_command(argv, cmd_find_doc_name)
+02664: 
+02665:         if cmd == "find-link":
+02666:             return handle_query_command(argv, cmd_find_link)
+02667: 
+02668:         if cmd in {"find-doc-any", "f"}:
+02669:             return handle_query_command(argv, cmd_find_doc_any, allow_json_flag=True)
+02670: 
+02671:         if cmd in {"open-doc-from-query", "o"}:
+02672:             return handle_query_command(
+02673:                 argv, cmd_open_doc_from_query, allow_json_flag=True
+02674:             )
+02675: 
+02676:         if cmd in {"read-doc-from-query", "r"}:
+02677:             return handle_query_command(
+02678:                 argv, cmd_read_doc_from_query, allow_json_flag=True
+02679:             )
+02680: 
+02681:         if cmd == "get-file":
+02682:             if len(argv) < 1:
+02683:                 print_usage_error("Missing google_drive_file_id argument.")
+02684:                 return EXIT_USAGE_ERROR
+02685:             cmd_get_file(argv[0])
+02686:             return EXIT_OK
+02687: 
+02688:         if cmd == "read-doc":
+02689:             if len(argv) < 1:
+02690:                 print_usage_error("Missing google_doc_id argument.")
+02691:                 return EXIT_USAGE_ERROR
+02692:             cmd_read_doc(argv[0])
+02693:             return EXIT_OK
+02694: 
+02695:         if cmd in {"ask", "q"}:
+02696:             return handle_query_command(argv, cmd_ask, allow_json_flag=True)
+02697: 
+02698:         print_usage_error(f"Unknown command: {cmd}")
+02699:         return EXIT_USAGE_ERROR
+02700: 
+02701:     except KeyboardInterrupt:
+02702:         print_json(
+02703:             {
+02704:                 "ok": False,
+02705:                 "command": cmd,
+02706:                 "error_type": "KeyboardInterrupt",
+02707:                 "error_message": "Interrupted by user",
+02708:                 "retryable": True,
+02709:                 "auth_related": False,
+02710:                 "network_related": False,
+02711:             }
+02712:         )
+02713:         return EXIT_INTERRUPTED
+02714: 
+02715: 
+02716: if __name__ == "__main__":
+02717:     raise SystemExit(main())
+
+=== "find-doc-name" @ line 2662 ===
+02642:                 print_usage_error(
+02643:                     "artifact-state requires: --file-id <google_drive_file_id>"
+02644:                 )
+02645:                 return EXIT_USAGE_ERROR
+02646:             return cmd_artifact_state(args[1], json_output=json_output)
+02647: 
+02648:         if cmd in {"doctor", "diagnose"}:
+02649:             json_output, args = parse_json_flag(argv)
+02650:             if args:
+02651:                 print_usage_error("doctor does not accept positional arguments.")
+02652:                 return EXIT_USAGE_ERROR
+02653:             return cmd_doctor(json_output=json_output)
+02654: 
+02655:         if cmd == "find-doc-id":
+02656:             if len(argv) < 1:
+02657:                 print_usage_error("Missing DOC-XXXX argument.")
+02658:                 return EXIT_USAGE_ERROR
+02659:             cmd_find_doc_id(argv[0])
+02660:             return EXIT_OK
+02661: 
+02662:         if cmd == "find-doc-name":
+02663:             return handle_query_command(argv, cmd_find_doc_name)
+02664: 
+02665:         if cmd == "find-link":
+02666:             return handle_query_command(argv, cmd_find_link)
+02667: 
+02668:         if cmd in {"find-doc-any", "f"}:
+02669:             return handle_query_command(argv, cmd_find_doc_any, allow_json_flag=True)
+02670: 
+02671:         if cmd in {"open-doc-from-query", "o"}:
+02672:             return handle_query_command(
+02673:                 argv, cmd_open_doc_from_query, allow_json_flag=True
+02674:             )
+02675: 
+02676:         if cmd in {"read-doc-from-query", "r"}:
+02677:             return handle_query_command(
+02678:                 argv, cmd_read_doc_from_query, allow_json_flag=True
+02679:             )
+02680: 
+02681:         if cmd == "get-file":
+02682:             if len(argv) < 1:
+02683:                 print_usage_error("Missing google_drive_file_id argument.")
+02684:                 return EXIT_USAGE_ERROR
+02685:             cmd_get_file(argv[0])
+02686:             return EXIT_OK
+02687: 
+02688:         if cmd == "read-doc":
+02689:             if len(argv) < 1:
+02690:                 print_usage_error("Missing google_doc_id argument.")
+02691:                 return EXIT_USAGE_ERROR
+02692:             cmd_read_doc(argv[0])
+02693:             return EXIT_OK
+02694: 
+02695:         if cmd in {"ask", "q"}:
+02696:             return handle_query_command(argv, cmd_ask, allow_json_flag=True)
+02697: 
+02698:         print_usage_error(f"Unknown command: {cmd}")
+02699:         return EXIT_USAGE_ERROR
+02700: 
+02701:     except KeyboardInterrupt:
+02702:         print_json(
+02703:             {
+02704:                 "ok": False,
+02705:                 "command": cmd,
+02706:                 "error_type": "KeyboardInterrupt",
+02707:                 "error_message": "Interrupted by user",
+02708:                 "retryable": True,
+02709:                 "auth_related": False,
+02710:                 "network_related": False,
+02711:             }
+02712:         )
+02713:         return EXIT_INTERRUPTED
+02714: 
+02715: 
+02716: if __name__ == "__main__":
+02717:     raise SystemExit(main())
+
+=== "find-link" @ line 2665 ===
+02645:                 return EXIT_USAGE_ERROR
+02646:             return cmd_artifact_state(args[1], json_output=json_output)
+02647: 
+02648:         if cmd in {"doctor", "diagnose"}:
+02649:             json_output, args = parse_json_flag(argv)
+02650:             if args:
+02651:                 print_usage_error("doctor does not accept positional arguments.")
+02652:                 return EXIT_USAGE_ERROR
+02653:             return cmd_doctor(json_output=json_output)
+02654: 
+02655:         if cmd == "find-doc-id":
+02656:             if len(argv) < 1:
+02657:                 print_usage_error("Missing DOC-XXXX argument.")
+02658:                 return EXIT_USAGE_ERROR
+02659:             cmd_find_doc_id(argv[0])
+02660:             return EXIT_OK
+02661: 
+02662:         if cmd == "find-doc-name":
+02663:             return handle_query_command(argv, cmd_find_doc_name)
+02664: 
+02665:         if cmd == "find-link":
+02666:             return handle_query_command(argv, cmd_find_link)
+02667: 
+02668:         if cmd in {"find-doc-any", "f"}:
+02669:             return handle_query_command(argv, cmd_find_doc_any, allow_json_flag=True)
+02670: 
+02671:         if cmd in {"open-doc-from-query", "o"}:
+02672:             return handle_query_command(
+02673:                 argv, cmd_open_doc_from_query, allow_json_flag=True
+02674:             )
+02675: 
+02676:         if cmd in {"read-doc-from-query", "r"}:
+02677:             return handle_query_command(
+02678:                 argv, cmd_read_doc_from_query, allow_json_flag=True
+02679:             )
+02680: 
+02681:         if cmd == "get-file":
+02682:             if len(argv) < 1:
+02683:                 print_usage_error("Missing google_drive_file_id argument.")
+02684:                 return EXIT_USAGE_ERROR
+02685:             cmd_get_file(argv[0])
+02686:             return EXIT_OK
+02687: 
+02688:         if cmd == "read-doc":
+02689:             if len(argv) < 1:
+02690:                 print_usage_error("Missing google_doc_id argument.")
+02691:                 return EXIT_USAGE_ERROR
+02692:             cmd_read_doc(argv[0])
+02693:             return EXIT_OK
+02694: 
+02695:         if cmd in {"ask", "q"}:
+02696:             return handle_query_command(argv, cmd_ask, allow_json_flag=True)
+02697: 
+02698:         print_usage_error(f"Unknown command: {cmd}")
+02699:         return EXIT_USAGE_ERROR
+02700: 
+02701:     except KeyboardInterrupt:
+02702:         print_json(
+02703:             {
+02704:                 "ok": False,
+02705:                 "command": cmd,
+02706:                 "error_type": "KeyboardInterrupt",
+02707:                 "error_message": "Interrupted by user",
+02708:                 "retryable": True,
+02709:                 "auth_related": False,
+02710:                 "network_related": False,
+02711:             }
+02712:         )
+02713:         return EXIT_INTERRUPTED
+02714: 
+02715: 
+02716: if __name__ == "__main__":
+02717:     raise SystemExit(main())
+
+=== find-row-by-column @ line 1277 ===
+01257:     payload = cmd_status_payload()
+01258:     if json_output:
+01259:         print_json(payload)
+01260:     else:
+01261:         print_compact_status(payload)
+01262:     return resolve_command_exit_code(payload)
+01263: 
+01264: 
+01265: def cmd_doctor(json_output: bool = False) -> int:
+01266:     payload = doctor_payload()
+01267:     if json_output:
+01268:         print_json(payload)
+01269:     else:
+01270:         print_compact_doctor(payload)
+01271:     return resolve_command_exit_code(payload)
+01272: 
+01273: 
+01274: def cmd_find_doc_id(value: str) -> None:
+01275:     payload = run_docs_agent_with_retry(
+01276:         [
+01277:             "find-row-by-column",
+01278:             MASTER_INDEX_ID,
+01279:             MASTER_INDEX_SHEET,
+01280:             "Document ID",
+01281:             value,
+01282:         ]
+01283:     )
+01284:     print_json(payload)
+01285: 
+01286: 
+01287: def cmd_find_doc_name(value: str) -> None:
+01288:     payload = run_docs_agent_with_retry(
+01289:         [
+01290:             "find-row-by-column",
+01291:             MASTER_INDEX_ID,
+01292:             MASTER_INDEX_SHEET,
+01293:             "Document Name",
+01294:             value,
+01295:         ]
+01296:     )
+01297:     print_json(payload)
+01298: 
+01299: 
+01300: def cmd_find_link(value: str) -> None:
+01301:     payload = run_docs_agent_with_retry(
+01302:         [
+01303:             "find-row-by-link-fragment",
+01304:             MASTER_INDEX_ID,
+01305:             MASTER_INDEX_SHEET,
+01306:             value,
+01307:         ]
+01308:     )
+01309:     print_json(payload)
+01310: 
+01311: 
+01312: def cmd_get_file(file_id: str) -> None:
+01313:     payload = run_docs_agent_with_retry(
+01314:         [
+01315:             "get-file",
+01316:             file_id,
+01317:         ]
+01318:     )
+01319:     print_json(payload)
+01320: 
+01321: 
+01322: def cmd_read_doc(document_id: str) -> None:
+01323:     payload = run_docs_agent_with_retry(
+01324:         [
+01325:             "read-doc",
+01326:             document_id,
+01327:         ]
+01328:     )
+01329:     print_json(payload)
+01330: 
+01331: 
+01332: def _find_doc_any_payload_live_impl(query: str) -> dict:
+01333:     attempts = []
+01334: 
+01335:     by_id = run_docs_agent_with_retry(
+01336:         [
+01337:             "find-row-by-column",
+01338:             MASTER_INDEX_ID,
+01339:             MASTER_INDEX_SHEET,
+01340:             "Document ID",
+01341:             query,
+01342:         ]
+01343:     )
+01344:     attempts.append(summarize_attempt("Document ID", by_id))
+01345:     if by_id.get("ok") and by_id.get("matches_found", 0) > 0:
+01346:         return build_find_doc_success_payload(
+01347:             query=query,
+01348:             matched_by="Document ID",
+01349:             result=by_id,
+01350:             attempts=attempts,
+01351:         )
+01352: 
+01353:     by_name = run_docs_agent_with_retry(
+01354:         [
+01355:             "find-row-by-column",
+01356:             MASTER_INDEX_ID,
+
+=== find-row-by-link-fragment @ line 1303 ===
+01283:     )
+01284:     print_json(payload)
+01285: 
+01286: 
+01287: def cmd_find_doc_name(value: str) -> None:
+01288:     payload = run_docs_agent_with_retry(
+01289:         [
+01290:             "find-row-by-column",
+01291:             MASTER_INDEX_ID,
+01292:             MASTER_INDEX_SHEET,
+01293:             "Document Name",
+01294:             value,
+01295:         ]
+01296:     )
+01297:     print_json(payload)
+01298: 
+01299: 
+01300: def cmd_find_link(value: str) -> None:
+01301:     payload = run_docs_agent_with_retry(
+01302:         [
+01303:             "find-row-by-link-fragment",
+01304:             MASTER_INDEX_ID,
+01305:             MASTER_INDEX_SHEET,
+01306:             value,
+01307:         ]
+01308:     )
+01309:     print_json(payload)
+01310: 
+01311: 
+01312: def cmd_get_file(file_id: str) -> None:
+01313:     payload = run_docs_agent_with_retry(
+01314:         [
+01315:             "get-file",
+01316:             file_id,
+01317:         ]
+01318:     )
+01319:     print_json(payload)
+01320: 
+01321: 
+01322: def cmd_read_doc(document_id: str) -> None:
+01323:     payload = run_docs_agent_with_retry(
+01324:         [
+01325:             "read-doc",
+01326:             document_id,
+01327:         ]
+01328:     )
+01329:     print_json(payload)
+01330: 
+01331: 
+01332: def _find_doc_any_payload_live_impl(query: str) -> dict:
+01333:     attempts = []
+01334: 
+01335:     by_id = run_docs_agent_with_retry(
+01336:         [
+01337:             "find-row-by-column",
+01338:             MASTER_INDEX_ID,
+01339:             MASTER_INDEX_SHEET,
+01340:             "Document ID",
+01341:             query,
+01342:         ]
+01343:     )
+01344:     attempts.append(summarize_attempt("Document ID", by_id))
+01345:     if by_id.get("ok") and by_id.get("matches_found", 0) > 0:
+01346:         return build_find_doc_success_payload(
+01347:             query=query,
+01348:             matched_by="Document ID",
+01349:             result=by_id,
+01350:             attempts=attempts,
+01351:         )
+01352: 
+01353:     by_name = run_docs_agent_with_retry(
+01354:         [
+01355:             "find-row-by-column",
+01356:             MASTER_INDEX_ID,
+01357:             MASTER_INDEX_SHEET,
+01358:             "Document Name",
+01359:             query,
+01360:         ]
+01361:     )
+01362:     attempts.append(summarize_attempt("Document Name", by_name))
+01363:     if by_name.get("ok") and by_name.get("matches_found", 0) > 0:
+01364:         return build_find_doc_success_payload(
+01365:             query=query,
+01366:             matched_by="Document Name",
+01367:             result=by_name,
+01368:             attempts=attempts,
+01369:         )
+01370: 
+01371:     by_link = run_docs_agent_with_retry(
+01372:         [
+01373:             "find-row-by-link-fragment",
+01374:             MASTER_INDEX_ID,
+01375:             MASTER_INDEX_SHEET,
+01376:             query,
+01377:         ]
+01378:     )
+01379:     attempts.append(summarize_attempt("Link fragment", by_link))
+01380:     if by_link.get("ok") and by_link.get("matches_found", 0) > 0:
+01381:         return build_find_doc_success_payload(
+01382:             query=query,
+

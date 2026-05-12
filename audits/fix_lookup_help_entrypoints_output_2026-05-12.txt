@@ -1,0 +1,115 @@
+==== find-doc-id help ====
+{
+  "ok": false,
+  "command": "subprocess",
+  "error_type": "JSONDecodeError",
+  "error_message": "Failed to parse JSON output from docs_agent.py.",
+  "retryable": false,
+  "auth_related": false,
+  "network_related": false,
+  "_debug": {
+    "returncode": 0,
+    "stderr": "",
+    "stdout_preview": "Usage: docs_agent.py find-row-by-column [OPTIONS] SPREADSHEET_ID SHEET_NAME    \n                                         COLUMN_NAME MATCH_VALUE                \n                                                                                \n Find rows by exact column value match.                                         \n                                                                                \n╭─ Arguments ──────────────────────────────────────────────────────────────────╮\n│ *    spreadsheet_id      TEXT  [required]                                    │\n│ *    sheet_name          TEXT  [required]                                    │\n│ *    column_name         TEXT  [required]                                    │\n│ *    match_value         TEXT  [required]                                    │\n╰──────────────────────────────────────────────────────────────────────────────╯\n╭─ Options ────────────────────────────────────────────────────────────────────╮\n│ --header-row               ",
+    "cmd": [
+      "/Users/zuevvladimir/AI/docs-agent/venv312/bin/python",
+      "/Users/zuevvladimir/AI/docs-agent/docs_agent.py",
+      "find-row-by-column",
+      "1hyWNNzsIHRLGJ65urOQUA0x_kOqCP61OkXcM3MMyedw",
+      "MASTER_INDEX",
+      "Document ID",
+      "--help",
+      "--json-output"
+    ],
+    "timeout_sec": 60
+  },
+  "_retry": {
+    "used": false,
+    "attempt_count": 1,
+    "attempts": [
+      {
+        "attempt": 1,
+        "ok": false,
+        "error_type": "JSONDecodeError",
+        "error_message": "Failed to parse JSON output from docs_agent.py."
+      }
+    ]
+  }
+}
+
+==== find-doc-name help ====
+{
+  "ok": false,
+  "command": "subprocess",
+  "error_type": "JSONDecodeError",
+  "error_message": "Failed to parse JSON output from docs_agent.py.",
+  "retryable": false,
+  "auth_related": false,
+  "network_related": false,
+  "_debug": {
+    "returncode": 0,
+    "stderr": "",
+    "stdout_preview": "Usage: docs_agent.py find-row-by-column [OPTIONS] SPREADSHEET_ID SHEET_NAME    \n                                         COLUMN_NAME MATCH_VALUE                \n                                                                                \n Find rows by exact column value match.                                         \n                                                                                \n╭─ Arguments ──────────────────────────────────────────────────────────────────╮\n│ *    spreadsheet_id      TEXT  [required]                                    │\n│ *    sheet_name          TEXT  [required]                                    │\n│ *    column_name         TEXT  [required]                                    │\n│ *    match_value         TEXT  [required]                                    │\n╰──────────────────────────────────────────────────────────────────────────────╯\n╭─ Options ────────────────────────────────────────────────────────────────────╮\n│ --header-row               ",
+    "cmd": [
+      "/Users/zuevvladimir/AI/docs-agent/venv312/bin/python",
+      "/Users/zuevvladimir/AI/docs-agent/docs_agent.py",
+      "find-row-by-column",
+      "1hyWNNzsIHRLGJ65urOQUA0x_kOqCP61OkXcM3MMyedw",
+      "MASTER_INDEX",
+      "Document Name",
+      "--help",
+      "--json-output"
+    ],
+    "timeout_sec": 60
+  },
+  "_retry": {
+    "used": false,
+    "attempt_count": 1,
+    "attempts": [
+      {
+        "attempt": 1,
+        "ok": false,
+        "error_type": "JSONDecodeError",
+        "error_message": "Failed to parse JSON output from docs_agent.py."
+      }
+    ]
+  }
+}
+
+==== find-link help ====
+{
+  "ok": false,
+  "command": "subprocess",
+  "error_type": "JSONDecodeError",
+  "error_message": "Failed to parse JSON output from docs_agent.py.",
+  "retryable": false,
+  "auth_related": false,
+  "network_related": false,
+  "_debug": {
+    "returncode": 0,
+    "stderr": "",
+    "stdout_preview": "Usage: docs_agent.py find-row-by-link-fragment [OPTIONS] SPREADSHEET_ID        \n                                                SHEET_NAME FRAGMENT             \n                                                                                \n Find rows where link column contains a fragment, e.g. Drive file ID.           \n                                                                                \n╭─ Arguments ──────────────────────────────────────────────────────────────────╮\n│ *    spreadsheet_id      TEXT  [required]                                    │\n│ *    sheet_name          TEXT  [required]                                    │\n│ *    fragment            TEXT  [required]                                    │\n╰──────────────────────────────────────────────────────────────────────────────╯\n╭─ Options ────────────────────────────────────────────────────────────────────╮\n│ --link-column                        TEXT     [default: Link]                │\n│ --header-row               ",
+    "cmd": [
+      "/Users/zuevvladimir/AI/docs-agent/venv312/bin/python",
+      "/Users/zuevvladimir/AI/docs-agent/docs_agent.py",
+      "find-row-by-link-fragment",
+      "1hyWNNzsIHRLGJ65urOQUA0x_kOqCP61OkXcM3MMyedw",
+      "MASTER_INDEX",
+      "--help",
+      "--json-output"
+    ],
+    "timeout_sec": 60
+  },
+  "_retry": {
+    "used": false,
+    "attempt_count": 1,
+    "attempts": [
+      {
+        "attempt": 1,
+        "ok": false,
+        "error_type": "JSONDecodeError",
+        "error_message": "Failed to parse JSON output from docs_agent.py."
+      }
+    ]
+  }
+}
