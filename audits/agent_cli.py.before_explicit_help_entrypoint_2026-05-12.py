@@ -2570,10 +2570,6 @@ def main() -> int:
     cmd = sys.argv[1]
     argv = sys.argv[2:]
 
-    if cmd in {"--help", "-h"}:
-        usage()
-        return 0
-
     try:
         if cmd == "status":
             json_output, args = parse_json_flag(argv)

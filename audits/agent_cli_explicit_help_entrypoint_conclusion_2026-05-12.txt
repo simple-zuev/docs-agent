@@ -1,0 +1,25 @@
+agent_cli explicit help entrypoint conclusion
+
+Scope
+- narrow clean refactor
+- target file: agent_cli.py
+- no command-surface redesign
+
+Applied change
+- added explicit first-class handling for:
+  - --help
+  - -h
+
+Behavioral result
+- both explicit help entrypoints now print existing usage()
+- both return success instead of routing to unknown-command usage error path
+
+Verification
+- explicit --help output captured
+- explicit -h output captured
+- py_compile passed
+
+Non-goals preserved
+- usage text unchanged
+- no other command dispatch behavior changed
+- duplicate doctor/diagnose residue not touched in this iteration

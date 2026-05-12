@@ -1,0 +1,39 @@
+agent_cli explicit help entrypoint review
+file: /Users/zuevvladimir/AI/docs-agent/agent_cli.py
+
+2550:         "  python agent_cli.py doctor --json\n"
+2551:     )
+2552: 
+2553: 
+2554: def run_query_handler(argv: list[str], handler) -> int:
+2555:     json_output, args = parse_json_flag(argv)
+2556:     if not args:
+2557:         usage()
+2558:         return 1
+2559: 
+2560:     value = " ".join(args)
+2561:     handler(value, json_output=json_output)
+2562:     return 0
+2563: 
+2564: 
+2565: def main() -> int:
+2566:     if len(sys.argv) < 2:
+2567:         print_usage_error("Missing command.")
+2568:         return EXIT_USAGE_ERROR
+2569: 
+2570:     cmd = sys.argv[1]
+2571:     argv = sys.argv[2:]
+2572: 
+2573:     try:
+2574:         if cmd == "status":
+2575:             json_output, args = parse_json_flag(argv)
+2576:             if args:
+2577:                 print_usage_error("status does not accept positional arguments.")
+2578:                 return EXIT_USAGE_ERROR
+2579:             return cmd_status(json_output=json_output)
+2580: 
+2581:         if cmd in {"repo-state", "rs"}:
+2582:             json_output, args = parse_json_flag(argv)
+2583:             if args:
+2584:                 print_usage_error("repo-state does not accept positional arguments.")
+2585:                 return EXIT_USAGE_ERROR
