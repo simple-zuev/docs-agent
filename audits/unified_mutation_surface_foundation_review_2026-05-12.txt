@@ -1,0 +1,32 @@
+Unified mutation surface foundation review
+Date: 2026-05-12
+
+Changed file
+- agent_cli.py
+
+What changed
+- added foundation helper `emit_mutation_result(payload, json_output=False)`
+- added foundation builder `build_mutation_envelope(...)`
+- migrated `artifact-state` payload assembly to `build_mutation_envelope(...)`
+
+Why
+- establish one bounded output contract entrypoint for future mutation routes
+- establish one bounded payload shape for future mutation-capable routes
+- validate the first narrow consumer migration on a non-destructive review-oriented route
+
+Foundation contract fields
+- command
+- ok
+- dry_run
+- safety
+- next_step
+- error_message
+
+Migrated route
+- artifact-state
+
+Scope control
+- no new CLI route added
+- no destructive capability added
+- only one bounded route payload was migrated in this iteration
+- behavior intent remains unchanged for current command surface

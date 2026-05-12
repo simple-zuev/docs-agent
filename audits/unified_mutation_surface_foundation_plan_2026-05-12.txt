@@ -1,0 +1,27 @@
+Unified mutation surface foundation plan
+Date: 2026-05-12
+
+Goal
+- introduce one disciplined mutation orchestration surface for bounded Google Drive / Docs write operations
+
+Target scope
+- narrow refactor only
+- no new destructive capabilities
+- no repo-wide cleanup
+
+Foundation objectives
+- centralize write entrypoints behind one module/helper contract
+- unify result/error envelope shape
+- unify dry-run handling contract
+- unify safety preflight hook placement
+- prepare safe routing for:
+  - create draft doc
+  - create staging copy
+  - move file
+  - append log
+  - safe replace text
+
+Non-goals
+- no delete support
+- no unrestricted overwrite support
+- no broad documentation sweep in this iteration
