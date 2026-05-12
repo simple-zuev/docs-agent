@@ -1,0 +1,13 @@
+Scope
+- audit-only review of the minimum mutation contour
+- commands reviewed: artifact-state, doc-body-only
+- no production code changes
+
+Review goals
+- verify live command presence
+- verify help and usage behavior
+- inspect mutation-result and envelope-related code paths
+- determine whether a narrow write-capable contour is already locally actionable
+
+Preliminary conclusion
+- fill after artifact review

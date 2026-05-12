@@ -1,0 +1,13 @@
+Minimal mutation contour audit inventory
+
+Scope
+- audit-only review of the minimum mutation contour for early ChatGPT-agent usefulness
+
+Commands under review
+- artifact-state
+- doc-body-only
+
+Why this scope
+- read/help/navigation surfaces have been partially stabilized
+- document-access runtime appears dependent on deeper or external integrations
+- the next practical question is whether a bounded write-capable contour is already locally actionable

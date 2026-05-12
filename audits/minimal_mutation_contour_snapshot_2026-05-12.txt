@@ -1,0 +1,20 @@
+839:    print(f"safe_for_mutation: {payload.get('safe_for_mutation')}")
+2081:        "draft-doc" if len(unresolved_sources) == 0 else "doc-body-only"
+2100:            "Use draft-doc when all critical sources are resolved; otherwise prefer doc-body-only and avoid direct mutation."
+2191:        "Документ подготовлен в режиме doc-body-only.",
+2250:        "Body is generated without direct mutation.",
+2257:        "command": "doc-body-only",
+2284:            command="artifact-state",
+2325:        review_status = "Not for direct mutation"
+2350:        "command": "artifact-state",
+2407:def cmd_doc_body_only(
+2431:def cmd_artifact_state(file_id: str, json_output: bool = False) -> int:
+2528:        "  python agent_cli.py doc-body-only [--json] --profile <profile> --document-type <type> --title <title>\n"
+2529:        "  python agent_cli.py artifact-state [--json] --file-id <google_drive_file_id>\n"
+2616:        if cmd == "doc-body-only":
+2620:                    "doc-body-only requires: --profile <profile> --document-type <type> --title <title>"
+2629:                    "doc-body-only requires: --profile <profile> --document-type <type> --title <title>"
+2632:            return cmd_doc_body_only(
+2639:        if cmd == "artifact-state":
+2643:                    "artifact-state requires: --file-id <google_drive_file_id>"
+2646:            return cmd_artifact_state(args[1], json_output=json_output)
