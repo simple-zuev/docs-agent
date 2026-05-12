@@ -1,0 +1,22 @@
+Scope
+- narrow refactor
+- migrate only doc-body-only bounded route to build_mutation_envelope(...)
+- no destructive capability expansion
+- no repo-wide cleanup
+
+Why this route
+- adjacent to draft/review workflow
+- bounded non-destructive content-generation surface
+- already present as a concrete payload route in agent_cli.py
+
+What changed
+- doc-body-only payload assembly now uses build_mutation_envelope(...)
+- nested context_snapshot dictionary remains a plain nested dict within the envelope call
+- helper contract remains centralized
+- broader command surface unchanged
+
+Verification
+- py_compile green
+- ruff green
+- ruff-format check green
+- narrow diff reviewed

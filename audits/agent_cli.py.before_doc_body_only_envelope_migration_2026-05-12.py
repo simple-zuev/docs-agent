@@ -2252,13 +2252,13 @@ def doc_body_only_payload(profile: str, document_type: str, title: str) -> dict:
         "Further review is required before canonical or review-draft update.",
     ]
 
-    return build_mutation_envelope(
-        command="doc-body-only",
-        ok=True,
-        profile=profile,
-        document_type=document_type,
-        title=title,
-        context_snapshot={
+    return {
+        "ok": True,
+        "command": "doc-body-only",
+        "profile": profile,
+        "document_type": document_type,
+        "title": title,
+        "context_snapshot": {
             "resolved_count": (context_payload.get("context_summary") or {}).get(
                 "resolved_count"
             ),
@@ -2269,12 +2269,12 @@ def doc_body_only_payload(profile: str, document_type: str, title: str) -> dict:
                 "partial_context"
             ),
         },
-        outline=outline,
-        body=body,
-        assumptions=assumptions,
-        unresolved_dependencies=unresolved_dependencies,
-        next_safe_step="Create or select a draft document in review scope and use controlled write workflow to place this body.",
-    )
+        "outline": outline,
+        "body": body,
+        "assumptions": assumptions,
+        "unresolved_dependencies": unresolved_dependencies,
+        "next_safe_step": "Create or select a draft document in review scope and use controlled write workflow to place this body.",
+    }
 
 
 def artifact_state_payload(file_id: str) -> dict:
