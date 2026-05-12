@@ -1,0 +1,18 @@
+Audit scope
+- select the next bounded surface after the exhausted file-operation line
+- focus only on master-index row mutation paths
+- avoid capability expansion
+- prefer one existing bounded function only
+
+Candidate preference order
+1. docs_agent_v2.py::append_master_index_row()
+2. docs_agent_v2.py::update_master_index_row()
+
+Decision rule
+- choose exactly one next candidate
+- prefer the less stateful and lower-risk row mutation path first
+- prefer parity-only or output-only implementation potential
+- reject any step that would require multi-route migration or broader helper rollout
+
+Expected safe outcome
+- determine whether append_master_index_row() is the next narrow implementation candidate before any change to update_master_index_row()

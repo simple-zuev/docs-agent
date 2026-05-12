@@ -1,0 +1,9 @@
+==== master-index bounded surface audit after exhausted file-operation line ====
+
+==== docs_agent_v2 candidate defs ====
+1204:def append_master_index_row(
+1256:def update_master_index_row(
+
+==== docs_agent reference defs ====
+1697:def append_master_index_row(
+1749:def update_master_index_row(

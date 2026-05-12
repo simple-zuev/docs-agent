@@ -1,0 +1,342 @@
+==== master-index bounded surface snapshot ====
+
+==== docs_agent_v2 master-index section ====
+        )
+
+
+@app.command("append-master-index-row")
+def append_master_index_row(
+    spreadsheet_id: str,
+    sheet_name: str,
+    payload_json: str,
+):
+    """Append one row into Master Index-like sheet using header names from JSON payload."""
+    ensure_write_allowed(
+        "append-master-index-row", target=f"{spreadsheet_id}/{sheet_name}"
+    )
+    ensure_master_index_write_allowed()
+    s = services()
+    sheets = s["sheets"]
+
+    payload = json.loads(payload_json)
+    if not isinstance(payload, dict):
+        raise typer.BadParameter("payload_json must be a JSON object")
+
+    header, mapping = get_sheet_header_map(
+        sheets, spreadsheet_id, sheet_name, header_row=1
+    )
+    row = [""] * len(header)
+
+    unknown = [k for k in payload.keys() if k not in mapping]
+    if unknown:
+        raise RuntimeError(f"Unknown columns in payload: {unknown}")
+
+    for key, value in payload.items():
+        row[mapping[key] - 1] = "" if value is None else str(value)
+
+    result = (
+        sheets.spreadsheets()
+        .values()
+        .append(
+            spreadsheetId=spreadsheet_id,
+            range=f"'{sheet_name}'!A:ZZ",
+            valueInputOption="USER_ENTERED",
+            insertDataOption="INSERT_ROWS",
+            body={"values": [row]},
+        )
+        .execute()
+    )
+
+    print("APPEND MASTER INDEX ROW OK")
+    print(f"Spreadsheet ID: {spreadsheet_id}")
+    print(f"Sheet: {sheet_name}")
+    print("Payload:")
+    print(json.dumps(payload, ensure_ascii=False, indent=2))
+    print(f"Updated range: {result.get('updates', {}).get('updatedRange')}")
+    print(f"Updated rows: {result.get('updates', {}).get('updatedRows')}")
+
+
+@app.command("update-master-index-row")
+def update_master_index_row(
+    spreadsheet_id: str,
+    sheet_name: str,
+    match_column: str,
+    match_value: str,
+    payload_json: str,
+):
+    """Update exactly one row in Master Index-like sheet by matching one column."""
+    ensure_write_allowed(
+        "update-master-index-row", target=f"{spreadsheet_id}/{sheet_name}"
+    )
+    ensure_master_index_write_allowed()
+    s = services()
+    sheets = s["sheets"]
+
+    payload = json.loads(payload_json)
+    if not isinstance(payload, dict):
+        raise typer.BadParameter("payload_json must be a JSON object")
+
+    rows = get_sheet_rows(sheets, spreadsheet_id, sheet_name)
+    header, mapping = get_sheet_header_map(
+        sheets, spreadsheet_id, sheet_name, header_row=1
+    )
+
+    matches = find_rows_by_column(
+        rows=rows,
+        header_map=mapping,
+        column_name=match_column,
+        match_value=match_value,
+        header_row=1,
+    )
+
+    if len(matches) == 0:
+        raise RuntimeError(f"No rows found for {match_column}={match_value}")
+
+    if len(matches) > 1:
+        raise RuntimeError(
+            f"More than one row found for {match_column}={match_value}: {len(matches)}"
+        )
+
+    target = matches[0]
+    row_num = target["row_number"]
+    current_row = pad_row(target["row_values"], len(header))
+
+    unknown = [k for k in payload.keys() if k not in mapping]
+    if unknown:
+        raise RuntimeError(f"Unknown columns in payload: {unknown}")
+
+    new_row = list(current_row)
+    for key, value in payload.items():
+        new_row[mapping[key] - 1] = "" if value is None else str(value)
+
+    end_col = col_to_a1(len(header))
+    target_range = f"'{sheet_name}'!A{row_num}:{end_col}{row_num}"
+
+    result = (
+        sheets.spreadsheets()
+        .values()
+        .update(
+            spreadsheetId=spreadsheet_id,
+            range=target_range,
+            valueInputOption="USER_ENTERED",
+            body={"values": [new_row]},
+        )
+        .execute()
+    )
+
+    print("UPDATE MASTER INDEX ROW OK")
+    print(f"Spreadsheet ID: {spreadsheet_id}")
+    print(f"Sheet: {sheet_name}")
+    print(f"Match column: {match_column}")
+    print(f"Match value: {match_value}")
+    print(f"Row number: {row_num}")
+    print("")
+    print("Old row:")
+    print(json.dumps(current_row, ensure_ascii=False, indent=2))
+    print("")
+    print("Patch payload:")
+    print(json.dumps(payload, ensure_ascii=False, indent=2))
+    print("")
+    print("New row:")
+    print(json.dumps(new_row, ensure_ascii=False, indent=2))
+    print("")
+    print(f"Updated range: {result.get('updatedRange')}")
+    print(f"Updated cells: {result.get('updatedCells')}")
+
+
+@app.command("find-row-by-link-fragment")
+def find_row_by_link_fragment(
+    spreadsheet_id: str,
+    sheet_name: str,
+    fragment: str,
+    link_column: str = "Link",
+    header_row: int = 1,
+):
+    """Find rows where link column contains a fragment, e.g. Drive file ID."""
+    s = services()
+    sheets = s["sheets"]
+
+    rows = get_sheet_rows(sheets, spreadsheet_id, sheet_name)
+    header, mapping = get_sheet_header_map(
+        sheets, spreadsheet_id, sheet_name, header_row=header_row
+    )
+
+    matches = find_rows_by_link_fragment(
+        rows=rows,
+        header_map=mapping,
+        fragment=fragment,
+        link_column=link_column,
+        header_row=header_row,
+
+==== docs_agent master-index section ====
+
+        emit_output(json_output, payload, human_lines=human_lines)
+    except Exception as exc:
+        emit_error(json_output, "find-row-by-column", exc)
+
+
+@app.command("append-master-index-row")
+def append_master_index_row(
+    spreadsheet_id: str,
+    sheet_name: str,
+    payload_json: str,
+):
+    """Append one row into Master Index-like sheet using header names from JSON payload."""
+    ensure_write_allowed(
+        "append-master-index-row", target=f"{spreadsheet_id}/{sheet_name}"
+    )
+    ensure_master_index_write_allowed()
+    s = services()
+    sheets = s["sheets"]
+
+    payload = json.loads(payload_json)
+    if not isinstance(payload, dict):
+        raise typer.BadParameter("payload_json must be a JSON object")
+
+    header, mapping = get_sheet_header_map(
+        sheets, spreadsheet_id, sheet_name, header_row=1
+    )
+    row = [""] * len(header)
+
+    unknown = [k for k in payload.keys() if k not in mapping]
+    if unknown:
+        raise RuntimeError(f"Unknown columns in payload: {unknown}")
+
+    for key, value in payload.items():
+        row[mapping[key] - 1] = "" if value is None else str(value)
+
+    result = (
+        sheets.spreadsheets()
+        .values()
+        .append(
+            spreadsheetId=spreadsheet_id,
+            range=f"'{sheet_name}'!A:ZZ",
+            valueInputOption="USER_ENTERED",
+            insertDataOption="INSERT_ROWS",
+            body={"values": [row]},
+        )
+        .execute()
+    )
+
+    print("APPEND MASTER INDEX ROW OK")
+    print(f"Spreadsheet ID: {spreadsheet_id}")
+    print(f"Sheet: {sheet_name}")
+    print("Payload:")
+    print(json.dumps(payload, ensure_ascii=False, indent=2))
+    print(f"Updated range: {result.get('updates', {}).get('updatedRange')}")
+    print(f"Updated rows: {result.get('updates', {}).get('updatedRows')}")
+
+
+@app.command("update-master-index-row")
+def update_master_index_row(
+    spreadsheet_id: str,
+    sheet_name: str,
+    match_column: str,
+    match_value: str,
+    payload_json: str,
+):
+    """Update exactly one row in Master Index-like sheet by matching one column."""
+    ensure_write_allowed(
+        "update-master-index-row", target=f"{spreadsheet_id}/{sheet_name}"
+    )
+    ensure_master_index_write_allowed()
+    s = services()
+    sheets = s["sheets"]
+
+    payload = json.loads(payload_json)
+    if not isinstance(payload, dict):
+        raise typer.BadParameter("payload_json must be a JSON object")
+
+    rows = get_sheet_rows(sheets, spreadsheet_id, sheet_name)
+    header, mapping = get_sheet_header_map(
+        sheets, spreadsheet_id, sheet_name, header_row=1
+    )
+
+    matches = find_rows_by_column(
+        rows=rows,
+        header_map=mapping,
+        column_name=match_column,
+        match_value=match_value,
+        header_row=1,
+    )
+
+    if len(matches) == 0:
+        raise RuntimeError(f"No rows found for {match_column}={match_value}")
+
+    if len(matches) > 1:
+        raise RuntimeError(
+            f"More than one row found for {match_column}={match_value}: {len(matches)}"
+        )
+
+    target = matches[0]
+    row_num = target["row_number"]
+    current_row = pad_row(target["row_values"], len(header))
+
+    unknown = [k for k in payload.keys() if k not in mapping]
+    if unknown:
+        raise RuntimeError(f"Unknown columns in payload: {unknown}")
+
+    new_row = list(current_row)
+    for key, value in payload.items():
+        new_row[mapping[key] - 1] = "" if value is None else str(value)
+
+    end_col = col_to_a1(len(header))
+    target_range = f"'{sheet_name}'!A{row_num}:{end_col}{row_num}"
+
+    result = (
+        sheets.spreadsheets()
+        .values()
+        .update(
+            spreadsheetId=spreadsheet_id,
+            range=target_range,
+            valueInputOption="USER_ENTERED",
+            body={"values": [new_row]},
+        )
+        .execute()
+    )
+
+    print("UPDATE MASTER INDEX ROW OK")
+    print(f"Spreadsheet ID: {spreadsheet_id}")
+    print(f"Sheet: {sheet_name}")
+    print(f"Match column: {match_column}")
+    print(f"Match value: {match_value}")
+    print(f"Row number: {row_num}")
+    print("")
+    print("Old row:")
+    print(json.dumps(current_row, ensure_ascii=False, indent=2))
+    print("")
+    print("Patch payload:")
+    print(json.dumps(payload, ensure_ascii=False, indent=2))
+    print("")
+    print("New row:")
+    print(json.dumps(new_row, ensure_ascii=False, indent=2))
+    print("")
+    print(f"Updated range: {result.get('updatedRange')}")
+    print(f"Updated cells: {result.get('updatedCells')}")
+
+
+@app.command("find-row-by-link-fragment")
+def find_row_by_link_fragment(
+    spreadsheet_id: str,
+    sheet_name: str,
+    fragment: str,
+    link_column: str = "Link",
+    header_row: int = 1,
+    json_output: bool = False,
+):
+    """Find rows where link column contains a fragment, e.g. Drive file ID."""
+    try:
+        s = services()
+        sheets = s["sheets"]
+
+        rows = get_sheet_rows(sheets, spreadsheet_id, sheet_name)
+        header, mapping = get_sheet_header_map(
+            sheets, spreadsheet_id, sheet_name, header_row=header_row
+        )
+
+        matches = find_rows_by_link_fragment(
+            rows=rows,
+            header_map=mapping,
+            fragment=fragment,
+            link_column=link_column,
+            header_row=header_row,
