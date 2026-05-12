@@ -60,6 +60,78 @@ def get_write_services() -> dict[str, Any]:
         )
 
 
+def create_staging_copy_writeonly(
+    *,
+    file_id: str,
+    target_folder: str = "13_Черновики_и_review",
+) -> dict[str, Any]:
+    services_payload = get_write_services()
+    if not services_payload.get("ok"):
+        return services_payload
+
+    try:
+        drive = services_payload["services"]["drive"]
+
+        cass = docs_agent.find_folder(drive, "Cass")
+        target = docs_agent.find_folder(drive, target_folder, cass["id"])
+        source = docs_agent.get_file_meta(drive, file_id)
+
+        copy_name = f"STAGING_COPY__{source['name']}__{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+
+        copied = (
+            drive.files()
+            .copy(
+                fileId=file_id,
+                body={
+                    "name": copy_name,
+                    "parents": [target["id"]],
+                },
+                fields="id,name,webViewLink,parents",
+                supportsAllDrives=True,
+            )
+            .execute()
+        )
+
+        log_payload = append_change_log_entry(
+            action="Copy",
+            obj=copy_name,
+            from_=source.get("webViewLink", file_id),
+            to=f"Cass / {target_folder}",
+            reason="Создание staging-копии для безопасного редактирования без изменения canonical-документа",
+            impact="Low",
+            status="Done",
+            notes=f"Source: {source['name']} | Copy URL: {copied.get('webViewLink')}",
+        )
+        if not log_payload.get("ok"):
+            return log_payload
+
+        return _ok(
+            "create-staging-copy-writeonly",
+            file_id=file_id,
+            target_folder=target_folder,
+            source=source,
+            copied=copied,
+            copy_name=copy_name,
+            change_log=log_payload,
+        )
+    except Exception as exc:
+        error_type, retryable, auth_related, network_related = (
+            docs_agent.classify_error(exc)
+        )
+        return _error(
+            "create-staging-copy-writeonly",
+            error_type,
+            str(exc),
+            retryable=retryable,
+            auth_related=auth_related,
+            network_related=network_related,
+            details={
+                "file_id": file_id,
+                "target_folder": target_folder,
+            },
+        )
+
+
 def append_change_log_entry(
     *,
     action: str,
