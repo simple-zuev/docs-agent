@@ -1,0 +1,24 @@
+Agent-assisted mode final note
+
+Current practical status
+- assisted bounded mode is usable now
+- navigation / lookup / state inspection contour is ready for practical use
+- bounded mutation-preparation contour is available through artifact-state and doc-body-only
+- document-access runtime remains degraded and should not be treated as baseline
+
+Confirmed agent-facing improvements
+- lookup help entrypoints stabilized
+- read help entrypoints stabilized
+- document-access help entrypoints stabilized
+- mutation help entrypoints stabilized
+- find-doc-any / alias f help entrypoints stabilized
+
+Operational recommendation
+- begin or continue ChatGPT-assisted bounded use now
+- keep document-reading-dependent flows out of the default path
+- continue later hardening only where there is clear practical value
+
+Follow-on hardening themes
+1. mutation result / output contract alignment
+2. document-access runtime stabilization
+3. explicit external operating prompt / integration layer for the local ChatGPT setup
