@@ -2301,9 +2301,18 @@ def artifact_state_payload(file_id: str) -> dict:
         (cmd_status_payload().get("safety") or {}).get("default_test_folder")
     ) or ""
 
+    review_folder_id = "1rZtuXOyThzFf_LFWaD4w5nHwuXCDIHQh"
+    office_folder_id = "1I8xbFY0sjdS4bVPICr4pOg7qkTftgHBv"
+
+    in_review_scope = review_folder_id in parents
+    in_default_test_scope = office_folder_id in parents
+
     placement = {
         "parents": parents,
-        "known_review_scope": "13_Черновики_и_review" in name or False,
+        "review_folder_id": review_folder_id,
+        "office_folder_id": office_folder_id,
+        "review_scope_by_parent_id": in_review_scope,
+        "default_test_scope_by_parent_id": in_default_test_scope,
         "default_test_folder": default_test_folder,
     }
 
@@ -2311,18 +2320,30 @@ def artifact_state_payload(file_id: str) -> dict:
     review_status = "Needs classification"
     next_safe_step = "Review artifact placement and classify before write actions."
 
-    if name.startswith("STAGING_COPY__"):
-        artifact_state = "Pending review"
-        review_status = "Review required"
-        next_safe_step = "Inspect staging artifact and decide whether body placement or review note is needed."
-    elif name.startswith("BACKUP_BEFORE_REPLACE__"):
+    if name.startswith("BACKUP_BEFORE_REPLACE__"):
         artifact_state = "Historical reference"
         review_status = "Not for direct mutation"
         next_safe_step = "Use as backup/reference only."
-    elif name:
+    elif name.startswith("STAGING_COPY__"):
+        artifact_state = "Pending review"
+        review_status = "Review required"
+        next_safe_step = "Inspect staging artifact and decide whether body placement or review note is needed."
+    elif in_review_scope:
         artifact_state = "Draft"
-        review_status = "Working draft or unclassified working artifact"
-        next_safe_step = "Validate target scope before bounded write."
+        review_status = "In review scope"
+        next_safe_step = (
+            "Safe candidate for bounded draft workflow after target validation."
+        )
+    elif in_default_test_scope:
+        artifact_state = "Draft"
+        review_status = "In default test scope"
+        next_safe_step = "Validate whether this artifact should stay test-only or move into review workflow."
+    elif name:
+        artifact_state = "Canonical or non-review artifact"
+        review_status = "Outside review scope"
+        next_safe_step = (
+            "Avoid bounded write until artifact scope is explicitly validated."
+        )
 
     return {
         "ok": True,
