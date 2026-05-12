@@ -1,0 +1,193 @@
+Top-level Python files:
+- agent_cli.py
+- append_change_log_test.py
+- auth_and_scan.py
+- cass_audit.py
+- doc_text_mutation.py
+- docs_agent.py
+- docs_agent_v2.py
+- drive_api.py
+- drive_write_api.py
+- repo_state.py
+- runtime_config.py
+- write_test.py
+- write_test_in_cass.py
+
+Candidate files by filename:
+- agent_cli.py
+- doc_text_mutation.py
+- docs_agent.py
+- docs_agent_v2.py
+- drive_write_api.py
+- write_test.py
+- write_test_in_cass.py
+
+FILE: agent_cli.py
+  Matching defs:
+    - print_json
+    - doc_body_only_outline
+    - build_doc_body_only_body
+    - doc_body_only_payload
+    - artifact_state_payload
+    - cmd_doc_body_only
+    - cmd_artifact_state
+    - parse_json_flag
+  Signal counts:
+    - emit_json: 0
+    - dry_run: 5
+    - mutation: 5
+    - envelope: 0
+    - artifact: 32
+    - idempot: 0
+    - status: 83
+    - updated: 0
+    - created: 0
+
+FILE: append_change_log_test.py
+  Signal counts:
+    - emit_json: 0
+    - dry_run: 0
+    - mutation: 0
+    - envelope: 0
+    - artifact: 0
+    - idempot: 0
+    - status: 0
+    - updated: 2
+    - created: 0
+
+FILE: cass_audit.py
+  Signal counts:
+    - emit_json: 0
+    - dry_run: 0
+    - mutation: 0
+    - envelope: 0
+    - artifact: 0
+    - idempot: 0
+    - status: 2
+    - updated: 0
+    - created: 2
+
+FILE: doc_text_mutation.py
+  Matching defs:
+    - replace_all_text
+    - insert_text_at_index
+  Signal counts:
+    - emit_json: 0
+    - dry_run: 0
+    - mutation: 0
+    - envelope: 0
+    - artifact: 0
+    - idempot: 0
+    - status: 0
+    - updated: 0
+    - created: 0
+
+FILE: docs_agent.py
+  Matching defs:
+    - ensure_master_index_write_allowed
+    - normalize_jsonable
+    - emit_json
+    - emit_output
+    - emit_error
+    - create_draft_doc
+    - append_review_note
+    - write_draft_doc
+    - replace_doc_text
+    - replace_doc_text_safe
+    - update_master_index_row
+  Signal counts:
+    - emit_json: 3
+    - dry_run: 39
+    - mutation: 1
+    - envelope: 0
+    - artifact: 4
+    - idempot: 0
+    - status: 24
+    - updated: 42
+    - created: 29
+
+FILE: docs_agent_v2.py
+  Matching defs:
+    - ensure_master_index_write_allowed
+    - replace_doc_text
+    - replace_doc_text_safe
+    - update_master_index_row
+  Signal counts:
+    - emit_json: 0
+    - dry_run: 27
+    - mutation: 1
+    - envelope: 0
+    - artifact: 0
+    - idempot: 0
+    - status: 14
+    - updated: 36
+    - created: 23
+
+FILE: drive_write_api.py
+  Matching defs:
+    - get_write_services
+    - create_staging_copy_writeonly
+    - create_doc_in_folder_writeonly
+    - move_file_with_log_writeonly
+  Signal counts:
+    - emit_json: 0
+    - dry_run: 0
+    - mutation: 0
+    - envelope: 0
+    - artifact: 0
+    - idempot: 0
+    - status: 9
+    - updated: 10
+    - created: 5
+
+FILE: repo_state.py
+  Signal counts:
+    - emit_json: 0
+    - dry_run: 0
+    - mutation: 6
+    - envelope: 0
+    - artifact: 0
+    - idempot: 0
+    - status: 29
+    - updated: 0
+    - created: 0
+
+FILE: runtime_config.py
+  Matching defs:
+    - ensure_write_allowed
+    - is_write_mode
+  Signal counts:
+    - emit_json: 0
+    - dry_run: 6
+    - mutation: 0
+    - envelope: 0
+    - artifact: 0
+    - idempot: 0
+    - status: 0
+    - updated: 0
+    - created: 0
+
+FILE: write_test.py
+  Signal counts:
+    - emit_json: 0
+    - dry_run: 0
+    - mutation: 0
+    - envelope: 0
+    - artifact: 0
+    - idempot: 0
+    - status: 0
+    - updated: 0
+    - created: 5
+
+FILE: write_test_in_cass.py
+  Signal counts:
+    - emit_json: 0
+    - dry_run: 0
+    - mutation: 0
+    - envelope: 0
+    - artifact: 0
+    - idempot: 0
+    - status: 0
+    - updated: 0
+    - created: 5
+

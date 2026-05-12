@@ -1,0 +1,14 @@
+Audit scope refinement
+- docs_agent_v2.py remains in scope
+- docs_agent_output.py removed from scope because file is not present in repository root
+- portable audit tooling only: find, grep, python3
+
+Decision rule
+- choose only an already existing bounded document mutation path
+- prefer candidate with existing structured/dry-run/status output semantics
+- avoid any new command surface
+- implementation target must be one-file or one-helper narrow diff
+
+Next audit objective
+- identify the nearest real neighboring file to docs_agent_v2.py that already participates in output or document mutation behavior
+- if no such neighboring helper file exists, keep future implementation scoped to docs_agent_v2.py only
