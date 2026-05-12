@@ -1,0 +1,14 @@
+Scope
+- audit-only review of the MVP document-access layer for ChatGPT-agent readiness
+- commands reviewed: read-doc, get-file, read-doc-from-query, r
+- no production code changes
+
+Review goals
+- verify live command presence
+- verify help behavior
+- verify missing-argument behavior
+- verify direct document-access behavior
+- identify the smallest next high-value fix if drift exists
+
+Preliminary conclusion
+- fill after artifact review

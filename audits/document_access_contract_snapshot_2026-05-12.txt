@@ -1,0 +1,37 @@
+787:    print("route: read-doc-from-query")
+1189:        "read-doc ",
+1312:def cmd_get_file(file_id: str) -> None:
+1315:            "get-file",
+1322:def cmd_read_doc(document_id: str) -> None:
+1325:            "read-doc",
+1550:def read_doc_from_query_payload(query: str) -> dict:
+1560:            command="read-doc-from-query",
+1567:    read_result = run_docs_agent_with_retry(["read-doc", google_id])
+1571:        "command": "read-doc-from-query",
+1605:def cmd_read_doc_from_query(query: str, json_output: bool = False) -> int:
+1606:    payload = read_doc_from_query_payload(query)
+1638:            "read-doc",
+1664:    result = read_doc_from_query_payload(lookup_query)
+1665:    return build_ask_result(query, "read-doc-from-query", result)
+1673:    file_result = run_docs_agent_with_retry(["get-file", lookup_query])
+1678:        "routed_to": "get-file",
+1727:    if routed in {"find-doc-any", "get-file"}:
+1759:        if result.get("command") == "get-file":
+1767:    if routed == "read-doc-from-query":
+1807:                next_step = "Проверь stderr/_debug и отдельно запусти docs_agent.py read-doc вручную."
+1815:                next_step = "Проверь _debug и повтори сценарий через status и точечный read-doc вызов."
+1866:        "read-doc-from-query",
+1867:        "read-doc",
+1868:        "get-file",
+1909:        "can_read_docs": True,
+1912:        "can_get_file_meta": True,
+2281:    file_payload = run_docs_agent_with_retry(["get-file", file_id])
+2535:        "  python agent_cli.py read-doc-from-query [--json] <query> | r [--json] <query>\n"
+2536:        "  python agent_cli.py get-file <google_drive_file_id>\n"
+2537:        "  python agent_cli.py read-doc <google_doc_id>\n"
+2676:        if cmd in {"read-doc-from-query", "r"}:
+2678:                argv, cmd_read_doc_from_query, allow_json_flag=True
+2681:        if cmd == "get-file":
+2685:            cmd_get_file(argv[0])
+2688:        if cmd == "read-doc":
+2692:            cmd_read_doc(argv[0])

@@ -1,0 +1,93 @@
+==== help: read-doc ====
+{
+  "ok": false,
+  "command": "subprocess",
+  "error_type": "JSONDecodeError",
+  "error_message": "Failed to parse JSON output from docs_agent.py.",
+  "retryable": false,
+  "auth_related": false,
+  "network_related": false,
+  "_debug": {
+    "returncode": 0,
+    "stderr": "",
+    "stdout_preview": "Usage: docs_agent.py read-doc [OPTIONS] DOCUMENT_ID                            \n                                                                                \n Read Google Doc text content.                                                  \n                                                                                \n╭─ Arguments ──────────────────────────────────────────────────────────────────╮\n│ *    document_id      TEXT  [required]                                       │\n╰──────────────────────────────────────────────────────────────────────────────╯\n╭─ Options ────────────────────────────────────────────────────────────────────╮\n│ --max-chars                          INTEGER  [default: 4000]                │\n│ --json-output    --no-json-output             [default: no-json-output]      │\n│ --help                                        Show this message and exit.    │\n╰──────────────────────────────────────────────────────────────────────────────╯",
+    "cmd": [
+      "/Users/zuevvladimir/AI/docs-agent/venv312/bin/python",
+      "/Users/zuevvladimir/AI/docs-agent/docs_agent.py",
+      "read-doc",
+      "--help",
+      "--json-output"
+    ],
+    "timeout_sec": 60
+  },
+  "_retry": {
+    "used": false,
+    "attempt_count": 1,
+    "attempts": [
+      {
+        "attempt": 1,
+        "ok": false,
+        "error_type": "JSONDecodeError",
+        "error_message": "Failed to parse JSON output from docs_agent.py."
+      }
+    ]
+  }
+}
+
+==== help: get-file ====
+{
+  "ok": false,
+  "command": "subprocess",
+  "error_type": "JSONDecodeError",
+  "error_message": "Failed to parse JSON output from docs_agent.py.",
+  "retryable": false,
+  "auth_related": false,
+  "network_related": false,
+  "_debug": {
+    "returncode": 0,
+    "stderr": "",
+    "stdout_preview": "Usage: docs_agent.py get-file [OPTIONS] FILE_ID                                \n                                                                                \n Read Drive file metadata including parents.                                    \n                                                                                \n╭─ Arguments ──────────────────────────────────────────────────────────────────╮\n│ *    file_id      TEXT  [required]                                           │\n╰──────────────────────────────────────────────────────────────────────────────╯\n╭─ Options ────────────────────────────────────────────────────────────────────╮\n│ --json-output    --no-json-output      [default: no-json-output]             │\n│ --help                                 Show this message and exit.           │\n╰──────────────────────────────────────────────────────────────────────────────╯",
+    "cmd": [
+      "/Users/zuevvladimir/AI/docs-agent/venv312/bin/python",
+      "/Users/zuevvladimir/AI/docs-agent/docs_agent.py",
+      "get-file",
+      "--help",
+      "--json-output"
+    ],
+    "timeout_sec": 60
+  },
+  "_retry": {
+    "used": false,
+    "attempt_count": 1,
+    "attempts": [
+      {
+        "attempt": 1,
+        "ok": false,
+        "error_type": "JSONDecodeError",
+        "error_message": "Failed to parse JSON output from docs_agent.py."
+      }
+    ]
+  }
+}
+
+==== help: read-doc-from-query ====
+{
+  "ok": false,
+  "command": "read-doc-from-query",
+  "error_type": "KeyboardInterrupt",
+  "error_message": "Interrupted by user",
+  "retryable": true,
+  "auth_related": false,
+  "network_related": false
+}
+
+==== help: r ====
+{
+  "ok": false,
+  "command": "r",
+  "error_type": "KeyboardInterrupt",
+  "error_message": "Interrupted by user",
+  "retryable": true,
+  "auth_related": false,
+  "network_related": false
+}

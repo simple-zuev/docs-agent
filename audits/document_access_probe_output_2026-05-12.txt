@@ -1,0 +1,54 @@
+==== document access probes ====
+
+$ python3 /Users/zuevvladimir/AI/docs-agent/agent_cli.py read-doc DOC-0001
+{
+  "ok": false,
+  "command": "read-doc",
+  "error_type": "KeyboardInterrupt",
+  "error_message": "Interrupted by user",
+  "retryable": true,
+  "auth_related": false,
+  "network_related": false
+}
+
+exit_code=130
+
+$ python3 /Users/zuevvladimir/AI/docs-agent/agent_cli.py get-file 1hyWNNzsIHRLGJ65urOQUA0x_kOqCP61OkXcM3MMyedw
+{
+  "ok": false,
+  "command": "get-file",
+  "error_type": "KeyboardInterrupt",
+  "error_message": "Interrupted by user",
+  "retryable": true,
+  "auth_related": false,
+  "network_related": false
+}
+
+exit_code=130
+
+$ python3 /Users/zuevvladimir/AI/docs-agent/agent_cli.py read-doc-from-query DOC-0001
+{
+  "ok": false,
+  "command": "read-doc-from-query",
+  "error_type": "KeyboardInterrupt",
+  "error_message": "Interrupted by user",
+  "retryable": true,
+  "auth_related": false,
+  "network_related": false
+}
+
+exit_code=130
+
+$ python3 /Users/zuevvladimir/AI/docs-agent/agent_cli.py r DOC-0001
+{
+  "ok": false,
+  "command": "r",
+  "error_type": "KeyboardInterrupt",
+  "error_message": "Interrupted by user",
+  "retryable": true,
+  "auth_related": false,
+  "network_related": false
+}
+
+exit_code=130
+

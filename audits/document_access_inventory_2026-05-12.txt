@@ -1,0 +1,17 @@
+Document access audit wave inventory
+
+Scope
+- audit-only review of the MVP document-access layer for ChatGPT-agent readiness
+
+Commands under review
+- read-doc
+- get-file
+- read-doc-from-query
+- alias: r
+
+Goals
+- verify live command presence
+- verify help behavior
+- verify missing-argument behavior
+- verify output and json behavior where applicable
+- identify the next small high-value fix if drift exists
