@@ -1,0 +1,2002 @@
+agent_cli handle_query_command audit snapshot
+
+## definition
+  2486: 
+  2487: 
+> 2488: def handle_query_command(
+  2489:     argv: list[str],
+  2490:     handler,
+
+## call_sites
+  2486: 
+  2487: 
+> 2488: def handle_query_command(
+  2489:     argv: list[str],
+  2490:     handler,
+
+  2630: 
+  2631:         if cmd == "find-doc-name":
+> 2632:             return handle_query_command(argv, cmd_find_doc_name)
+  2633: 
+  2634:         if cmd == "find-link":
+
+  2633: 
+  2634:         if cmd == "find-link":
+> 2635:             return handle_query_command(argv, cmd_find_link)
+  2636: 
+  2637:         if cmd in {"find-doc-any", "f"}:
+
+  2636: 
+  2637:         if cmd in {"find-doc-any", "f"}:
+> 2638:             return handle_query_command(argv, cmd_find_doc_any, allow_json_flag=True)
+  2639: 
+  2640:         if cmd in {"open-doc-from-query", "o"}:
+
+  2639: 
+  2640:         if cmd in {"open-doc-from-query", "o"}:
+> 2641:             return handle_query_command(
+  2642:                 argv, cmd_open_doc_from_query, allow_json_flag=True
+  2643:             )
+
+  2644: 
+  2645:         if cmd in {"read-doc-from-query", "r"}:
+> 2646:             return handle_query_command(
+  2647:                 argv, cmd_read_doc_from_query, allow_json_flag=True
+  2648:             )
+
+  2663: 
+  2664:         if cmd in {"ask", "q"}:
+> 2665:             return handle_query_command(argv, cmd_ask, allow_json_flag=True)
+  2666: 
+  2667:         print_usage_error(f"Unknown command: {cmd}")
+
+## parse_json_flag
+  2466: 
+  2467: 
+> 2468: def parse_json_flag(argv: list[str]) -> tuple[bool, list[str]]:
+  2469:     json_output = False
+  2470:     args = argv[:]
+
+  2480:     args = argv[:]
+  2481:     if allow_json_flag:
+> 2482:         _, args = parse_json_flag(args)
+  2483:     if not args:
+  2484:         return None
+
+  2493: ) -> int:
+  2494:     if allow_json_flag:
+> 2495:         json_output, args = parse_json_flag(argv)
+  2496:     else:
+  2497:         json_output, args = False, argv[:]
+
+  2549:     try:
+  2550:         if cmd == "status":
+> 2551:             json_output, args = parse_json_flag(argv)
+  2552:             if args:
+  2553:                 print_usage_error("status does not accept positional arguments.")
+
+  2556: 
+  2557:         if cmd in {"repo-state", "rs"}:
+> 2558:             json_output, args = parse_json_flag(argv)
+  2559:             if args:
+  2560:                 print_usage_error("repo-state does not accept positional arguments.")
+
+  2563: 
+  2564:         if cmd in {"doctor-lite", "diagnose-lite"}:
+> 2565:             json_output, args = parse_json_flag(argv)
+  2566:             if args:
+  2567:                 print_usage_error("doctor-lite does not accept positional arguments.")
+
+  2570: 
+  2571:         if cmd == "capabilities":
+> 2572:             json_output, args = parse_json_flag(argv)
+  2573:             if args:
+  2574:                 print_usage_error("capabilities does not accept positional arguments.")
+
+  2577: 
+  2578:         if cmd == "assemble-context":
+> 2579:             json_output, args = parse_json_flag(argv)
+  2580:             if len(args) != 2 or args[0] != "--profile":
+  2581:                 print_usage_error("assemble-context requires: --profile <profile>")
+
+  2584: 
+  2585:         if cmd == "doc-body-only":
+> 2586:             json_output, args = parse_json_flag(argv)
+  2587:             if len(args) != 6:
+  2588:                 print_usage_error(
+
+  2607: 
+  2608:         if cmd == "artifact-state":
+> 2609:             json_output, args = parse_json_flag(argv)
+  2610:             if len(args) != 2 or args[0] != "--file-id":
+  2611:                 print_usage_error(
+
+  2616: 
+  2617:         if cmd in {"doctor", "diagnose"}:
+> 2618:             json_output, args = parse_json_flag(argv)
+  2619:             if args:
+  2620:                 print_usage_error("doctor does not accept positional arguments.")
+
+## sys_exit
+(no matches)
+
+## return_stmt
+  0014:     env_python = os.environ.get("DOCS_AGENT_PYTHON")
+  0015:     if env_python:
+> 0016:         return Path(env_python).expanduser(), "env:DOCS_AGENT_PYTHON"
+  0017: 
+  0018:     candidates = [
+
+  0024:     for candidate, source in candidates:
+  0025:         if candidate.exists():
+> 0026:             return candidate, source
+  0027: 
+  0028:     return Path(sys.executable), "fallback:sys.executable"
+
+  0026:             return candidate, source
+  0027: 
+> 0028:     return Path(sys.executable), "fallback:sys.executable"
+  0029: 
+  0030: 
+
+  0060:         "resource exhausted",
+  0061:     ]
+> 0062:     return any(marker in s for marker in markers)
+  0063: 
+  0064: 
+
+  0071:     import time
+  0072: 
+> 0073:     return int(time.time())
+  0074: 
+  0075: 
+
+  0080: def normalize_cell(v):
+  0081:     if v is None:
+> 0082:         return ""
+  0083:     return str(v).strip()
+  0084: 
+
+  0081:     if v is None:
+  0082:         return ""
+> 0083:     return str(v).strip()
+  0084: 
+  0085: 
+
+  0085: 
+  0086: def safe_lower(v):
+> 0087:     return normalize_cell(v).lower()
+  0088: 
+  0089: 
+
+  0094:         if key:
+  0095:             m[key] = i
+> 0096:     return m
+  0097: 
+  0098: 
+
+  0100:     idx = idx_map.get(column_name)
+  0101:     if idx is None:
+> 0102:         return ""
+  0103:     if idx >= len(row):
+  0104:         return ""
+
+  0102:         return ""
+  0103:     if idx >= len(row):
+> 0104:         return ""
+  0105:     return normalize_cell(row[idx])
+  0106: 
+
+  0103:     if idx >= len(row):
+  0104:         return ""
+> 0105:     return normalize_cell(row[idx])
+  0106: 
+  0107: 
+
+  0126:         matched_by = "Cache local search"
+  0127: 
+> 0128:     return {
+  0129:         "ok": True,
+  0130:         "command": "find-doc-any",
+
+  0166: 
+  0167: def _build_find_doc_any_not_found_from_cache(query):
+> 0168:     return {
+  0169:         "ok": False,
+  0170:         "command": "find-doc-any",
+
+  0198: 
+  0199:     if not MASTER_INDEX_CACHE_FILE.exists():
+> 0200:         return None
+  0201:     try:
+  0202:         data = json.loads(MASTER_INDEX_CACHE_FILE.read_text(encoding="utf-8"))
+
+  0202:         data = json.loads(MASTER_INDEX_CACHE_FILE.read_text(encoding="utf-8"))
+  0203:     except Exception:
+> 0204:         return None
+  0205: 
+  0206:     fetched_at = int(data.get("fetched_at_epoch") or 0)
+
+  0206:     fetched_at = int(data.get("fetched_at_epoch") or 0)
+  0207:     if fetched_at <= 0:
+> 0208:         return None
+  0209: 
+  0210:     age = now_epoch_int() - fetched_at
+
+  0210:     age = now_epoch_int() - fetched_at
+  0211:     if age > MASTER_INDEX_CACHE_TTL_SEC:
+> 0212:         return None
+  0213: 
+  0214:     header = data.get("header") or []
+
+  0215:     rows = data.get("rows") or []
+  0216:     if not isinstance(header, list) or not isinstance(rows, list) or not header:
+> 0217:         return None
+  0218: 
+  0219:     return data
+
+  0217:         return None
+  0218: 
+> 0219:     return data
+  0220: 
+  0221: 
+
+  0234:     matches = result.get("matches") or []
+  0235:     if not matches:
+> 0236:         return None
+  0237: 
+  0238:     row_values = matches[0].get("row_values") or []
+
+  0238:     row_values = matches[0].get("row_values") or []
+  0239:     if not isinstance(row_values, list) or len(row_values) < 3:
+> 0240:         return None
+  0241: 
+  0242:     return row_values
+
+  0240:         return None
+  0241: 
+> 0242:     return row_values
+  0243: 
+  0244: 
+
+  0246:     seed = find_doc_any_payload_live("DOC-0001")
+  0247:     if not isinstance(seed, dict) or not seed.get("ok"):
+> 0248:         return seed
+  0249: 
+  0250:     row = _parse_master_index_rows_from_live_result(seed)
+
+  0250:     row = _parse_master_index_rows_from_live_result(seed)
+  0251:     if not row:
+> 0252:         return build_error_payload(
+  0253:             command="master-index-cache-refresh",
+  0254:             error_type="CacheSeedParseError",
+
+  0286:     )
+  0287: 
+> 0288:     return {
+  0289:         "ok": True,
+  0290:         "command": "master-index-cache-refresh",
+
+  0298:     cache = load_master_index_cache()
+  0299:     if cache is None:
+> 0300:         return
+  0301: 
+  0302:     row = _parse_master_index_rows_from_live_result(payload)
+
+  0302:     row = _parse_master_index_rows_from_live_result(payload)
+  0303:     if not row:
+> 0304:         return
+  0305: 
+  0306:     rows = cache.get("rows") or []
+
+  0308:     t = tuple(row)
+  0309:     if t in existing:
+> 0310:         return
+  0311: 
+  0312:     rows.append(row)
+
+  0319:     cache = load_master_index_cache()
+  0320:     if cache is None:
+> 0321:         return None
+  0322: 
+  0323:     header = cache.get("header") or []
+
+  0338: 
+  0339:         if safe_lower(document_id) == ql:
+> 0340:             return _build_find_doc_any_success_from_cache(q, row, i, header)
+  0341: 
+  0342:         if safe_lower(document_name) == ql:
+
+  0341: 
+  0342:         if safe_lower(document_name) == ql:
+> 0343:             return _build_find_doc_any_success_from_cache(q, row, i, header)
+  0344: 
+  0345:         if ql and ql in safe_lower(link):
+
+  0344: 
+  0345:         if ql and ql in safe_lower(link):
+> 0346:             return _build_find_doc_any_success_from_cache(q, row, i, header)
+  0347: 
+  0348:     return _build_find_doc_any_not_found_from_cache(q)
+
+  0346:             return _build_find_doc_any_success_from_cache(q, row, i, header)
+  0347: 
+> 0348:     return _build_find_doc_any_not_found_from_cache(q)
+  0349: 
+  0350: 
+
+  0351: def payload_contains_quota_or_rate_limit(payload) -> bool:
+  0352:     if payload is None:
+> 0353:         return False
+  0354: 
+  0355:     stack = [payload]
+
+  0366:             for v in item.values():
+  0367:                 if isinstance(v, str) and is_quota_or_rate_limit_error_text(v):
+> 0368:                     return True
+  0369:                 if isinstance(v, (dict, list)):
+  0370:                     stack.append(v)
+
+  0372:             for v in item:
+  0373:                 if isinstance(v, str) and is_quota_or_rate_limit_error_text(v):
+> 0374:                     return True
+  0375:                 if isinstance(v, (dict, list)):
+  0376:                     stack.append(v)
+
+  0376:                     stack.append(v)
+  0377: 
+> 0378:     return False
+  0379: 
+  0380: 
+
+  0380: 
+  0381: def summarize_payload_ok(payload: dict | None) -> bool:
+> 0382:     return isinstance(payload, dict) and bool(payload.get("ok"))
+  0383: 
+  0384: 
+
+  0385: def safe_error_type(payload: dict | None) -> str | None:
+  0386:     if not isinstance(payload, dict):
+> 0387:         return None
+  0388:     return payload.get("error_type")
+  0389: 
+
+  0386:     if not isinstance(payload, dict):
+  0387:         return None
+> 0388:     return payload.get("error_type")
+  0389: 
+  0390: 
+
+  0391: def safe_error_message(payload: dict | None) -> str | None:
+  0392:     if not isinstance(payload, dict):
+> 0393:         return None
+  0394:     return payload.get("error_message")
+  0395: 
+
+  0392:     if not isinstance(payload, dict):
+  0393:         return None
+> 0394:     return payload.get("error_message")
+  0395: 
+  0396: 
+
+  0399: ) -> str:
+  0400:     if env_ok and status_ok and master_index_ok and smoke_ok:
+> 0401:         return "CLI выглядит работоспособным: окружение, status, доступ к MASTER_INDEX и smoke-проверка прошли успешно."
+  0402:     failed = []
+  0403:     if not env_ok:
+
+  0410:         failed.append("smoke")
+  0411:     failed_text = ", ".join(failed)
+> 0412:     return f"Обнаружены проблемы в следующих зонах: {failed_text}."
+  0413: 
+  0414: 
+
+  0415: def diagnose_payload_failure(payload: dict | None) -> tuple[str, str, str]:
+  0416:     if not isinstance(payload, dict):
+> 0417:         return (
+  0418:             "unknown",
+  0419:             "Не удалось интерпретировать результат проверки.",
+
+  0422: 
+  0423:     if payload_contains_quota_or_rate_limit(payload):
+> 0424:         return (
+  0425:             "network",
+  0426:             "Похоже на временную внешнюю проблему или превышение квоты Google API.",
+
+  0452: 
+  0453:     if auth_related:
+> 0454:         return (
+  0455:             "auth",
+  0456:             "Похоже на проблему авторизации или доступа к Google/API.",
+
+  0464:         or "eof occurred in violation of protocol" in joined_text
+  0465:     ):
+> 0466:         return (
+  0467:             "network",
+  0468:             "Похоже на временную сетевую проблему или нестабильность внешнего API.",
+
+  0471: 
+  0472:     if error_type in {"NotFound", "LinkParseError"}:
+> 0473:         return (
+  0474:             "not_found",
+  0475:             "Похоже, CLI не смог найти документ или корректно извлечь идентификатор из ссылки.",
+
+  0483:         "SmokeCheckFailed",
+  0484:     }:
+> 0485:         return (
+  0486:             "internal",
+  0487:             "Похоже на внутренний сбой CLI или дочернего docs_agent.py.",
+
+  0489:         )
+  0490: 
+> 0491:     return (
+  0492:         "internal",
+  0493:         "Похоже на внутренний сбой без точной классификации.",
+
+  0500: ) -> str:
+  0501:     if not env_ok:
+> 0502:         return "Проверь активацию venv и доступность python/agent_cli.py."
+  0503:     if not status_ok:
+  0504:         return "Сначала выполни python agent_cli.py status --json и проверь блоки safety/config."
+
+  0502:         return "Проверь активацию venv и доступность python/agent_cli.py."
+  0503:     if not status_ok:
+> 0504:         return "Сначала выполни python agent_cli.py status --json и проверь блоки safety/config."
+  0505:     if not master_index_ok:
+  0506:         return (
+
+  0504:         return "Сначала выполни python agent_cli.py status --json и проверь блоки safety/config."
+  0505:     if not master_index_ok:
+> 0506:         return (
+  0507:             "Проверь доступность MASTER_INDEX и повтори python agent_cli.py f DOC-0001."
+  0508:         )
+
+  0508:         )
+  0509:     if not smoke_ok:
+> 0510:         return "Запусти bash scripts/regression_smoke_quiet.sh отдельно и проверь, какой шаг падает."
+  0511:     return "Можно начинать штатную работу."
+  0512: 
+
+  0509:     if not smoke_ok:
+  0510:         return "Запусти bash scripts/regression_smoke_quiet.sh отдельно и проверь, какой шаг падает."
+> 0511:     return "Можно начинать штатную работу."
+  0512: 
+  0513: 
+
+  0540: 
+  0541:     if not failed:
+> 0542:         return {
+  0543:             "ok": True,
+  0544:             "command": "doctor",
+
+  0565:     error_message = str(sample.get("error_message") or "doctor check failed")
+  0566: 
+> 0567:     return {
+  0568:         "ok": False,
+  0569:         "command": "doctor",
+
+  0608: 
+  0609:     if not failed:
+> 0610:         return {
+  0611:             "ok": True,
+  0612:             "command": "doctor-lite",
+
+  0639:         recommended_action = "Проверь MASTER_INDEX и доступность ожидаемых объектов."
+  0640: 
+> 0641:     return {
+  0642:         "ok": False,
+  0643:         "command": "doctor-lite",
+
+  0659:     script = BASE / "scripts" / "regression_smoke_explain.sh"
+  0660:     if not script.exists():
+> 0661:         return build_error_payload(
+  0662:             command="smoke-explain",
+  0663:             error_type="ScriptNotFound",
+
+  0677:         )
+  0678:     except subprocess.TimeoutExpired:
+> 0679:         return build_error_payload(
+  0680:             command="smoke-explain",
+  0681:             error_type="TimeoutExpired",
+
+  0686:         )
+  0687:     except Exception as exc:
+> 0688:         return build_error_payload(
+  0689:             command="smoke-explain",
+  0690:             error_type=exc.__class__.__name__,
+
+  0757:         )
+  0758: 
+> 0759:     return payload
+  0760: 
+  0761: 
+
+  0830:         print(f"error_type: {payload.get('error_type')}")
+  0831:         print(f"error_message: {payload.get('error_message')}")
+> 0832:         return
+  0833: 
+  0834:     print(f"repo_path: {payload.get('repo_path')}")
+
+  0901: def is_retryable_network_error(payload: dict) -> bool:
+  0902:     if not isinstance(payload, dict):
+> 0903:         return False
+  0904: 
+  0905:     if payload.get("network_related") is True and payload.get("retryable") is True:
+
+  0904: 
+  0905:     if payload.get("network_related") is True and payload.get("retryable") is True:
+> 0906:         return True
+  0907: 
+  0908:     err = str(payload.get("error_type") or "")
+
+  0917: 
+  0918:     if err in retryable_error_types:
+> 0919:         return True
+  0920: 
+  0921:     msg_upper = msg.upper()
+
+  0921:     msg_upper = msg.upper()
+  0922:     if "EOF" in msg_upper or "SSL" in msg_upper or "TIMEOUT" in msg_upper:
+> 0923:         return True
+  0924: 
+  0925:     return False
+
+  0923:         return True
+  0924: 
+> 0925:     return False
+  0926: 
+  0927: 
+
+  0952:                 "attempts": attempts,
+  0953:             }
+> 0954:             return payload
+  0955: 
+  0956:         if attempt < retries and is_retryable_network_error(payload):
+
+  0966:             "attempts": attempts,
+  0967:         }
+> 0968:     return last
+  0969: 
+  0970: 
+
+  0980:         )
+  0981:     except subprocess.TimeoutExpired as exc:
+> 0982:         return build_error_payload(
+  0983:             command="subprocess",
+  0984:             error_type="TimeoutExpired",
+
+  0995:         )
+  0996:     except Exception as exc:
+> 0997:         return build_error_payload(
+  0998:             command="subprocess",
+  0999:             error_type=exc.__class__.__name__,
+
+  1011: 
+  1012:     if not stdout:
+> 1013:         return build_error_payload(
+  1014:             command="subprocess",
+  1015:             error_type="EmptyOutput",
+
+  1030:         data = json.loads(stdout)
+  1031:     except Exception as exc:
+> 1032:         return build_error_payload(
+  1033:             command="subprocess",
+  1034:             error_type=exc.__class__.__name__,
+
+  1054:         }
+  1055: 
+> 1056:     return data
+  1057: 
+  1058: 
+
+  1123:     lines.append(f"explanation: {explanation}")
+  1124:     lines.append(f"next_step: {next_step}")
+> 1125:     return lines
+  1126: 
+  1127: 
+
+  1138:     matches = payload.get("matches") or []
+  1139:     if not matches:
+> 1140:         return None
+  1141:     row = matches[0].get("row_values") or []
+  1142:     if idx < len(row):
+
+  1141:     row = matches[0].get("row_values") or []
+  1142:     if idx < len(row):
+> 1143:         return row[idx]
+  1144:     return None
+  1145: 
+
+  1142:     if idx < len(row):
+  1143:         return row[idx]
+> 1144:     return None
+  1145: 
+  1146: 
+
+  1146: 
+  1147: def summarize_attempt(strategy: str, payload: dict) -> dict:
+> 1148:     return {
+  1149:         "strategy": strategy,
+  1150:         "ok": payload.get("ok"),
+
+  1158: def extract_google_id_from_link(link: str | None) -> str | None:
+  1159:     if not link:
+> 1160:         return None
+  1161: 
+  1162:     patterns = [
+
+  1169:         m = re.search(pat, link)
+  1170:         if m:
+> 1171:             return m.group(1)
+  1172: 
+  1173:     if re.fullmatch(r"[a-zA-Z0-9_-]{20,}", link):
+
+  1172: 
+  1173:     if re.fullmatch(r"[a-zA-Z0-9_-]{20,}", link):
+> 1174:         return link
+  1175: 
+  1176:     return None
+
+  1174:         return link
+  1175: 
+> 1176:     return None
+  1177: 
+  1178: 
+
+  1178: 
+  1179: def looks_like_google_id(value: str) -> bool:
+> 1180:     return re.fullmatch(r"[a-zA-Z0-9_-]{20,}", value) is not None
+  1181: 
+  1182: 
+
+  1208:                 changed = True
+  1209: 
+> 1210:     return q
+  1211: 
+  1212: 
+
+  1214:     safety = run_docs_agent_with_retry(["show-safety-mode"])
+  1215:     config = run_docs_agent_with_retry(["show-config-status"])
+> 1216:     return {
+  1217:         "ok": bool(safety.get("ok")) and bool(config.get("ok")),
+  1218:         "command": "status",
+
+  1226: 
+  1227:     if payload.get("ok"):
+> 1228:         return payload
+  1229: 
+  1230:     return {
+
+  1228:         return payload
+  1229: 
+> 1230:     return {
+  1231:         "ok": False,
+  1232:         "command": "repo-state",
+
+  1251:         else:
+  1252:             print_compact_error(payload)
+> 1253:     return resolve_command_exit_code(payload)
+  1254: 
+  1255: 
+
+  1260:     else:
+  1261:         print_compact_status(payload)
+> 1262:     return resolve_command_exit_code(payload)
+  1263: 
+  1264: 
+
+  1269:     else:
+  1270:         print_compact_doctor(payload)
+> 1271:     return resolve_command_exit_code(payload)
+  1272: 
+  1273: 
+
+  1344:     attempts.append(summarize_attempt("Document ID", by_id))
+  1345:     if by_id.get("ok") and by_id.get("matches_found", 0) > 0:
+> 1346:         return build_find_doc_success_payload(
+  1347:             query=query,
+  1348:             matched_by="Document ID",
+
+  1362:     attempts.append(summarize_attempt("Document Name", by_name))
+  1363:     if by_name.get("ok") and by_name.get("matches_found", 0) > 0:
+> 1364:         return build_find_doc_success_payload(
+  1365:             query=query,
+  1366:             matched_by="Document Name",
+
+  1379:     attempts.append(summarize_attempt("Link fragment", by_link))
+  1380:     if by_link.get("ok") and by_link.get("matches_found", 0) > 0:
+> 1381:         return build_find_doc_success_payload(
+  1382:             query=query,
+  1383:             matched_by="Link fragment",
+
+  1386:         )
+  1387: 
+> 1388:     return build_error_payload(
+  1389:         command="find-doc-any",
+  1390:         query=query,
+
+  1397: def resolve_exit_code(payload: dict | None) -> int:
+  1398:     if not isinstance(payload, dict):
+> 1399:         return EXIT_INTERNAL_ERROR
+  1400: 
+  1401:     if payload.get("ok") is True:
+
+  1400: 
+  1401:     if payload.get("ok") is True:
+> 1402:         return EXIT_OK
+  1403: 
+  1404:     error_type = str(payload.get("error_type") or "")
+
+  1408: 
+  1409:     if auth_related:
+> 1410:         return EXIT_AUTH_ERROR
+  1411: 
+  1412:     if network_related or retryable:
+
+  1411: 
+  1412:     if network_related or retryable:
+> 1413:         return EXIT_NETWORK_ERROR
+  1414: 
+  1415:     if error_type in {"NotFound", "LinkParseError"}:
+
+  1414: 
+  1415:     if error_type in {"NotFound", "LinkParseError"}:
+> 1416:         return EXIT_NOT_FOUND
+  1417: 
+  1418:     if error_type in {"EmptyOutput", "JSONDecodeError", "TimeoutExpired"}:
+
+  1417: 
+  1418:     if error_type in {"EmptyOutput", "JSONDecodeError", "TimeoutExpired"}:
+> 1419:         return EXIT_INTERNAL_ERROR
+  1420: 
+  1421:     return EXIT_INTERNAL_ERROR
+
+  1419:         return EXIT_INTERNAL_ERROR
+  1420: 
+> 1421:     return EXIT_INTERNAL_ERROR
+  1422: 
+  1423: 
+
+  1423: 
+  1424: def find_doc_any_payload_live(query):
+> 1425:     return _find_doc_any_payload_live_impl(query)
+  1426: 
+  1427: 
+
+  1429:     cached = find_doc_any_payload_from_cache(query)
+  1430:     if isinstance(cached, dict) and cached.get("ok"):
+> 1431:         return cached
+  1432: 
+  1433:     if load_master_index_cache() is None:
+
+  1435:         cached = find_doc_any_payload_from_cache(query)
+  1436:         if isinstance(cached, dict) and cached.get("ok"):
+> 1437:             return cached
+  1438: 
+  1439:     live = find_doc_any_payload_live(query)
+
+  1440:     if isinstance(live, dict) and live.get("ok"):
+  1441:         extend_master_index_cache_from_success(live)
+> 1442:         return live
+  1443: 
+  1444:     if payload_contains_quota_or_rate_limit(live):
+
+  1450:         live["network_related"] = True
+  1451: 
+> 1452:     return live
+  1453: 
+  1454: 
+
+  1455: def resolve_command_exit_code(payload: dict | None) -> int:
+  1456:     if not isinstance(payload, dict):
+> 1457:         return EXIT_INTERNAL_ERROR
+  1458: 
+  1459:     if payload.get("ok") is True:
+
+  1458: 
+  1459:     if payload.get("ok") is True:
+> 1460:         return EXIT_OK
+  1461: 
+  1462:     if payload.get("command") == "ask":
+
+  1463:         result = payload.get("result")
+  1464:         if isinstance(result, dict):
+> 1465:             return resolve_exit_code(result)
+  1466: 
+  1467:     return resolve_exit_code(payload)
+
+  1465:             return resolve_exit_code(result)
+  1466: 
+> 1467:     return resolve_exit_code(payload)
+  1468: 
+  1469: 
+
+  1500:         payload["query"] = query
+  1501:     payload.update(extra)
+> 1502:     return payload
+  1503: 
+  1504: 
+
+  1504: 
+  1505: def build_doc_summary(result: dict) -> dict:
+> 1506:     return {
+  1507:         "document_id": extract_first_match_value(result, COL_DOCUMENT_ID),
+  1508:         "document_name": extract_first_match_value(result, COL_DOCUMENT_NAME),
+
+  1518:     attempts: list[dict],
+  1519: ) -> dict:
+> 1520:     return {
+  1521:         "ok": True,
+  1522:         "command": "find-doc-any",
+
+  1532:     found = find_doc_any_payload(query)
+  1533:     if not found.get("ok"):
+> 1534:         return found
+  1535: 
+  1536:     link = (found.get("summary") or {}).get("link")
+
+  1537:     google_id = extract_google_id_from_link(link)
+  1538: 
+> 1539:     return {
+  1540:         "ok": True,
+  1541:         "command": "open-doc-from-query",
+
+  1551:     found = find_doc_any_payload(query)
+  1552:     if not found.get("ok"):
+> 1553:         return found
+  1554: 
+  1555:     link = (found.get("summary") or {}).get("link")
+
+  1557: 
+  1558:     if not google_id:
+> 1559:         return build_error_payload(
+  1560:             command="read-doc-from-query",
+  1561:             query=query,
+
+  1567:     read_result = run_docs_agent_with_retry(["read-doc", google_id])
+  1568: 
+> 1569:     return {
+  1570:         "ok": bool(read_result.get("ok")),
+  1571:         "command": "read-doc-from-query",
+
+  1588:         else:
+  1589:             print_compact_error(payload)
+> 1590:     return resolve_command_exit_code(payload)
+  1591: 
+  1592: 
+
+  1600:         else:
+  1601:             print_compact_error(payload)
+> 1602:     return resolve_command_exit_code(payload)
+  1603: 
+  1604: 
+
+  1612:         else:
+  1613:             print_compact_error(payload)
+> 1614:     return resolve_command_exit_code(payload)
+  1615: 
+  1616: 
+
+  1616: 
+  1617: def is_status_query(query_lower: str) -> bool:
+> 1618:     return any(
+  1619:         x in query_lower
+  1620:         for x in [
+
+  1631: 
+  1632: def is_read_query(query_lower: str) -> bool:
+> 1633:     return any(
+  1634:         x in query_lower
+  1635:         for x in [
+
+  1653:     }
+  1654:     payload.update(extra)
+> 1655:     return payload
+  1656: 
+  1657: 
+
+  1658: def ask_status_payload(query: str) -> dict:
+  1659:     result = cmd_status_payload()
+> 1660:     return build_ask_result(query, "status", result)
+  1661: 
+  1662: 
+
+  1663: def ask_read_payload(query: str, lookup_query: str) -> dict:
+  1664:     result = read_doc_from_query_payload(lookup_query)
+> 1665:     return build_ask_result(query, "read-doc-from-query", result)
+  1666: 
+  1667: 
+
+  1669:     found = find_doc_any_payload(lookup_query)
+  1670:     if found.get("ok"):
+> 1671:         return build_ask_result(query, "find-doc-any", found)
+  1672: 
+  1673:     file_result = run_docs_agent_with_retry(["get-file", lookup_query])
+
+  1672: 
+  1673:     file_result = run_docs_agent_with_retry(["get-file", lookup_query])
+> 1674:     return {
+  1675:         "ok": bool(file_result.get("ok")),
+  1676:         "command": "ask",
+
+  1684: def ask_find_payload(query: str, lookup_query: str) -> dict:
+  1685:     found = find_doc_any_payload(lookup_query)
+> 1686:     return build_ask_result(query, "find-doc-any", found)
+  1687: 
+  1688: 
+
+  1693: 
+  1694:     if is_status_query(ql):
+> 1695:         return ask_status_payload(query)
+  1696: 
+  1697:     if is_read_query(ql):
+
+  1696: 
+  1697:     if is_read_query(ql):
+> 1698:         return ask_read_payload(query, lookup_query)
+  1699: 
+  1700:     if looks_like_google_id(lookup_query):
+
+  1699: 
+  1700:     if looks_like_google_id(lookup_query):
+> 1701:         return ask_google_id_payload(query, lookup_query)
+  1702: 
+  1703:     return ask_find_payload(query, lookup_query)
+
+  1701:         return ask_google_id_payload(query, lookup_query)
+  1702: 
+> 1703:     return ask_find_payload(query, lookup_query)
+  1704: 
+  1705: 
+
+  1723:             f"master_index: {config.get('master_index_sheet_name')} / {config.get('master_index_spreadsheet_id')}"
+  1724:         )
+> 1725:         return lines
+  1726: 
+  1727:     if routed in {"find-doc-any", "get-file"}:
+
+  1748:                     "next_step: Запусти команду в JSON-режиме и посмотри debug-поля."
+  1749:                 )
+> 1750:             return lines
+  1751: 
+  1752:         if result.get("command") == "find-doc-any":
+
+  1755:             lines.append(f"document_name: {summary.get('document_name')}")
+  1756:             lines.append(f"link: {summary.get('link')}")
+> 1757:             return lines
+  1758: 
+  1759:         if result.get("command") == "get-file":
+
+  1763:             lines.append(f"mime: {f.get('mimeType')}")
+  1764:             lines.append(f"link: {f.get('webViewLink')}")
+> 1765:             return lines
+  1766: 
+  1767:     if routed == "read-doc-from-query":
+
+  1817:             lines.append(f"explanation: {explanation}")
+  1818:             lines.append(f"next_step: {next_step}")
+> 1819:             return lines
+  1820: 
+  1821:         summary = result.get("summary", {}) or {}
+
+  1833:             lines.append("")
+  1834:             lines.append("[truncated]")
+> 1835:         return lines
+  1836: 
+  1837:     if not ok:
+
+  1845:         lines.append("explanation: Запрос маршрутизирован, но завершился ошибкой.")
+  1846:         lines.append("next_step: Повтори команду в JSON-режиме и проверь debug-поля.")
+> 1847:         return lines
+  1848: 
+  1849:     lines.append(json.dumps(payload, ensure_ascii=False, indent=2))
+
+  1848: 
+  1849:     lines.append(json.dumps(payload, ensure_ascii=False, indent=2))
+> 1850:     return lines
+  1851: 
+  1852: 
+
+  1929:     ]
+  1930: 
+> 1931:     return {
+  1932:         "ok": True,
+  1933:         "command": "capabilities",
+
+  1948: def assemble_context_payload(profile: str) -> dict:
+  1949:     if profile != "exchange-docs":
+> 1950:         return build_error_payload(
+  1951:             command="assemble-context",
+  1952:             error_type="UnsupportedProfile",
+
+  2082:     )
+  2083: 
+> 2084:     return {
+  2085:         "ok": True,
+  2086:         "command": "assemble-context",
+
+  2151:         ],
+  2152:     }
+> 2153:     return outlines.get(
+  2154:         document_type,
+  2155:         [
+
+  2225:     )
+  2226: 
+> 2227:     return "\n".join(lines)
+  2228: 
+  2229: 
+
+  2231:     context_payload = assemble_context_payload(profile)
+  2232:     if not context_payload.get("ok"):
+> 2233:         return context_payload
+  2234: 
+  2235:     outline = doc_body_only_outline(document_type)
+
+  2253:     ]
+  2254: 
+> 2255:     return {
+  2256:         "ok": True,
+  2257:         "command": "doc-body-only",
+
+  2281:     file_payload = run_docs_agent_with_retry(["get-file", file_id])
+  2282:     if not isinstance(file_payload, dict) or not file_payload.get("ok"):
+> 2283:         return build_error_payload(
+  2284:             command="artifact-state",
+  2285:             error_type=(file_payload or {}).get("error_type", "ArtifactLookupError"),
+
+  2346:         )
+  2347: 
+> 2348:     return {
+  2349:         "ok": True,
+  2350:         "command": "artifact-state",
+
+  2367:     if json_output:
+  2368:         print_json(payload)
+> 2369:         return EXIT_OK
+  2370: 
+  2371:     print("CAPABILITIES OK")
+
+  2378:             print(f"- {route}")
+  2379:         print("")
+> 2380:     return EXIT_OK
+  2381: 
+  2382: 
+
+  2385:     if json_output:
+  2386:         print_json(payload)
+> 2387:         return resolve_command_exit_code(payload)
+  2388: 
+  2389:     if payload.get("ok"):
+
+  2399:             f"Recommended generation mode: {payload.get('recommended_generation_mode')}"
+  2400:         )
+> 2401:         return EXIT_OK
+  2402: 
+  2403:     print_compact_error(payload)
+
+  2402: 
+  2403:     print_compact_error(payload)
+> 2404:     return resolve_command_exit_code(payload)
+  2405: 
+  2406: 
+
+  2414:     if json_output:
+  2415:         print_json(payload)
+> 2416:         return resolve_command_exit_code(payload)
+  2417: 
+  2418:     if payload.get("ok"):
+
+  2423:         print("")
+  2424:         print(payload.get("body", ""))
+> 2425:         return EXIT_OK
+  2426: 
+  2427:     print_compact_error(payload)
+
+  2426: 
+  2427:     print_compact_error(payload)
+> 2428:     return resolve_command_exit_code(payload)
+  2429: 
+  2430: 
+
+  2433:     if json_output:
+  2434:         print_json(payload)
+> 2435:         return resolve_command_exit_code(payload)
+  2436: 
+  2437:     if payload.get("ok"):
+
+  2442:         print(f"Review status: {payload.get('review_status')}")
+  2443:         print(f"Next safe step: {payload.get('next_safe_step')}")
+> 2444:         return EXIT_OK
+  2445: 
+  2446:     print_compact_error(payload)
+
+  2445: 
+  2446:     print_compact_error(payload)
+> 2447:     return resolve_command_exit_code(payload)
+  2448: 
+  2449: 
+
+  2454:     else:
+  2455:         print_compact_doctor_lite(payload)
+> 2456:     return resolve_command_exit_code(payload)
+  2457: 
+  2458: 
+
+  2463:     else:
+  2464:         print_human_lines(build_compact_ask_output(payload))
+> 2465:     return resolve_command_exit_code(payload)
+  2466: 
+  2467: 
+
+  2472:         json_output = True
+  2473:         args = args[1:]
+> 2474:     return json_output, args
+  2475: 
+  2476: 
+
+  2482:         _, args = parse_json_flag(args)
+  2483:     if not args:
+> 2484:         return None
+  2485:     return True, args
+  2486: 
+
+  2483:     if not args:
+  2484:         return None
+> 2485:     return True, args
+  2486: 
+  2487: 
+
+  2499:     if not args:
+  2500:         print_usage_error("Missing query argument.")
+> 2501:         return EXIT_USAGE_ERROR
+  2502: 
+  2503:     value = " ".join(args)
+
+  2503:     value = " ".join(args)
+  2504:     if allow_json_flag:
+> 2505:         return handler(value, json_output=json_output)
+  2506:     return handler(value)
+  2507: 
+
+  2504:     if allow_json_flag:
+  2505:         return handler(value, json_output=json_output)
+> 2506:     return handler(value)
+  2507: 
+  2508: 
+
+  2542:     if len(sys.argv) < 2:
+  2543:         print_usage_error("Missing command.")
+> 2544:         return EXIT_USAGE_ERROR
+  2545: 
+  2546:     cmd = sys.argv[1]
+
+  2552:             if args:
+  2553:                 print_usage_error("status does not accept positional arguments.")
+> 2554:                 return EXIT_USAGE_ERROR
+  2555:             return cmd_status(json_output=json_output)
+  2556: 
+
+  2553:                 print_usage_error("status does not accept positional arguments.")
+  2554:                 return EXIT_USAGE_ERROR
+> 2555:             return cmd_status(json_output=json_output)
+  2556: 
+  2557:         if cmd in {"repo-state", "rs"}:
+
+  2559:             if args:
+  2560:                 print_usage_error("repo-state does not accept positional arguments.")
+> 2561:                 return EXIT_USAGE_ERROR
+  2562:             return cmd_repo_state(json_output=json_output)
+  2563: 
+
+  2560:                 print_usage_error("repo-state does not accept positional arguments.")
+  2561:                 return EXIT_USAGE_ERROR
+> 2562:             return cmd_repo_state(json_output=json_output)
+  2563: 
+  2564:         if cmd in {"doctor-lite", "diagnose-lite"}:
+
+  2566:             if args:
+  2567:                 print_usage_error("doctor-lite does not accept positional arguments.")
+> 2568:                 return EXIT_USAGE_ERROR
+  2569:             return cmd_doctor_lite(json_output=json_output)
+  2570: 
+
+  2567:                 print_usage_error("doctor-lite does not accept positional arguments.")
+  2568:                 return EXIT_USAGE_ERROR
+> 2569:             return cmd_doctor_lite(json_output=json_output)
+  2570: 
+  2571:         if cmd == "capabilities":
+
+  2573:             if args:
+  2574:                 print_usage_error("capabilities does not accept positional arguments.")
+> 2575:                 return EXIT_USAGE_ERROR
+  2576:             return cmd_capabilities(json_output=json_output)
+  2577: 
+
+  2574:                 print_usage_error("capabilities does not accept positional arguments.")
+  2575:                 return EXIT_USAGE_ERROR
+> 2576:             return cmd_capabilities(json_output=json_output)
+  2577: 
+  2578:         if cmd == "assemble-context":
+
+  2580:             if len(args) != 2 or args[0] != "--profile":
+  2581:                 print_usage_error("assemble-context requires: --profile <profile>")
+> 2582:                 return EXIT_USAGE_ERROR
+  2583:             return cmd_assemble_context(args[1], json_output=json_output)
+  2584: 
+
+  2581:                 print_usage_error("assemble-context requires: --profile <profile>")
+  2582:                 return EXIT_USAGE_ERROR
+> 2583:             return cmd_assemble_context(args[1], json_output=json_output)
+  2584: 
+  2585:         if cmd == "doc-body-only":
+
+  2589:                     "doc-body-only requires: --profile <profile> --document-type <type> --title <title>"
+  2590:                 )
+> 2591:                 return EXIT_USAGE_ERROR
+  2592:             if (
+  2593:                 args[0] != "--profile"
+
+  2598:                     "doc-body-only requires: --profile <profile> --document-type <type> --title <title>"
+  2599:                 )
+> 2600:                 return EXIT_USAGE_ERROR
+  2601:             return cmd_doc_body_only(
+  2602:                 args[1],
+
+  2599:                 )
+  2600:                 return EXIT_USAGE_ERROR
+> 2601:             return cmd_doc_body_only(
+  2602:                 args[1],
+  2603:                 args[3],
+
+  2612:                     "artifact-state requires: --file-id <google_drive_file_id>"
+  2613:                 )
+> 2614:                 return EXIT_USAGE_ERROR
+  2615:             return cmd_artifact_state(args[1], json_output=json_output)
+  2616: 
+
+  2613:                 )
+  2614:                 return EXIT_USAGE_ERROR
+> 2615:             return cmd_artifact_state(args[1], json_output=json_output)
+  2616: 
+  2617:         if cmd in {"doctor", "diagnose"}:
+
+  2619:             if args:
+  2620:                 print_usage_error("doctor does not accept positional arguments.")
+> 2621:                 return EXIT_USAGE_ERROR
+  2622:             return cmd_doctor(json_output=json_output)
+  2623: 
+
+  2620:                 print_usage_error("doctor does not accept positional arguments.")
+  2621:                 return EXIT_USAGE_ERROR
+> 2622:             return cmd_doctor(json_output=json_output)
+  2623: 
+  2624:         if cmd == "find-doc-id":
+
+  2625:             if len(argv) < 1:
+  2626:                 print_usage_error("Missing DOC-XXXX argument.")
+> 2627:                 return EXIT_USAGE_ERROR
+  2628:             cmd_find_doc_id(argv[0])
+  2629:             return EXIT_OK
+
+  2627:                 return EXIT_USAGE_ERROR
+  2628:             cmd_find_doc_id(argv[0])
+> 2629:             return EXIT_OK
+  2630: 
+  2631:         if cmd == "find-doc-name":
+
+  2630: 
+  2631:         if cmd == "find-doc-name":
+> 2632:             return handle_query_command(argv, cmd_find_doc_name)
+  2633: 
+  2634:         if cmd == "find-link":
+
+  2633: 
+  2634:         if cmd == "find-link":
+> 2635:             return handle_query_command(argv, cmd_find_link)
+  2636: 
+  2637:         if cmd in {"find-doc-any", "f"}:
+
+  2636: 
+  2637:         if cmd in {"find-doc-any", "f"}:
+> 2638:             return handle_query_command(argv, cmd_find_doc_any, allow_json_flag=True)
+  2639: 
+  2640:         if cmd in {"open-doc-from-query", "o"}:
+
+  2639: 
+  2640:         if cmd in {"open-doc-from-query", "o"}:
+> 2641:             return handle_query_command(
+  2642:                 argv, cmd_open_doc_from_query, allow_json_flag=True
+  2643:             )
+
+  2644: 
+  2645:         if cmd in {"read-doc-from-query", "r"}:
+> 2646:             return handle_query_command(
+  2647:                 argv, cmd_read_doc_from_query, allow_json_flag=True
+  2648:             )
+
+  2651:             if len(argv) < 1:
+  2652:                 print_usage_error("Missing google_drive_file_id argument.")
+> 2653:                 return EXIT_USAGE_ERROR
+  2654:             cmd_get_file(argv[0])
+  2655:             return EXIT_OK
+
+  2653:                 return EXIT_USAGE_ERROR
+  2654:             cmd_get_file(argv[0])
+> 2655:             return EXIT_OK
+  2656: 
+  2657:         if cmd == "read-doc":
+
+  2658:             if len(argv) < 1:
+  2659:                 print_usage_error("Missing google_doc_id argument.")
+> 2660:                 return EXIT_USAGE_ERROR
+  2661:             cmd_read_doc(argv[0])
+  2662:             return EXIT_OK
+
+  2660:                 return EXIT_USAGE_ERROR
+  2661:             cmd_read_doc(argv[0])
+> 2662:             return EXIT_OK
+  2663: 
+  2664:         if cmd in {"ask", "q"}:
+
+  2663: 
+  2664:         if cmd in {"ask", "q"}:
+> 2665:             return handle_query_command(argv, cmd_ask, allow_json_flag=True)
+  2666: 
+  2667:         print_usage_error(f"Unknown command: {cmd}")
+
+  2666: 
+  2667:         print_usage_error(f"Unknown command: {cmd}")
+> 2668:         return EXIT_USAGE_ERROR
+  2669: 
+  2670:     except KeyboardInterrupt:
+
+  2680:             }
+  2681:         )
+> 2682:         return EXIT_INTERRUPTED
+  2683: 
+  2684: 
+
+## print_stmt
+  0761: 
+  0762: def print_compact_find(payload: dict):
+> 0763:     print(f"ok: {payload.get('ok')}")
+  0764:     print("route: find-doc-any")
+  0765:     print(f"query: {payload.get('query')}")
+
+  0762: def print_compact_find(payload: dict):
+  0763:     print(f"ok: {payload.get('ok')}")
+> 0764:     print("route: find-doc-any")
+  0765:     print(f"query: {payload.get('query')}")
+  0766:     summary = payload.get("summary") or {}
+
+  0763:     print(f"ok: {payload.get('ok')}")
+  0764:     print("route: find-doc-any")
+> 0765:     print(f"query: {payload.get('query')}")
+  0766:     summary = payload.get("summary") or {}
+  0767:     if summary:
+
+  0766:     summary = payload.get("summary") or {}
+  0767:     if summary:
+> 0768:         print(f"document_id: {summary.get('document_id')}")
+  0769:         print(f"document_name: {summary.get('document_name')}")
+  0770:         print(f"link: {summary.get('link')}")
+
+  0767:     if summary:
+  0768:         print(f"document_id: {summary.get('document_id')}")
+> 0769:         print(f"document_name: {summary.get('document_name')}")
+  0770:         print(f"link: {summary.get('link')}")
+  0771: 
+
+  0768:         print(f"document_id: {summary.get('document_id')}")
+  0769:         print(f"document_name: {summary.get('document_name')}")
+> 0770:         print(f"link: {summary.get('link')}")
+  0771: 
+  0772: 
+
+  0772: 
+  0773: def print_compact_open(payload: dict):
+> 0774:     print(f"ok: {payload.get('ok')}")
+  0775:     print("route: open-doc-from-query")
+  0776:     print(f"query: {payload.get('query')}")
+
+  0773: def print_compact_open(payload: dict):
+  0774:     print(f"ok: {payload.get('ok')}")
+> 0775:     print("route: open-doc-from-query")
+  0776:     print(f"query: {payload.get('query')}")
+  0777:     print(f"google_object_id: {payload.get('google_object_id')}")
+
+  0774:     print(f"ok: {payload.get('ok')}")
+  0775:     print("route: open-doc-from-query")
+> 0776:     print(f"query: {payload.get('query')}")
+  0777:     print(f"google_object_id: {payload.get('google_object_id')}")
+  0778:     summary = payload.get("summary") or {}
+
+  0775:     print("route: open-doc-from-query")
+  0776:     print(f"query: {payload.get('query')}")
+> 0777:     print(f"google_object_id: {payload.get('google_object_id')}")
+  0778:     summary = payload.get("summary") or {}
+  0779:     if summary:
+
+  0778:     summary = payload.get("summary") or {}
+  0779:     if summary:
+> 0780:         print(f"document_id: {summary.get('document_id')}")
+  0781:         print(f"document_name: {summary.get('document_name')}")
+  0782:         print(f"link: {summary.get('link')}")
+
+  0779:     if summary:
+  0780:         print(f"document_id: {summary.get('document_id')}")
+> 0781:         print(f"document_name: {summary.get('document_name')}")
+  0782:         print(f"link: {summary.get('link')}")
+  0783: 
+
+  0780:         print(f"document_id: {summary.get('document_id')}")
+  0781:         print(f"document_name: {summary.get('document_name')}")
+> 0782:         print(f"link: {summary.get('link')}")
+  0783: 
+  0784: 
+
+  0784: 
+  0785: def print_compact_read(payload: dict):
+> 0786:     print(f"ok: {payload.get('ok')}")
+  0787:     print("route: read-doc-from-query")
+  0788:     print(f"query: {payload.get('query')}")
+
+  0785: def print_compact_read(payload: dict):
+  0786:     print(f"ok: {payload.get('ok')}")
+> 0787:     print("route: read-doc-from-query")
+  0788:     print(f"query: {payload.get('query')}")
+  0789:     summary = payload.get("summary") or {}
+
+  0786:     print(f"ok: {payload.get('ok')}")
+  0787:     print("route: read-doc-from-query")
+> 0788:     print(f"query: {payload.get('query')}")
+  0789:     summary = payload.get("summary") or {}
+  0790:     if summary:
+
+  0789:     summary = payload.get("summary") or {}
+  0790:     if summary:
+> 0791:         print(f"document_id: {summary.get('document_id')}")
+  0792:         print(f"document_name: {summary.get('document_name')}")
+  0793:         print(f"link: {summary.get('link')}")
+
+  0790:     if summary:
+  0791:         print(f"document_id: {summary.get('document_id')}")
+> 0792:         print(f"document_name: {summary.get('document_name')}")
+  0793:         print(f"link: {summary.get('link')}")
+  0794: 
+
+  0791:         print(f"document_id: {summary.get('document_id')}")
+  0792:         print(f"document_name: {summary.get('document_name')}")
+> 0793:         print(f"link: {summary.get('link')}")
+  0794: 
+  0795:     read_result = payload.get("read_result") or {}
+
+  0796:     content = read_result.get("content", "")
+  0797:     if content:
+> 0798:         print("")
+  0799:         print("content_preview:")
+  0800:         preview = content[:1200]
+
+  0797:     if content:
+  0798:         print("")
+> 0799:         print("content_preview:")
+  0800:         preview = content[:1200]
+  0801:         print(preview)
+
+  0799:         print("content_preview:")
+  0800:         preview = content[:1200]
+> 0801:         print(preview)
+  0802:         if read_result.get("truncated") or len(content) > 1200:
+  0803:             print("")
+
+  0801:         print(preview)
+  0802:         if read_result.get("truncated") or len(content) > 1200:
+> 0803:             print("")
+  0804:             print("[truncated]")
+  0805: 
+
+  0802:         if read_result.get("truncated") or len(content) > 1200:
+  0803:             print("")
+> 0804:             print("[truncated]")
+  0805: 
+  0806: 
+
+  0806: 
+  0807: def print_compact_status(payload: dict):
+> 0808:     print(f"ok: {payload.get('ok')}")
+  0809:     print("route: status")
+  0810: 
+
+  0807: def print_compact_status(payload: dict):
+  0808:     print(f"ok: {payload.get('ok')}")
+> 0809:     print("route: status")
+  0810: 
+  0811:     safety = payload.get("safety") or {}
+
+  0812:     config = payload.get("config") or {}
+  0813: 
+> 0814:     print(f"mode: {safety.get('mode')}")
+  0815:     print(f"default_dry_run: {safety.get('default_dry_run')}")
+  0816:     print(f"forbid_master_index_write: {safety.get('forbid_master_index_write')}")
+
+  0813: 
+  0814:     print(f"mode: {safety.get('mode')}")
+> 0815:     print(f"default_dry_run: {safety.get('default_dry_run')}")
+  0816:     print(f"forbid_master_index_write: {safety.get('forbid_master_index_write')}")
+  0817:     print(f"forbid_delete: {safety.get('forbid_delete')}")
+
+  0814:     print(f"mode: {safety.get('mode')}")
+  0815:     print(f"default_dry_run: {safety.get('default_dry_run')}")
+> 0816:     print(f"forbid_master_index_write: {safety.get('forbid_master_index_write')}")
+  0817:     print(f"forbid_delete: {safety.get('forbid_delete')}")
+  0818:     print(f"default_test_folder: {safety.get('default_test_folder')}")
+
+  0815:     print(f"default_dry_run: {safety.get('default_dry_run')}")
+  0816:     print(f"forbid_master_index_write: {safety.get('forbid_master_index_write')}")
+> 0817:     print(f"forbid_delete: {safety.get('forbid_delete')}")
+  0818:     print(f"default_test_folder: {safety.get('default_test_folder')}")
+  0819:     print(f"master_index_sheet: {config.get('master_index_sheet_name')}")
+
+  0816:     print(f"forbid_master_index_write: {safety.get('forbid_master_index_write')}")
+  0817:     print(f"forbid_delete: {safety.get('forbid_delete')}")
+> 0818:     print(f"default_test_folder: {safety.get('default_test_folder')}")
+  0819:     print(f"master_index_sheet: {config.get('master_index_sheet_name')}")
+  0820:     print(f"master_index_id: {config.get('master_index_spreadsheet_id')}")
+
+  0817:     print(f"forbid_delete: {safety.get('forbid_delete')}")
+  0818:     print(f"default_test_folder: {safety.get('default_test_folder')}")
+> 0819:     print(f"master_index_sheet: {config.get('master_index_sheet_name')}")
+  0820:     print(f"master_index_id: {config.get('master_index_spreadsheet_id')}")
+  0821:     print(f"change_log_sheet: {config.get('change_log_sheet_name')}")
+
+  0818:     print(f"default_test_folder: {safety.get('default_test_folder')}")
+  0819:     print(f"master_index_sheet: {config.get('master_index_sheet_name')}")
+> 0820:     print(f"master_index_id: {config.get('master_index_spreadsheet_id')}")
+  0821:     print(f"change_log_sheet: {config.get('change_log_sheet_name')}")
+  0822:     print(f"change_log_id: {config.get('change_log_spreadsheet_id')}")
+
+  0819:     print(f"master_index_sheet: {config.get('master_index_sheet_name')}")
+  0820:     print(f"master_index_id: {config.get('master_index_spreadsheet_id')}")
+> 0821:     print(f"change_log_sheet: {config.get('change_log_sheet_name')}")
+  0822:     print(f"change_log_id: {config.get('change_log_spreadsheet_id')}")
+  0823: 
+
+  0820:     print(f"master_index_id: {config.get('master_index_spreadsheet_id')}")
+  0821:     print(f"change_log_sheet: {config.get('change_log_sheet_name')}")
+> 0822:     print(f"change_log_id: {config.get('change_log_spreadsheet_id')}")
+  0823: 
+  0824: 
+
+  0824: 
+  0825: def print_compact_repo_state(payload: dict):
+> 0826:     print(f"ok: {payload.get('ok')}")
+  0827:     print("route: repo-state")
+  0828: 
+
+  0825: def print_compact_repo_state(payload: dict):
+  0826:     print(f"ok: {payload.get('ok')}")
+> 0827:     print("route: repo-state")
+  0828: 
+  0829:     if not payload.get("ok"):
+
+  0828: 
+  0829:     if not payload.get("ok"):
+> 0830:         print(f"error_type: {payload.get('error_type')}")
+  0831:         print(f"error_message: {payload.get('error_message')}")
+  0832:         return
+
+  0829:     if not payload.get("ok"):
+  0830:         print(f"error_type: {payload.get('error_type')}")
+> 0831:         print(f"error_message: {payload.get('error_message')}")
+  0832:         return
+  0833: 
+
+  0832:         return
+  0833: 
+> 0834:     print(f"repo_path: {payload.get('repo_path')}")
+  0835:     print(f"branch: {payload.get('branch')}")
+  0836:     print(f"is_main: {payload.get('is_main')}")
+
+  0833: 
+  0834:     print(f"repo_path: {payload.get('repo_path')}")
+> 0835:     print(f"branch: {payload.get('branch')}")
+  0836:     print(f"is_main: {payload.get('is_main')}")
+  0837:     print(f"working_tree_clean: {payload.get('working_tree_clean')}")
+
+  0834:     print(f"repo_path: {payload.get('repo_path')}")
+  0835:     print(f"branch: {payload.get('branch')}")
+> 0836:     print(f"is_main: {payload.get('is_main')}")
+  0837:     print(f"working_tree_clean: {payload.get('working_tree_clean')}")
+  0838:     print(f"local_equals_origin_main: {payload.get('local_equals_origin_main')}")
+
+  0835:     print(f"branch: {payload.get('branch')}")
+  0836:     print(f"is_main: {payload.get('is_main')}")
+> 0837:     print(f"working_tree_clean: {payload.get('working_tree_clean')}")
+  0838:     print(f"local_equals_origin_main: {payload.get('local_equals_origin_main')}")
+  0839:     print(f"safe_for_mutation: {payload.get('safe_for_mutation')}")
+
+  0836:     print(f"is_main: {payload.get('is_main')}")
+  0837:     print(f"working_tree_clean: {payload.get('working_tree_clean')}")
+> 0838:     print(f"local_equals_origin_main: {payload.get('local_equals_origin_main')}")
+  0839:     print(f"safe_for_mutation: {payload.get('safe_for_mutation')}")
+  0840:     print(f"head_sha: {payload.get('head_sha')}")
+
+  0837:     print(f"working_tree_clean: {payload.get('working_tree_clean')}")
+  0838:     print(f"local_equals_origin_main: {payload.get('local_equals_origin_main')}")
+> 0839:     print(f"safe_for_mutation: {payload.get('safe_for_mutation')}")
+  0840:     print(f"head_sha: {payload.get('head_sha')}")
+  0841:     print(f"origin_main_sha: {payload.get('origin_main_sha')}")
+
+  0838:     print(f"local_equals_origin_main: {payload.get('local_equals_origin_main')}")
+  0839:     print(f"safe_for_mutation: {payload.get('safe_for_mutation')}")
+> 0840:     print(f"head_sha: {payload.get('head_sha')}")
+  0841:     print(f"origin_main_sha: {payload.get('origin_main_sha')}")
+  0842: 
+
+  0839:     print(f"safe_for_mutation: {payload.get('safe_for_mutation')}")
+  0840:     print(f"head_sha: {payload.get('head_sha')}")
+> 0841:     print(f"origin_main_sha: {payload.get('origin_main_sha')}")
+  0842: 
+  0843:     entries = payload.get("diff_name_status_entries") or []
+
+  0843:     entries = payload.get("diff_name_status_entries") or []
+  0844:     if entries:
+> 0845:         print("diff_name_status_entries:")
+  0846:         for entry in entries:
+  0847:             print(f"  - {entry}")
+
+  0845:         print("diff_name_status_entries:")
+  0846:         for entry in entries:
+> 0847:             print(f"  - {entry}")
+  0848: 
+  0849:     print(f"recommended_next_step: {payload.get('recommended_next_step')}")
+
+  0847:             print(f"  - {entry}")
+  0848: 
+> 0849:     print(f"recommended_next_step: {payload.get('recommended_next_step')}")
+  0850: 
+  0851: 
+
+  0851: 
+  0852: def print_compact_doctor_lite(payload: dict):
+> 0853:     print(f"ok: {payload.get('ok')}")
+  0854:     print("route: doctor-lite")
+  0855:     print(
+
+  0852: def print_compact_doctor_lite(payload: dict):
+  0853:     print(f"ok: {payload.get('ok')}")
+> 0854:     print("route: doctor-lite")
+  0855:     print(
+  0856:         f"environment_ok: {(payload.get('checks') or {}).get('environment', {}).get('ok')}"
+
+  0853:     print(f"ok: {payload.get('ok')}")
+  0854:     print("route: doctor-lite")
+> 0855:     print(
+  0856:         f"environment_ok: {(payload.get('checks') or {}).get('environment', {}).get('ok')}"
+  0857:     )
+
+  0856:         f"environment_ok: {(payload.get('checks') or {}).get('environment', {}).get('ok')}"
+  0857:     )
+> 0858:     print(f"status_ok: {(payload.get('checks') or {}).get('status', {}).get('ok')}")
+  0859:     print(
+  0860:         f"master_index_ok: {(payload.get('checks') or {}).get('master_index_lookup', {}).get('ok')}"
+
+  0857:     )
+  0858:     print(f"status_ok: {(payload.get('checks') or {}).get('status', {}).get('ok')}")
+> 0859:     print(
+  0860:         f"master_index_ok: {(payload.get('checks') or {}).get('master_index_lookup', {}).get('ok')}"
+  0861:     )
+
+  0860:         f"master_index_ok: {(payload.get('checks') or {}).get('master_index_lookup', {}).get('ok')}"
+  0861:     )
+> 0862:     print(f"summary: {payload.get('summary')}")
+  0863:     print(f"next_step: {payload.get('next_step')}")
+  0864:     print(f"diagnosis: {payload.get('diagnosis')}")
+
+  0861:     )
+  0862:     print(f"summary: {payload.get('summary')}")
+> 0863:     print(f"next_step: {payload.get('next_step')}")
+  0864:     print(f"diagnosis: {payload.get('diagnosis')}")
+  0865:     print(f"likely_cause: {payload.get('likely_cause')}")
+
+  0862:     print(f"summary: {payload.get('summary')}")
+  0863:     print(f"next_step: {payload.get('next_step')}")
+> 0864:     print(f"diagnosis: {payload.get('diagnosis')}")
+  0865:     print(f"likely_cause: {payload.get('likely_cause')}")
+  0866:     print(f"recommended_action: {payload.get('recommended_action')}")
+
+  0863:     print(f"next_step: {payload.get('next_step')}")
+  0864:     print(f"diagnosis: {payload.get('diagnosis')}")
+> 0865:     print(f"likely_cause: {payload.get('likely_cause')}")
+  0866:     print(f"recommended_action: {payload.get('recommended_action')}")
+  0867:     if not payload.get("ok"):
+
+  0864:     print(f"diagnosis: {payload.get('diagnosis')}")
+  0865:     print(f"likely_cause: {payload.get('likely_cause')}")
+> 0866:     print(f"recommended_action: {payload.get('recommended_action')}")
+  0867:     if not payload.get("ok"):
+  0868:         print(f"error_type: {payload.get('error_type')}")
+
+  0866:     print(f"recommended_action: {payload.get('recommended_action')}")
+  0867:     if not payload.get("ok"):
+> 0868:         print(f"error_type: {payload.get('error_type')}")
+  0869:         print(f"error_message: {payload.get('error_message')}")
+  0870: 
+
+  0867:     if not payload.get("ok"):
+  0868:         print(f"error_type: {payload.get('error_type')}")
+> 0869:         print(f"error_message: {payload.get('error_message')}")
+  0870: 
+  0871: 
+
+  0871: 
+  0872: def print_compact_doctor(payload: dict):
+> 0873:     print(f"ok: {payload.get('ok')}")
+  0874:     print("route: doctor")
+  0875: 
+
+  0872: def print_compact_doctor(payload: dict):
+  0873:     print(f"ok: {payload.get('ok')}")
+> 0874:     print("route: doctor")
+  0875: 
+  0876:     checks = payload.get("checks") or {}
+
+  0880:     smoke_check = checks.get("smoke_probe") or {}
+  0881: 
+> 0882:     print(f"environment_ok: {env_check.get('ok')}")
+  0883:     print(f"status_ok: {status_check.get('ok')}")
+  0884:     print(f"master_index_ok: {mi_check.get('ok')}")
+
+  0881: 
+  0882:     print(f"environment_ok: {env_check.get('ok')}")
+> 0883:     print(f"status_ok: {status_check.get('ok')}")
+  0884:     print(f"master_index_ok: {mi_check.get('ok')}")
+  0885:     print(f"smoke_ok: {smoke_check.get('ok')}")
+
+  0882:     print(f"environment_ok: {env_check.get('ok')}")
+  0883:     print(f"status_ok: {status_check.get('ok')}")
+> 0884:     print(f"master_index_ok: {mi_check.get('ok')}")
+  0885:     print(f"smoke_ok: {smoke_check.get('ok')}")
+  0886:     print(f"summary: {payload.get('summary')}")
+
+  0883:     print(f"status_ok: {status_check.get('ok')}")
+  0884:     print(f"master_index_ok: {mi_check.get('ok')}")
+> 0885:     print(f"smoke_ok: {smoke_check.get('ok')}")
+  0886:     print(f"summary: {payload.get('summary')}")
+  0887:     print(f"next_step: {payload.get('next_step')}")
+
+  0884:     print(f"master_index_ok: {mi_check.get('ok')}")
+  0885:     print(f"smoke_ok: {smoke_check.get('ok')}")
+> 0886:     print(f"summary: {payload.get('summary')}")
+  0887:     print(f"next_step: {payload.get('next_step')}")
+  0888: 
+
+  0885:     print(f"smoke_ok: {smoke_check.get('ok')}")
+  0886:     print(f"summary: {payload.get('summary')}")
+> 0887:     print(f"next_step: {payload.get('next_step')}")
+  0888: 
+  0889:     if payload.get("diagnosis"):
+
+  0888: 
+  0889:     if payload.get("diagnosis"):
+> 0890:         print(f"diagnosis: {payload.get('diagnosis')}")
+  0891:     if payload.get("likely_cause"):
+  0892:         print(f"likely_cause: {payload.get('likely_cause')}")
+
+  0890:         print(f"diagnosis: {payload.get('diagnosis')}")
+  0891:     if payload.get("likely_cause"):
+> 0892:         print(f"likely_cause: {payload.get('likely_cause')}")
+  0893:     if payload.get("recommended_action"):
+  0894:         print(f"recommended_action: {payload.get('recommended_action')}")
+
+  0892:         print(f"likely_cause: {payload.get('likely_cause')}")
+  0893:     if payload.get("recommended_action"):
+> 0894:         print(f"recommended_action: {payload.get('recommended_action')}")
+  0895: 
+  0896:     if not payload.get("ok"):
+
+  0895: 
+  0896:     if not payload.get("ok"):
+> 0897:         print(f"error_type: {payload.get('error_type')}")
+  0898:         print(f"error_message: {payload.get('error_message')}")
+  0899: 
+
+  0896:     if not payload.get("ok"):
+  0897:         print(f"error_type: {payload.get('error_type')}")
+> 0898:         print(f"error_message: {payload.get('error_message')}")
+  0899: 
+  0900: 
+
+  1058: 
+  1059: def print_json(payload: dict) -> None:
+> 1060:     print(json.dumps(payload, ensure_ascii=False, indent=2))
+  1061: 
+  1062: 
+
+  1132: def print_human_lines(lines: list[str]) -> None:
+  1133:     for line in lines:
+> 1134:         print(line)
+  1135: 
+  1136: 
+
+  1469: 
+  1470: def print_usage_error(message: str) -> None:
+> 1471:     print("ok: False")
+  1472:     print("command: usage")
+  1473:     print("error_type: UsageError")
+
+  1470: def print_usage_error(message: str) -> None:
+  1471:     print("ok: False")
+> 1472:     print("command: usage")
+  1473:     print("error_type: UsageError")
+  1474:     print(f"error_message: {message}")
+
+  1471:     print("ok: False")
+  1472:     print("command: usage")
+> 1473:     print("error_type: UsageError")
+  1474:     print(f"error_message: {message}")
+  1475:     print("")
+
+  1472:     print("command: usage")
+  1473:     print("error_type: UsageError")
+> 1474:     print(f"error_message: {message}")
+  1475:     print("")
+  1476:     usage()
+
+  1473:     print("error_type: UsageError")
+  1474:     print(f"error_message: {message}")
+> 1475:     print("")
+  1476:     usage()
+  1477: 
+
+  2369:         return EXIT_OK
+  2370: 
+> 2371:     print("CAPABILITIES OK")
+  2372:     print(f"Safety mode: {payload['safety'].get('mode')}")
+  2373:     print(f"Default dry run: {payload['safety'].get('default_dry_run')}")
+
+  2370: 
+  2371:     print("CAPABILITIES OK")
+> 2372:     print(f"Safety mode: {payload['safety'].get('mode')}")
+  2373:     print(f"Default dry run: {payload['safety'].get('default_dry_run')}")
+  2374:     print("")
+
+  2371:     print("CAPABILITIES OK")
+  2372:     print(f"Safety mode: {payload['safety'].get('mode')}")
+> 2373:     print(f"Default dry run: {payload['safety'].get('default_dry_run')}")
+  2374:     print("")
+  2375:     for category, routes in payload["categories"].items():
+
+  2372:     print(f"Safety mode: {payload['safety'].get('mode')}")
+  2373:     print(f"Default dry run: {payload['safety'].get('default_dry_run')}")
+> 2374:     print("")
+  2375:     for category, routes in payload["categories"].items():
+  2376:         print(f"[{category}]")
+
+  2374:     print("")
+  2375:     for category, routes in payload["categories"].items():
+> 2376:         print(f"[{category}]")
+  2377:         for route in routes:
+  2378:             print(f"- {route}")
+
+  2376:         print(f"[{category}]")
+  2377:         for route in routes:
+> 2378:             print(f"- {route}")
+  2379:         print("")
+  2380:     return EXIT_OK
+
+  2377:         for route in routes:
+  2378:             print(f"- {route}")
+> 2379:         print("")
+  2380:     return EXIT_OK
+  2381: 
+
+  2388: 
+  2389:     if payload.get("ok"):
+> 2390:         print("ASSEMBLE CONTEXT OK")
+  2391:         print(f"Profile: {payload.get('profile')}")
+  2392:         print(
+
+  2389:     if payload.get("ok"):
+  2390:         print("ASSEMBLE CONTEXT OK")
+> 2391:         print(f"Profile: {payload.get('profile')}")
+  2392:         print(
+  2393:             f"Resolved sources: {(payload.get('context_summary') or {}).get('resolved_count')}"
+
+  2390:         print("ASSEMBLE CONTEXT OK")
+  2391:         print(f"Profile: {payload.get('profile')}")
+> 2392:         print(
+  2393:             f"Resolved sources: {(payload.get('context_summary') or {}).get('resolved_count')}"
+  2394:         )
+
+  2393:             f"Resolved sources: {(payload.get('context_summary') or {}).get('resolved_count')}"
+  2394:         )
+> 2395:         print(
+  2396:             f"Unresolved sources: {(payload.get('context_summary') or {}).get('unresolved_count')}"
+  2397:         )
+
+  2396:             f"Unresolved sources: {(payload.get('context_summary') or {}).get('unresolved_count')}"
+  2397:         )
+> 2398:         print(
+  2399:             f"Recommended generation mode: {payload.get('recommended_generation_mode')}"
+  2400:         )
+
+  2417: 
+  2418:     if payload.get("ok"):
+> 2419:         print("DOC BODY ONLY OK")
+  2420:         print(f"Profile: {payload.get('profile')}")
+  2421:         print(f"Document type: {payload.get('document_type')}")
+
+  2418:     if payload.get("ok"):
+  2419:         print("DOC BODY ONLY OK")
+> 2420:         print(f"Profile: {payload.get('profile')}")
+  2421:         print(f"Document type: {payload.get('document_type')}")
+  2422:         print(f"Title: {payload.get('title')}")
+
+  2419:         print("DOC BODY ONLY OK")
+  2420:         print(f"Profile: {payload.get('profile')}")
+> 2421:         print(f"Document type: {payload.get('document_type')}")
+  2422:         print(f"Title: {payload.get('title')}")
+  2423:         print("")
+
+  2420:         print(f"Profile: {payload.get('profile')}")
+  2421:         print(f"Document type: {payload.get('document_type')}")
+> 2422:         print(f"Title: {payload.get('title')}")
+  2423:         print("")
+  2424:         print(payload.get("body", ""))
+
+  2421:         print(f"Document type: {payload.get('document_type')}")
+  2422:         print(f"Title: {payload.get('title')}")
+> 2423:         print("")
+  2424:         print(payload.get("body", ""))
+  2425:         return EXIT_OK
+
+  2422:         print(f"Title: {payload.get('title')}")
+  2423:         print("")
+> 2424:         print(payload.get("body", ""))
+  2425:         return EXIT_OK
+  2426: 
+
+  2436: 
+  2437:     if payload.get("ok"):
+> 2438:         print("ARTIFACT STATE OK")
+  2439:         print(f"File ID: {(payload.get('target_artifact') or {}).get('file_id')}")
+  2440:         print(f"Name: {(payload.get('target_artifact') or {}).get('name')}")
+
+  2437:     if payload.get("ok"):
+  2438:         print("ARTIFACT STATE OK")
+> 2439:         print(f"File ID: {(payload.get('target_artifact') or {}).get('file_id')}")
+  2440:         print(f"Name: {(payload.get('target_artifact') or {}).get('name')}")
+  2441:         print(f"Artifact state: {payload.get('artifact_state')}")
+
+  2438:         print("ARTIFACT STATE OK")
+  2439:         print(f"File ID: {(payload.get('target_artifact') or {}).get('file_id')}")
+> 2440:         print(f"Name: {(payload.get('target_artifact') or {}).get('name')}")
+  2441:         print(f"Artifact state: {payload.get('artifact_state')}")
+  2442:         print(f"Review status: {payload.get('review_status')}")
+
+  2439:         print(f"File ID: {(payload.get('target_artifact') or {}).get('file_id')}")
+  2440:         print(f"Name: {(payload.get('target_artifact') or {}).get('name')}")
+> 2441:         print(f"Artifact state: {payload.get('artifact_state')}")
+  2442:         print(f"Review status: {payload.get('review_status')}")
+  2443:         print(f"Next safe step: {payload.get('next_safe_step')}")
+
+  2440:         print(f"Name: {(payload.get('target_artifact') or {}).get('name')}")
+  2441:         print(f"Artifact state: {payload.get('artifact_state')}")
+> 2442:         print(f"Review status: {payload.get('review_status')}")
+  2443:         print(f"Next safe step: {payload.get('next_safe_step')}")
+  2444:         return EXIT_OK
+
+  2441:         print(f"Artifact state: {payload.get('artifact_state')}")
+  2442:         print(f"Review status: {payload.get('review_status')}")
+> 2443:         print(f"Next safe step: {payload.get('next_safe_step')}")
+  2444:         return EXIT_OK
+  2445: 
+
+  2508: 
+  2509: def usage() -> None:
+> 2510:     print(
+  2511:         "Usage:\n"
+  2512:         "  python agent_cli.py status [--json]\n  python agent_cli.py repo-state [--json]    | rs [--json]\n"
+

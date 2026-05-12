@@ -1,0 +1,15 @@
+handle_query_command audit review
+
+definition lines: 2488-2506
+arguments: ['argv', 'handler']
+
+- uses parse_json_flag: yes
+- contains print side effects: no
+- contains sys.exit: no
+- contains broad exception handling: no
+- contains direct docs_agent adapter style invocation: no
+
+recommended next decision gate
+- if wrapper is purely routing + minor normalization: possible future non-behavioral command-family classification map
+- if wrapper mixes routing/rendering/runtime adaptation: stop cleanup and preserve until separate adapter-boundary audit
+- no code mutation in this step

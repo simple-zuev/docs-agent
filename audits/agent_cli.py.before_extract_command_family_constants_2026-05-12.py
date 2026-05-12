@@ -2485,15 +2485,6 @@ def require_query_args(
     return True, args
 
 
-REPO_STATE_COMMANDS = {"repo-state", "rs"}
-DOCTOR_LITE_COMMANDS = {"doctor-lite", "diagnose-lite"}
-DOCTOR_COMMANDS = {"doctor", "diagnose"}
-FIND_DOC_ANY_COMMANDS = {"find-doc-any", "f"}
-OPEN_DOC_FROM_QUERY_COMMANDS = {"open-doc-from-query", "o"}
-READ_DOC_FROM_QUERY_COMMANDS = {"read-doc-from-query", "r"}
-ASK_COMMANDS = {"ask", "q"}
-
-
 def handle_query_command(
     argv: list[str],
     handler,
@@ -2563,14 +2554,14 @@ def main() -> int:
                 return EXIT_USAGE_ERROR
             return cmd_status(json_output=json_output)
 
-        if cmd in REPO_STATE_COMMANDS:
+        if cmd in {"repo-state", "rs"}:
             json_output, args = parse_json_flag(argv)
             if args:
                 print_usage_error("repo-state does not accept positional arguments.")
                 return EXIT_USAGE_ERROR
             return cmd_repo_state(json_output=json_output)
 
-        if cmd in DOCTOR_LITE_COMMANDS:
+        if cmd in {"doctor-lite", "diagnose-lite"}:
             json_output, args = parse_json_flag(argv)
             if args:
                 print_usage_error("doctor-lite does not accept positional arguments.")
@@ -2623,7 +2614,7 @@ def main() -> int:
                 return EXIT_USAGE_ERROR
             return cmd_artifact_state(args[1], json_output=json_output)
 
-        if cmd in DOCTOR_COMMANDS:
+        if cmd in {"doctor", "diagnose"}:
             json_output, args = parse_json_flag(argv)
             if args:
                 print_usage_error("doctor does not accept positional arguments.")
@@ -2643,15 +2634,15 @@ def main() -> int:
         if cmd == "find-link":
             return handle_query_command(argv, cmd_find_link)
 
-        if cmd in FIND_DOC_ANY_COMMANDS:
+        if cmd in {"find-doc-any", "f"}:
             return handle_query_command(argv, cmd_find_doc_any, allow_json_flag=True)
 
-        if cmd in OPEN_DOC_FROM_QUERY_COMMANDS:
+        if cmd in {"open-doc-from-query", "o"}:
             return handle_query_command(
                 argv, cmd_open_doc_from_query, allow_json_flag=True
             )
 
-        if cmd in READ_DOC_FROM_QUERY_COMMANDS:
+        if cmd in {"read-doc-from-query", "r"}:
             return handle_query_command(
                 argv, cmd_read_doc_from_query, allow_json_flag=True
             )
@@ -2670,7 +2661,7 @@ def main() -> int:
             cmd_read_doc(argv[0])
             return EXIT_OK
 
-        if cmd in ASK_COMMANDS:
+        if cmd in {"ask", "q"}:
             return handle_query_command(argv, cmd_ask, allow_json_flag=True)
 
         print_usage_error(f"Unknown command: {cmd}")

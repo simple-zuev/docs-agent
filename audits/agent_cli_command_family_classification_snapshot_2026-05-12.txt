@@ -1,0 +1,236 @@
+agent_cli command family classification snapshot
+
+## cmd assignments
+  0668:         )
+  0669: 
+> 0670:     cmd = ["bash", str(script)]
+  0671:     try:
+  0672:         proc = subprocess.run(
+
+  0970: 
+  0971: def run_docs_agent(args: list[str]) -> dict:
+> 0972:     cmd = [str(PYTHON_BIN), str(DOCS_AGENT)] + args + ["--json-output"]
+  0973: 
+  0974:     try:
+
+  2544:         return EXIT_USAGE_ERROR
+  2545: 
+> 2546:     cmd = sys.argv[1]
+  2547:     argv = sys.argv[2:]
+  2548: 
+
+## direct command equality checks
+  2548: 
+  2549:     try:
+> 2550:         if cmd == "status":
+  2551:             json_output, args = parse_json_flag(argv)
+  2552:             if args:
+
+  2569:             return cmd_doctor_lite(json_output=json_output)
+  2570: 
+> 2571:         if cmd == "capabilities":
+  2572:             json_output, args = parse_json_flag(argv)
+  2573:             if args:
+
+  2576:             return cmd_capabilities(json_output=json_output)
+  2577: 
+> 2578:         if cmd == "assemble-context":
+  2579:             json_output, args = parse_json_flag(argv)
+  2580:             if len(args) != 2 or args[0] != "--profile":
+
+  2583:             return cmd_assemble_context(args[1], json_output=json_output)
+  2584: 
+> 2585:         if cmd == "doc-body-only":
+  2586:             json_output, args = parse_json_flag(argv)
+  2587:             if len(args) != 6:
+
+  2606:             )
+  2607: 
+> 2608:         if cmd == "artifact-state":
+  2609:             json_output, args = parse_json_flag(argv)
+  2610:             if len(args) != 2 or args[0] != "--file-id":
+
+  2622:             return cmd_doctor(json_output=json_output)
+  2623: 
+> 2624:         if cmd == "find-doc-id":
+  2625:             if len(argv) < 1:
+  2626:                 print_usage_error("Missing DOC-XXXX argument.")
+
+  2629:             return EXIT_OK
+  2630: 
+> 2631:         if cmd == "find-doc-name":
+  2632:             return handle_query_command(argv, cmd_find_doc_name)
+  2633: 
+
+  2632:             return handle_query_command(argv, cmd_find_doc_name)
+  2633: 
+> 2634:         if cmd == "find-link":
+  2635:             return handle_query_command(argv, cmd_find_link)
+  2636: 
+
+  2648:             )
+  2649: 
+> 2650:         if cmd == "get-file":
+  2651:             if len(argv) < 1:
+  2652:                 print_usage_error("Missing google_drive_file_id argument.")
+
+  2655:             return EXIT_OK
+  2656: 
+> 2657:         if cmd == "read-doc":
+  2658:             if len(argv) < 1:
+  2659:                 print_usage_error("Missing google_doc_id argument.")
+
+## direct command membership checks
+  2555:             return cmd_status(json_output=json_output)
+  2556: 
+> 2557:         if cmd in {"repo-state", "rs"}:
+  2558:             json_output, args = parse_json_flag(argv)
+  2559:             if args:
+
+  2562:             return cmd_repo_state(json_output=json_output)
+  2563: 
+> 2564:         if cmd in {"doctor-lite", "diagnose-lite"}:
+  2565:             json_output, args = parse_json_flag(argv)
+  2566:             if args:
+
+  2615:             return cmd_artifact_state(args[1], json_output=json_output)
+  2616: 
+> 2617:         if cmd in {"doctor", "diagnose"}:
+  2618:             json_output, args = parse_json_flag(argv)
+  2619:             if args:
+
+  2635:             return handle_query_command(argv, cmd_find_link)
+  2636: 
+> 2637:         if cmd in {"find-doc-any", "f"}:
+  2638:             return handle_query_command(argv, cmd_find_doc_any, allow_json_flag=True)
+  2639: 
+
+  2638:             return handle_query_command(argv, cmd_find_doc_any, allow_json_flag=True)
+  2639: 
+> 2640:         if cmd in {"open-doc-from-query", "o"}:
+  2641:             return handle_query_command(
+  2642:                 argv, cmd_open_doc_from_query, allow_json_flag=True
+
+  2643:             )
+  2644: 
+> 2645:         if cmd in {"read-doc-from-query", "r"}:
+  2646:             return handle_query_command(
+  2647:                 argv, cmd_read_doc_from_query, allow_json_flag=True
+
+  2662:             return EXIT_OK
+  2663: 
+> 2664:         if cmd in {"ask", "q"}:
+  2665:             return handle_query_command(argv, cmd_ask, allow_json_flag=True)
+  2666: 
+
+## elif command equality checks
+(no matches)
+
+## elif command membership checks
+(no matches)
+
+## handle_query_command call sites
+  2486: 
+  2487: 
+> 2488: def handle_query_command(
+  2489:     argv: list[str],
+  2490:     handler,
+
+  2630: 
+  2631:         if cmd == "find-doc-name":
+> 2632:             return handle_query_command(argv, cmd_find_doc_name)
+  2633: 
+  2634:         if cmd == "find-link":
+
+  2633: 
+  2634:         if cmd == "find-link":
+> 2635:             return handle_query_command(argv, cmd_find_link)
+  2636: 
+  2637:         if cmd in {"find-doc-any", "f"}:
+
+  2636: 
+  2637:         if cmd in {"find-doc-any", "f"}:
+> 2638:             return handle_query_command(argv, cmd_find_doc_any, allow_json_flag=True)
+  2639: 
+  2640:         if cmd in {"open-doc-from-query", "o"}:
+
+  2639: 
+  2640:         if cmd in {"open-doc-from-query", "o"}:
+> 2641:             return handle_query_command(
+  2642:                 argv, cmd_open_doc_from_query, allow_json_flag=True
+  2643:             )
+
+  2644: 
+  2645:         if cmd in {"read-doc-from-query", "r"}:
+> 2646:             return handle_query_command(
+  2647:                 argv, cmd_read_doc_from_query, allow_json_flag=True
+  2648:             )
+
+  2663: 
+  2664:         if cmd in {"ask", "q"}:
+> 2665:             return handle_query_command(argv, cmd_ask, allow_json_flag=True)
+  2666: 
+  2667:         print_usage_error(f"Unknown command: {cmd}")
+
+## subprocess boundaries
+  0002: import os
+  0003: import re
+> 0004: import subprocess
+  0005: import sys
+  0006: from pathlib import Path
+
+  0670:     cmd = ["bash", str(script)]
+  0671:     try:
+> 0672:         proc = subprocess.run(
+  0673:             cmd,
+  0674:             capture_output=True,
+
+  0676:             timeout=DOCS_AGENT_TIMEOUT_SEC,
+  0677:         )
+> 0678:     except subprocess.TimeoutExpired:
+  0679:         return build_error_payload(
+  0680:             command="smoke-explain",
+
+  0973: 
+  0974:     try:
+> 0975:         proc = subprocess.run(
+  0976:             cmd,
+  0977:             capture_output=True,
+
+  0979:             timeout=DOCS_AGENT_TIMEOUT_SEC,
+  0980:         )
+> 0981:     except subprocess.TimeoutExpired as exc:
+  0982:         return build_error_payload(
+  0983:             command="subprocess",
+
+  0981:     except subprocess.TimeoutExpired as exc:
+  0982:         return build_error_payload(
+> 0983:             command="subprocess",
+  0984:             error_type="TimeoutExpired",
+  0985:             error_message=f"docs_agent.py timed out after {DOCS_AGENT_TIMEOUT_SEC} seconds.",
+
+  0996:     except Exception as exc:
+  0997:         return build_error_payload(
+> 0998:             command="subprocess",
+  0999:             error_type=exc.__class__.__name__,
+  1000:             error_message=f"Failed to start docs_agent.py: {exc}",
+
+  1012:     if not stdout:
+  1013:         return build_error_payload(
+> 1014:             command="subprocess",
+  1015:             error_type="EmptyOutput",
+  1016:             error_message="No stdout from docs_agent.py.",
+
+  1031:     except Exception as exc:
+  1032:         return build_error_payload(
+> 1033:             command="subprocess",
+  1034:             error_type=exc.__class__.__name__,
+  1035:             error_message="Failed to parse JSON output from docs_agent.py.",
+
+## help or usage text
+  2665:             return handle_query_command(argv, cmd_ask, allow_json_flag=True)
+  2666: 
+> 2667:         print_usage_error(f"Unknown command: {cmd}")
+  2668:         return EXIT_USAGE_ERROR
+  2669: 
+

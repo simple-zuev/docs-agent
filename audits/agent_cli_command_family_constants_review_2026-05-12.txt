@@ -1,0 +1,22 @@
+agent_cli command family constants review
+
+Applied narrow non-behavioral cleanup:
+- extracted membership-based command alias sets into named constants
+- replaced inline set literals in main() dispatch with constant references
+
+Scope limits preserved:
+- no change to direct equality command checks
+- no change to handle_query_command behavior
+- no change to help or exit/output policy
+- no change to command order
+- no CLI surface expansion
+- no subprocess/runtime boundary refactor
+
+Extracted constants:
+- REPO_STATE_COMMANDS
+- DOCTOR_LITE_COMMANDS
+- DOCTOR_COMMANDS
+- FIND_DOC_ANY_COMMANDS
+- OPEN_DOC_FROM_QUERY_COMMANDS
+- READ_DOC_FROM_QUERY_COMMANDS
+- ASK_COMMANDS

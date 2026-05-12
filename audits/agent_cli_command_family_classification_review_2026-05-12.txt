@@ -1,0 +1,48 @@
+agent_cli command family classification review
+
+direct equality command checks
+- line 2550: cmd=status | if cmd == "status":
+- line 2571: cmd=capabilities | if cmd == "capabilities":
+- line 2578: cmd=assemble-context | if cmd == "assemble-context":
+- line 2585: cmd=doc-body-only | if cmd == "doc-body-only":
+- line 2608: cmd=artifact-state | if cmd == "artifact-state":
+- line 2624: cmd=find-doc-id | if cmd == "find-doc-id":
+- line 2631: cmd=find-doc-name | if cmd == "find-doc-name":
+- line 2634: cmd=find-link | if cmd == "find-link":
+- line 2650: cmd=get-file | if cmd == "get-file":
+- line 2657: cmd=read-doc | if cmd == "read-doc":
+
+membership-based command families
+- line 2557: if cmd in {"repo-state", "rs"}:
+- line 2564: if cmd in {"doctor-lite", "diagnose-lite"}:
+- line 2617: if cmd in {"doctor", "diagnose"}:
+- line 2637: if cmd in {"find-doc-any", "f"}:
+- line 2640: if cmd in {"open-doc-from-query", "o"}:
+- line 2645: if cmd in {"read-doc-from-query", "r"}:
+- line 2664: if cmd in {"ask", "q"}:
+
+handle_query_command call sites
+- line 2488: def handle_query_command(
+- line 2632: return handle_query_command(argv, cmd_find_doc_name)
+- line 2635: return handle_query_command(argv, cmd_find_link)
+- line 2638: return handle_query_command(argv, cmd_find_doc_any, allow_json_flag=True)
+- line 2641: return handle_query_command(
+- line 2646: return handle_query_command(
+- line 2665: return handle_query_command(argv, cmd_ask, allow_json_flag=True)
+
+subprocess/runtime boundary indicators
+- line 4: import subprocess
+- line 672: proc = subprocess.run(
+- line 678: except subprocess.TimeoutExpired:
+- line 975: proc = subprocess.run(
+- line 981: except subprocess.TimeoutExpired as exc:
+- line 983: command="subprocess",
+- line 998: command="subprocess",
+- line 1014: command="subprocess",
+- line 1033: command="subprocess",
+
+decision note
+- this is an audit artifact only
+- next safe decision depends on whether command families are already legible and stable
+- if stable: optional non-behavioral extraction of command-family constants/map
+- if still blurred: preserve code and stop before mutation
