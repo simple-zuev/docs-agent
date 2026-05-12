@@ -1,0 +1,15 @@
+==== next adjacent read-surface audit after read-doc parity ====
+
+==== docs_agent_v2 candidate defs ====
+634:def read_doc(
+814:def verify_doc_text(
+851:def export_doc(
+903:def upload_file_to_folder(
+981:def move_file_with_log(
+
+==== docs_agent reference defs ====
+1070:def read_doc(
+1272:def verify_doc_text(
+1309:def export_doc(
+1361:def upload_file_to_folder(
+1439:def move_file_with_log(

@@ -1,0 +1,412 @@
+==== next adjacent read-surface snapshot ====
+
+==== docs_agent_v2 verify/export section ====
+        .execute()
+    )
+
+    replace_all_text(
+        docs=docs,
+        document_id=document_id,
+        old_text=old_text,
+        new_text=new_text,
+        match_case=True,
+    )
+
+    change_id, updated_range = append_log(
+        sheets=sheets,
+        action="Safe Replace Text",
+        obj=meta["name"],
+        from_=old_text,
+        to=new_text,
+        reason="Точечная замена текста с предварительным backup документа",
+        impact="Medium",
+        status="Done",
+        notes=f"Backup: {backup.get('webViewLink')} | Document: {meta.get('webViewLink')}",
+    )
+
+    print("SAFE REPLACE DOC TEXT OK")
+    print(f"Document: {meta['name']}")
+    print(f"Document ID: {document_id}")
+    print(f"Document URL: {meta.get('webViewLink')}")
+    print(f"Backup: {backup['name']}")
+    print(f"Backup ID: {backup['id']}")
+    print(f"Backup URL: {backup.get('webViewLink')}")
+    print(f"Change Log: {change_id} | {updated_range}")
+
+
+@app.command("verify-doc-text")
+def verify_doc_text(
+    document_id: str,
+    text_to_find: str,
+):
+    """Verify whether exact text fragment exists in Google Doc."""
+    s = services()
+    docs = s["docs"]
+    drive = s["drive"]
+
+    meta = (
+        drive.files()
+        .get(
+            fileId=document_id,
+            fields="id,name,mimeType,webViewLink,modifiedTime",
+            supportsAllDrives=True,
+        )
+        .execute()
+    )
+
+    doc = docs.documents().get(documentId=document_id).execute()
+    content = doc.get("body", {}).get("content", [])
+    text_content = extract_text(content)
+
+    count = text_content.count(text_to_find)
+    found = count > 0
+
+    print("VERIFY DOC TEXT OK")
+    print(f"Name: {meta['name']}")
+    print(f"ID: {meta['id']}")
+    print(f"Modified: {meta.get('modifiedTime')}")
+    print(f"URL: {meta.get('webViewLink')}")
+    print(f"Search text: {text_to_find}")
+    print(f"Found: {found}")
+    print(f"Count: {count}")
+
+
+@app.command("export-doc")
+def export_doc(
+    document_id: str,
+    out_path: str,
+    export_format: str = "docx",
+):
+    """Export Google Doc to local file. Supported: docx, pdf, txt."""
+    s = services()
+    drive = s["drive"]
+
+    meta = (
+        drive.files()
+        .get(
+            fileId=document_id,
+            fields="id,name,mimeType,webViewLink,modifiedTime",
+            supportsAllDrives=True,
+        )
+        .execute()
+    )
+
+    mime_map = {
+        "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "pdf": "application/pdf",
+        "txt": "text/plain",
+    }
+
+    export_format = export_format.lower()
+    if export_format not in mime_map:
+        raise typer.BadParameter("export_format must be one of: docx, pdf, txt")
+
+    request = drive.files().export_media(
+        fileId=document_id,
+        mimeType=mime_map[export_format],
+    )
+
+    out_file = Path(out_path)
+    out_file.parent.mkdir(parents=True, exist_ok=True)
+
+    with out_file.open("wb") as f:
+        downloader = MediaIoBaseDownload(f, request)
+        done = False
+        while not done:
+            _, done = downloader.next_chunk()
+
+    print("EXPORT DOC OK")
+    print(f"Name: {meta['name']}")
+    print(f"ID: {meta['id']}")
+    print(f"Format: {export_format}")
+    print(f"Output: {out_file}")
+    print(f"URL: {meta.get('webViewLink')}")
+
+
+@app.command("upload-file-to-folder")
+def upload_file_to_folder(
+    local_path: str,
+    folder_name: str,
+    target_name: Optional[str] = None,
+    dry_run: bool = False,
+    confirm: bool = False,
+):
+    """Upload local file into selected top-level Cass folder."""
+    src = Path(local_path)
+
+    if should_dry_run(dry_run):
+        print_dry_run(
+            {
+                "command": "upload-file-to-folder",
+                "local_path": str(src),
+                "folder_name": folder_name,
+                "target_name": target_name or src.name,
+                "write_mode_required": True,
+            }
+        )
+        return
+
+    ensure_write_allowed("upload-file-to-folder", target=folder_name)
+    ensure_confirmed(confirm, "upload-file-to-folder")
+    s = services()
+    drive = s["drive"]
+    sheets = s["sheets"]
+
+    src = Path(local_path)
+    if not src.exists():
+        raise typer.BadParameter(f"Local file not found: {src}")
+
+    cass = find_folder(drive, "Cass")
+    target = find_folder(drive, folder_name, cass["id"])
+
+    from googleapiclient.http import MediaFileUpload
+
+    media = MediaFileUpload(str(src), resumable=True)
+    file_name = target_name or src.name
+
+    created = (
+        drive.files()
+        .create(
+            body={
+                "name": file_name,
+                "parents": [target["id"]],
+            },
+            media_body=media,
+            fields="id,name,mimeType,webViewLink,parents",
+            supportsAllDrives=True,
+        )
+        .execute()
+    )
+
+    change_id, updated_range = append_log(
+        sheets=sheets,
+        action="Upload File",
+        obj=created["name"],
+        from_=str(src),
+        to=f"Cass / {folder_name}",
+        reason="Загрузка локального файла в папку Cass через docs-agent",
+        impact="Low",
+        status="Done",
+        notes=f"File ID: {created['id']} | URL: {created.get('webViewLink')}",
+    )
+
+    print("UPLOAD FILE OK")
+    print(f"Local path: {src}")
+    print(f"Uploaded name: {created['name']}")
+    print(f"File ID: {created['id']}")
+    print(f"Folder: Cass / {folder_name}")
+    print(f"Target folder ID: {target['id']}")
+    print(f"Created parents: {created.get('parents', [])}")
+    print(f"URL: {created.get('webViewLink')}")
+    print(f"Change Log: {change_id} | {updated_range}")
+
+
+@app.command("move-file-with-log")
+
+==== docs_agent verify/export section ====
+
+    print("SAFE REPLACE DOC TEXT OK")
+    print(f"Document: {meta['name']}")
+    print(f"Document ID: {document_id}")
+    print(f"Document URL: {meta.get('webViewLink')}")
+    print(f"Backup: {backup['name']}")
+    print(f"Backup ID: {backup['id']}")
+    print(f"Backup URL: {backup.get('webViewLink')}")
+    print(f"Change Log: {change_id} | {updated_range}")
+
+
+@app.command("verify-doc-text")
+def verify_doc_text(
+    document_id: str,
+    text_to_find: str,
+):
+    """Verify whether exact text fragment exists in Google Doc."""
+    s = services()
+    docs = s["docs"]
+    drive = s["drive"]
+
+    meta = (
+        drive.files()
+        .get(
+            fileId=document_id,
+            fields="id,name,mimeType,webViewLink,modifiedTime",
+            supportsAllDrives=True,
+        )
+        .execute()
+    )
+
+    doc = docs.documents().get(documentId=document_id).execute()
+    content = doc.get("body", {}).get("content", [])
+    text_content = extract_text(content)
+
+    count = text_content.count(text_to_find)
+    found = count > 0
+
+    print("VERIFY DOC TEXT OK")
+    print(f"Name: {meta['name']}")
+    print(f"ID: {meta['id']}")
+    print(f"Modified: {meta.get('modifiedTime')}")
+    print(f"URL: {meta.get('webViewLink')}")
+    print(f"Search text: {text_to_find}")
+    print(f"Found: {found}")
+    print(f"Count: {count}")
+
+
+@app.command("export-doc")
+def export_doc(
+    document_id: str,
+    out_path: str,
+    export_format: str = "docx",
+):
+    """Export Google Doc to local file. Supported: docx, pdf, txt."""
+    s = services()
+    drive = s["drive"]
+
+    meta = (
+        drive.files()
+        .get(
+            fileId=document_id,
+            fields="id,name,mimeType,webViewLink,modifiedTime",
+            supportsAllDrives=True,
+        )
+        .execute()
+    )
+
+    mime_map = {
+        "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "pdf": "application/pdf",
+        "txt": "text/plain",
+    }
+
+    export_format = export_format.lower()
+    if export_format not in mime_map:
+        raise typer.BadParameter("export_format must be one of: docx, pdf, txt")
+
+    request = drive.files().export_media(
+        fileId=document_id,
+        mimeType=mime_map[export_format],
+    )
+
+    out_file = Path(out_path)
+    out_file.parent.mkdir(parents=True, exist_ok=True)
+
+    with out_file.open("wb") as f:
+        downloader = MediaIoBaseDownload(f, request)
+        done = False
+        while not done:
+            _, done = downloader.next_chunk()
+
+    print("EXPORT DOC OK")
+    print(f"Name: {meta['name']}")
+    print(f"ID: {meta['id']}")
+    print(f"Format: {export_format}")
+    print(f"Output: {out_file}")
+    print(f"URL: {meta.get('webViewLink')}")
+
+
+@app.command("upload-file-to-folder")
+def upload_file_to_folder(
+    local_path: str,
+    folder_name: str,
+    target_name: Optional[str] = None,
+    dry_run: bool = False,
+    confirm: bool = False,
+):
+    """Upload local file into selected top-level Cass folder."""
+    src = Path(local_path)
+
+    if should_dry_run(dry_run):
+        print_dry_run(
+            {
+                "command": "upload-file-to-folder",
+                "local_path": str(src),
+                "folder_name": folder_name,
+                "target_name": target_name or src.name,
+                "write_mode_required": True,
+            }
+        )
+        return
+
+    ensure_write_allowed("upload-file-to-folder", target=folder_name)
+    ensure_confirmed(confirm, "upload-file-to-folder")
+    s = services()
+    drive = s["drive"]
+    sheets = s["sheets"]
+
+    src = Path(local_path)
+    if not src.exists():
+        raise typer.BadParameter(f"Local file not found: {src}")
+
+    cass = find_folder(drive, "Cass")
+    target = find_folder(drive, folder_name, cass["id"])
+
+    from googleapiclient.http import MediaFileUpload
+
+    media = MediaFileUpload(str(src), resumable=True)
+    file_name = target_name or src.name
+
+    created = (
+        drive.files()
+        .create(
+            body={
+                "name": file_name,
+                "parents": [target["id"]],
+            },
+            media_body=media,
+            fields="id,name,mimeType,webViewLink,parents",
+            supportsAllDrives=True,
+        )
+        .execute()
+    )
+
+    change_id, updated_range = append_log(
+        sheets=sheets,
+        action="Upload File",
+        obj=created["name"],
+        from_=str(src),
+        to=f"Cass / {folder_name}",
+        reason="Загрузка локального файла в папку Cass через docs-agent",
+        impact="Low",
+        status="Done",
+        notes=f"File ID: {created['id']} | URL: {created.get('webViewLink')}",
+    )
+
+    print("UPLOAD FILE OK")
+    print(f"Local path: {src}")
+    print(f"Uploaded name: {created['name']}")
+    print(f"File ID: {created['id']}")
+    print(f"Folder: Cass / {folder_name}")
+    print(f"Target folder ID: {target['id']}")
+    print(f"Created parents: {created.get('parents', [])}")
+    print(f"URL: {created.get('webViewLink')}")
+    print(f"Change Log: {change_id} | {updated_range}")
+
+
+@app.command("move-file-with-log")
+def move_file_with_log(
+    file_id: str,
+    target_folder_name: str,
+    reason: str,
+    dry_run: bool = False,
+    confirm: bool = False,
+):
+    """Move Drive file into selected top-level Cass folder and write Change Log Lite."""
+    if should_dry_run(dry_run):
+        print_dry_run(
+            {
+                "command": "move-file-with-log",
+                "file_id": file_id,
+                "target_folder_name": target_folder_name,
+                "reason": reason,
+                "write_mode_required": True,
+            }
+        )
+        return
+
+    ensure_write_allowed("move-file-with-log", target=target_folder_name)
+    ensure_confirmed(confirm, "move-file-with-log")
+    s = services()
+    drive = s["drive"]
+    sheets = s["sheets"]
+
+    if not reason.strip():
