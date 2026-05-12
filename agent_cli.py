@@ -2572,6 +2572,15 @@ def main() -> int:
 
     try:
         if cmd == "status":
+            if argv in (["--help"], ["-h"]):
+                print(
+                    "Usage:\n"
+                    "  python agent_cli.py status [--json]\n\n"
+                    "Examples:\n"
+                    "  python agent_cli.py status\n"
+                    "  python agent_cli.py status --json"
+                )
+                return EXIT_OK
             json_output, args = parse_json_flag(argv)
             if args:
                 print_usage_error("status does not accept positional arguments.")
@@ -2579,6 +2588,16 @@ def main() -> int:
             return cmd_status(json_output=json_output)
 
         if cmd in {"repo-state", "rs"}:
+            if argv in (["--help"], ["-h"]):
+                print(
+                    "Usage:\n"
+                    "  python agent_cli.py repo-state [--json]\n"
+                    "  python agent_cli.py rs [--json]\n\n"
+                    "Examples:\n"
+                    "  python agent_cli.py repo-state\n"
+                    "  python agent_cli.py repo-state --json"
+                )
+                return EXIT_OK
             json_output, args = parse_json_flag(argv)
             if args:
                 print_usage_error("repo-state does not accept positional arguments.")
@@ -2600,6 +2619,16 @@ def main() -> int:
             return cmd_capabilities(json_output=json_output)
 
         if cmd in {"doctor", "diagnose"}:
+            if argv in (["--help"], ["-h"]):
+                print(
+                    "Usage:\n"
+                    "  python agent_cli.py doctor [--json]\n"
+                    "  python agent_cli.py diagnose [--json]\n\n"
+                    "Examples:\n"
+                    "  python agent_cli.py doctor\n"
+                    "  python agent_cli.py doctor --json"
+                )
+                return EXIT_OK
             json_output, args = parse_json_flag(argv)
             if args:
                 print_usage_error("doctor does not accept positional arguments.")
@@ -2646,6 +2675,16 @@ def main() -> int:
             return cmd_artifact_state(args[1], json_output=json_output)
 
         if cmd in {"doctor", "diagnose"}:
+            if argv in (["--help"], ["-h"]):
+                print(
+                    "Usage:\n"
+                    "  python agent_cli.py doctor [--json]\n"
+                    "  python agent_cli.py diagnose [--json]\n\n"
+                    "Examples:\n"
+                    "  python agent_cli.py doctor\n"
+                    "  python agent_cli.py doctor --json"
+                )
+                return EXIT_OK
             json_output, args = parse_json_flag(argv)
             if args:
                 print_usage_error("doctor does not accept positional arguments.")
