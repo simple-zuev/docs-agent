@@ -1,0 +1,17 @@
+Post-implementation review scope
+- validate PR #45 stayed within intended narrow read-doc parity boundary
+- confirm docs_agent_v2.py::read_doc() is aligned with docs_agent.py reference
+- confirm only local helper additions required by read-doc parity were introduced
+- confirm no command surface expansion occurred
+
+Review checklist
+- only docs_agent_v2.py and audit artifacts changed
+- read_doc parity established against docs_agent.py
+- emit_output / classify_error / emit_error added locally to docs_agent_v2.py
+- HttpError import added to support copied error classifier
+- no mutation semantics changed
+- no additional command migrations performed in the same step
+
+Expected next step after this review
+- choose the next adjacent bounded candidate near read/verify/export surface
+- avoid restarting broad discovery unless this review reveals drift
