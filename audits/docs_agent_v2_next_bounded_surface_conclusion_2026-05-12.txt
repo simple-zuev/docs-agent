@@ -1,0 +1,26 @@
+Audit scope
+- next bounded surface selection after replace/output line exhaustion
+- compare docs_agent_v2.py against docs_agent.py only in read/verify/export and adjacent bounded utility paths
+
+Findings
+- read_doc is the first adjacent surface with a clear parity gap
+- docs_agent.py::read_doc already has structured output and error handling via emit_output / emit_error
+- docs_agent_v2.py::read_doc remains plain-print only
+- verify_doc_text and export_doc appear closer to current local behavior and are lower-value next targets than read_doc
+
+Selected next candidate
+- docs_agent_v2.py::read_doc()
+
+Why selected
+- existing bounded read surface
+- no mutation semantics involved
+- narrow parity target against existing reference implementation
+- likely one-function implementation step if code migration is approved later
+
+Rejected for now
+- verify_doc_text
+- export_doc
+- upload_file_to_folder
+- move_file_with_log
+- append_master_index_row
+- update_master_index_row

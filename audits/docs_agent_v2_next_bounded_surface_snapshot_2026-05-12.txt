@@ -1,0 +1,581 @@
+==== next bounded surface focused snapshot ====
+
+==== docs_agent_v2 read/verify/export section ====
+def read_doc(
+    document_id: str,
+    max_chars: int = 4000,
+):
+    """Read Google Doc text content."""
+    s = services()
+    docs = s["docs"]
+    drive = s["drive"]
+
+    meta = (
+        drive.files()
+        .get(
+            fileId=document_id,
+            fields="id,name,mimeType,webViewLink,modifiedTime",
+            supportsAllDrives=True,
+        )
+        .execute()
+    )
+
+    doc = docs.documents().get(documentId=document_id).execute()
+
+    content = doc.get("body", {}).get("content", [])
+    text_content = extract_text(content)
+
+    if len(text_content) > max_chars:
+        text_content = text_content[:max_chars] + "\n\n...[TRUNCATED]..."
+
+    print("READ DOC OK")
+    print(f"Name: {meta['name']}")
+    print(f"ID: {meta['id']}")
+    print(f"Modified: {meta.get('modifiedTime')}")
+    print(f"URL: {meta.get('webViewLink')}")
+    print("")
+    print("----- DOCUMENT CONTENT BEGIN -----")
+    print(text_content)
+    print("----- DOCUMENT CONTENT END -----")
+
+
+@app.command("replace-doc-text")
+def replace_doc_text(
+    document_id: str,
+    old_text: str,
+    new_text: str,
+):
+    """Replace exact text fragment in Google Doc and log operation."""
+    ensure_write_allowed("replace-doc-text", target=document_id)
+    s = services()
+    docs = s["docs"]
+    drive = s["drive"]
+    sheets = s["sheets"]
+
+    meta = (
+        drive.files()
+        .get(
+            fileId=document_id,
+            fields="id,name,mimeType,webViewLink,modifiedTime",
+            supportsAllDrives=True,
+        )
+        .execute()
+    )
+
+    replace_all_text(
+        docs=docs,
+        document_id=document_id,
+        old_text=old_text,
+        new_text=new_text,
+        match_case=True,
+    )
+
+    change_id, updated_range = append_log(
+        sheets=sheets,
+        action="Replace Text",
+        obj=meta["name"],
+        from_=old_text,
+        to=new_text,
+        reason="Точечная замена текста через Google Docs API",
+        impact="Low",
+        status="Done",
+        notes=f"Document ID: {document_id} | URL: {meta.get('webViewLink')}",
+    )
+
+    print("REPLACE DOC TEXT OK")
+    print(f"Document: {meta['name']}")
+    print(f"ID: {document_id}")
+    print(f"URL: {meta.get('webViewLink')}")
+    print(f"Old text: {old_text}")
+    print(f"New text: {new_text}")
+    print(f"Change Log: {change_id} | {updated_range}")
+
+
+@app.command("replace-doc-text-safe")
+def replace_doc_text_safe(
+    document_id: str,
+    old_text: str,
+    new_text: str,
+    backup_folder: str = "13_Черновики_и_review",
+    dry_run: bool = False,
+    confirm: bool = False,
+):
+    """Backup document, then replace exact text fragment and log operation."""
+    if should_dry_run(dry_run):
+        print_dry_run(
+            {
+                "command": "replace-doc-text-safe",
+                "document_id": document_id,
+                "old_text": old_text,
+                "new_text": new_text,
+                "backup_folder": backup_folder,
+                "write_mode_required": True,
+            }
+        )
+        return
+
+    ensure_write_allowed("replace-doc-text-safe", target=document_id)
+    ensure_confirmed(confirm, "replace-doc-text-safe")
+    s = services()
+    docs = s["docs"]
+    drive = s["drive"]
+    sheets = s["sheets"]
+
+    cass = find_folder(drive, "Cass")
+    target = find_folder(drive, backup_folder, cass["id"])
+
+    meta = (
+        drive.files()
+        .get(
+            fileId=document_id,
+            fields="id,name,mimeType,webViewLink,modifiedTime",
+            supportsAllDrives=True,
+        )
+        .execute()
+    )
+
+    backup_name = f"BACKUP_BEFORE_REPLACE__{meta['name']}__{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+
+    backup = (
+        drive.files()
+        .copy(
+            fileId=document_id,
+            body={
+                "name": backup_name,
+                "parents": [target["id"]],
+            },
+            fields="id,name,webViewLink",
+            supportsAllDrives=True,
+        )
+        .execute()
+    )
+
+    replace_all_text(
+        docs=docs,
+        document_id=document_id,
+        old_text=old_text,
+        new_text=new_text,
+        match_case=True,
+    )
+
+    change_id, updated_range = append_log(
+        sheets=sheets,
+        action="Safe Replace Text",
+        obj=meta["name"],
+        from_=old_text,
+        to=new_text,
+        reason="Точечная замена текста с предварительным backup документа",
+        impact="Medium",
+        status="Done",
+        notes=f"Backup: {backup.get('webViewLink')} | Document: {meta.get('webViewLink')}",
+    )
+
+    print("SAFE REPLACE DOC TEXT OK")
+    print(f"Document: {meta['name']}")
+    print(f"Document ID: {document_id}")
+    print(f"Document URL: {meta.get('webViewLink')}")
+    print(f"Backup: {backup['name']}")
+    print(f"Backup ID: {backup['id']}")
+    print(f"Backup URL: {backup.get('webViewLink')}")
+    print(f"Change Log: {change_id} | {updated_range}")
+
+
+@app.command("verify-doc-text")
+def verify_doc_text(
+    document_id: str,
+    text_to_find: str,
+):
+    """Verify whether exact text fragment exists in Google Doc."""
+    s = services()
+    docs = s["docs"]
+    drive = s["drive"]
+
+    meta = (
+        drive.files()
+        .get(
+            fileId=document_id,
+            fields="id,name,mimeType,webViewLink,modifiedTime",
+            supportsAllDrives=True,
+        )
+        .execute()
+    )
+
+    doc = docs.documents().get(documentId=document_id).execute()
+    content = doc.get("body", {}).get("content", [])
+    text_content = extract_text(content)
+
+    count = text_content.count(text_to_find)
+    found = count > 0
+
+    print("VERIFY DOC TEXT OK")
+    print(f"Name: {meta['name']}")
+    print(f"ID: {meta['id']}")
+    print(f"Modified: {meta.get('modifiedTime')}")
+    print(f"URL: {meta.get('webViewLink')}")
+    print(f"Search text: {text_to_find}")
+    print(f"Found: {found}")
+    print(f"Count: {count}")
+
+
+@app.command("export-doc")
+def export_doc(
+    document_id: str,
+    out_path: str,
+    export_format: str = "docx",
+):
+    """Export Google Doc to local file. Supported: docx, pdf, txt."""
+    s = services()
+    drive = s["drive"]
+
+    meta = (
+        drive.files()
+        .get(
+            fileId=document_id,
+            fields="id,name,mimeType,webViewLink,modifiedTime",
+            supportsAllDrives=True,
+        )
+        .execute()
+    )
+
+    mime_map = {
+        "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "pdf": "application/pdf",
+        "txt": "text/plain",
+    }
+
+    export_format = export_format.lower()
+    if export_format not in mime_map:
+        raise typer.BadParameter("export_format must be one of: docx, pdf, txt")
+
+    request = drive.files().export_media(
+        fileId=document_id,
+        mimeType=mime_map[export_format],
+    )
+
+    out_file = Path(out_path)
+    out_file.parent.mkdir(parents=True, exist_ok=True)
+
+    with out_file.open("wb") as f:
+        downloader = MediaIoBaseDownload(f, request)
+        done = False
+        while not done:
+            _, done = downloader.next_chunk()
+
+    print("EXPORT DOC OK")
+    print(f"Name: {meta['name']}")
+    print(f"ID: {meta['id']}")
+    print(f"Format: {export_format}")
+    print(f"Output: {out_file}")
+    print(f"URL: {meta.get('webViewLink')}")
+
+
+@app.command("upload-file-to-folder")
+def upload_file_to_folder(
+    local_path: str,
+    folder_name: str,
+    target_name: Optional[str] = None,
+    dry_run: bool = False,
+    confirm: bool = False,
+):
+    """Upload local file into selected top-level Cass folder."""
+
+==== docs_agent read/verify/export section ====
+def read_doc(
+    document_id: str,
+    max_chars: int = 4000,
+    json_output: bool = False,
+):
+    """Read Google Doc text content."""
+    try:
+        s = services()
+        docs = s["docs"]
+        drive = s["drive"]
+
+        meta = (
+            drive.files()
+            .get(
+                fileId=document_id,
+                fields="id,name,mimeType,webViewLink,modifiedTime",
+                supportsAllDrives=True,
+            )
+            .execute()
+        )
+
+        doc = docs.documents().get(documentId=document_id).execute()
+
+        content = doc.get("body", {}).get("content", [])
+        text_content = extract_text(content)
+
+        truncated = False
+        if len(text_content) > max_chars:
+            text_content = text_content[:max_chars] + "\n\n...[TRUNCATED]..."
+            truncated = True
+
+        payload = {
+            "ok": True,
+            "command": "read-doc",
+            "document_id": document_id,
+            "meta": meta,
+            "content": text_content,
+            "truncated": truncated,
+            "max_chars": max_chars,
+        }
+
+        emit_output(
+            json_output,
+            payload,
+            human_lines=[
+                "READ DOC OK",
+                f"Name: {meta['name']}",
+                f"ID: {meta['id']}",
+                f"Modified: {meta.get('modifiedTime')}",
+                f"URL: {meta.get('webViewLink')}",
+                "",
+                "----- DOCUMENT CONTENT BEGIN -----",
+                text_content,
+                "----- DOCUMENT CONTENT END -----",
+            ],
+        )
+    except Exception as exc:
+        emit_error(json_output, "read-doc", exc)
+
+
+@app.command("replace-doc-text")
+def replace_doc_text(
+    document_id: str,
+    old_text: str,
+    new_text: str,
+):
+    """Replace exact text fragment in Google Doc and log operation."""
+    ensure_write_allowed("replace-doc-text", target=document_id)
+    s = services()
+    docs = s["docs"]
+    drive = s["drive"]
+    sheets = s["sheets"]
+
+    meta = (
+        drive.files()
+        .get(
+            fileId=document_id,
+            fields="id,name,mimeType,webViewLink,modifiedTime",
+            supportsAllDrives=True,
+        )
+        .execute()
+    )
+
+    replace_all_text(
+        docs=docs,
+        document_id=document_id,
+        old_text=old_text,
+        new_text=new_text,
+        match_case=True,
+    )
+
+    change_id, updated_range = append_log(
+        sheets=sheets,
+        action="Replace Text",
+        obj=meta["name"],
+        from_=old_text,
+        to=new_text,
+        reason="Точечная замена текста через Google Docs API",
+        impact="Low",
+        status="Done",
+        notes=f"Document ID: {document_id} | URL: {meta.get('webViewLink')}",
+    )
+
+    print("REPLACE DOC TEXT OK")
+    print(f"Document: {meta['name']}")
+    print(f"ID: {document_id}")
+    print(f"URL: {meta.get('webViewLink')}")
+    print(f"Old text: {old_text}")
+    print(f"New text: {new_text}")
+    print(f"Change Log: {change_id} | {updated_range}")
+
+
+@app.command("replace-doc-text-safe")
+def replace_doc_text_safe(
+    document_id: str,
+    old_text: str,
+    new_text: str,
+    backup_folder: str = "13_Черновики_и_review",
+    dry_run: bool = False,
+    confirm: bool = False,
+):
+    """Backup document, then replace exact text fragment and log operation."""
+    if should_dry_run(dry_run):
+        print_dry_run(
+            {
+                "command": "replace-doc-text-safe",
+                "document_id": document_id,
+                "old_text": old_text,
+                "new_text": new_text,
+                "backup_folder": backup_folder,
+                "write_mode_required": True,
+            }
+        )
+        return
+
+    ensure_write_allowed("replace-doc-text-safe", target=document_id)
+    ensure_confirmed(confirm, "replace-doc-text-safe")
+    s = services()
+    docs = s["docs"]
+    drive = s["drive"]
+    sheets = s["sheets"]
+
+    cass = find_folder(drive, "Cass")
+    target = find_folder(drive, backup_folder, cass["id"])
+
+    meta = (
+        drive.files()
+        .get(
+            fileId=document_id,
+            fields="id,name,mimeType,webViewLink,modifiedTime",
+            supportsAllDrives=True,
+        )
+        .execute()
+    )
+
+    backup_name = f"BACKUP_BEFORE_REPLACE__{meta['name']}__{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+
+    backup = (
+        drive.files()
+        .copy(
+            fileId=document_id,
+            body={
+                "name": backup_name,
+                "parents": [target["id"]],
+            },
+            fields="id,name,webViewLink",
+            supportsAllDrives=True,
+        )
+        .execute()
+    )
+
+    replace_all_text(
+        docs=docs,
+        document_id=document_id,
+        old_text=old_text,
+        new_text=new_text,
+        match_case=True,
+    )
+
+    change_id, updated_range = append_log(
+        sheets=sheets,
+        action="Safe Replace Text",
+        obj=meta["name"],
+        from_=old_text,
+        to=new_text,
+        reason="Точечная замена текста с предварительным backup документа",
+        impact="Medium",
+        status="Done",
+        notes=f"Backup: {backup.get('webViewLink')} | Document: {meta.get('webViewLink')}",
+    )
+
+    print("SAFE REPLACE DOC TEXT OK")
+    print(f"Document: {meta['name']}")
+    print(f"Document ID: {document_id}")
+    print(f"Document URL: {meta.get('webViewLink')}")
+    print(f"Backup: {backup['name']}")
+    print(f"Backup ID: {backup['id']}")
+    print(f"Backup URL: {backup.get('webViewLink')}")
+    print(f"Change Log: {change_id} | {updated_range}")
+
+
+@app.command("verify-doc-text")
+def verify_doc_text(
+    document_id: str,
+    text_to_find: str,
+):
+    """Verify whether exact text fragment exists in Google Doc."""
+    s = services()
+    docs = s["docs"]
+    drive = s["drive"]
+
+    meta = (
+        drive.files()
+        .get(
+            fileId=document_id,
+            fields="id,name,mimeType,webViewLink,modifiedTime",
+            supportsAllDrives=True,
+        )
+        .execute()
+    )
+
+    doc = docs.documents().get(documentId=document_id).execute()
+    content = doc.get("body", {}).get("content", [])
+    text_content = extract_text(content)
+
+    count = text_content.count(text_to_find)
+    found = count > 0
+
+    print("VERIFY DOC TEXT OK")
+    print(f"Name: {meta['name']}")
+    print(f"ID: {meta['id']}")
+    print(f"Modified: {meta.get('modifiedTime')}")
+    print(f"URL: {meta.get('webViewLink')}")
+    print(f"Search text: {text_to_find}")
+    print(f"Found: {found}")
+    print(f"Count: {count}")
+
+
+@app.command("export-doc")
+def export_doc(
+    document_id: str,
+    out_path: str,
+    export_format: str = "docx",
+):
+    """Export Google Doc to local file. Supported: docx, pdf, txt."""
+    s = services()
+    drive = s["drive"]
+
+    meta = (
+        drive.files()
+        .get(
+            fileId=document_id,
+            fields="id,name,mimeType,webViewLink,modifiedTime",
+            supportsAllDrives=True,
+        )
+        .execute()
+    )
+
+    mime_map = {
+        "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "pdf": "application/pdf",
+        "txt": "text/plain",
+    }
+
+    export_format = export_format.lower()
+    if export_format not in mime_map:
+        raise typer.BadParameter("export_format must be one of: docx, pdf, txt")
+
+    request = drive.files().export_media(
+        fileId=document_id,
+        mimeType=mime_map[export_format],
+    )
+
+    out_file = Path(out_path)
+    out_file.parent.mkdir(parents=True, exist_ok=True)
+
+    with out_file.open("wb") as f:
+        downloader = MediaIoBaseDownload(f, request)
+        done = False
+        while not done:
+            _, done = downloader.next_chunk()
+
+    print("EXPORT DOC OK")
+    print(f"Name: {meta['name']}")
+    print(f"ID: {meta['id']}")
+    print(f"Format: {export_format}")
+    print(f"Output: {out_file}")
+    print(f"URL: {meta.get('webViewLink')}")
+
+
+@app.command("upload-file-to-folder")
+def upload_file_to_folder(
+    local_path: str,
+    folder_name: str,
+    target_name: Optional[str] = None,
+    dry_run: bool = False,
+    confirm: bool = False,
+):
+    """Upload local file into selected top-level Cass folder."""
