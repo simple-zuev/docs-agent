@@ -1,0 +1,13 @@
+Conclusion
+
+The query-wrapper audit confirms that:
+- handle_query_command remains part of the active command-routing surface
+- run_query_command is not referenced by active call sites in agent_cli.py
+
+Safe next mutation
+- remove only run_query_command
+
+Not in scope for next mutation
+- handle_query_command changes
+- main() query dispatch restructuring
+- alias normalization or broader command-surface cleanup

@@ -1,0 +1,12 @@
+== run_query_command ==
+2509: def run_query_command(
+
+== handle_query_command ==
+2488: def handle_query_command(
+2663:             return handle_query_command(argv, cmd_find_doc_name)
+2666:             return handle_query_command(argv, cmd_find_link)
+2669:             return handle_query_command(argv, cmd_find_doc_any, allow_json_flag=True)
+2672:             return handle_query_command(
+2677:             return handle_query_command(
+2696:             return handle_query_command(argv, cmd_ask, allow_json_flag=True)
+

@@ -1,0 +1,122 @@
+agent_cli query-wrapper audit
+date: 2026-05-12
+
+== symbol inventory ==
+108: def _build_find_doc_any_success_from_cache(query, row, row_number, header):
+116:     q = normalize_cell(query)
+131:         "query": q,
+167: def _build_find_doc_any_not_found_from_cache(query):
+171:         "query": normalize_cell(query),
+318: def find_doc_any_payload_from_cache(query):
+326:     q = normalize_cell(query)
+476:             "Проверь точный query/Document ID/ссылку и сначала выполни find-doc-any.",
+765:     print(f"query: {payload.get('query')}")
+775:     print("route: open-doc-from-query")
+776:     print(f"query: {payload.get('query')}")
+787:     print("route: read-doc-from-query")
+788:     print(f"query: {payload.get('query')}")
+1068:     query = payload.get("query")
+1077:     if query is not None:
+1078:         lines.append(f"query: {query}")
+1183: def normalize_query_for_lookup(query: str) -> str:
+1184:     q = query.strip()
+1332: def _find_doc_any_payload_live_impl(query: str) -> dict:
+1341:             query,
+1347:             query=query,
+1359:             query,
+1365:             query=query,
+1376:             query,
+1382:             query=query,
+1390:         query=query,
+1424: def find_doc_any_payload_live(query):
+1425:     return _find_doc_any_payload_live_impl(query)
+1428: def find_doc_any_payload(query):
+1429:     cached = find_doc_any_payload_from_cache(query)
+1435:         cached = find_doc_any_payload_from_cache(query)
+1439:     live = find_doc_any_payload_live(query)
+1482:     query: str | None = None,
+1499:     if query is not None:
+1500:         payload["query"] = query
+1515:     query: str,
+1523:         "query": query,
+1531: def open_doc_from_query_payload(query: str) -> dict:
+1532:     found = find_doc_any_payload(query)
+1541:         "command": "open-doc-from-query",
+1542:         "query": query,
+1550: def read_doc_from_query_payload(query: str) -> dict:
+1551:     found = find_doc_any_payload(query)
+1560:             command="read-doc-from-query",
+1561:             query=query,
+1571:         "command": "read-doc-from-query",
+1572:         "query": query,
+1581: def cmd_find_doc_any(query: str, json_output: bool = False) -> int:
+1582:     payload = find_doc_any_payload(query)
+1593: def cmd_open_doc_from_query(query: str, json_output: bool = False) -> int:
+1594:     payload = open_doc_from_query_payload(query)
+1605: def cmd_read_doc_from_query(query: str, json_output: bool = False) -> int:
+1606:     payload = read_doc_from_query_payload(query)
+1617: def is_status_query(query_lower: str) -> bool:
+1619:         x in query_lower
+1632: def is_read_query(query_lower: str) -> bool:
+1634:         x in query_lower
+1646: def build_ask_result(query: str, routed_to: str, result: dict, **extra) -> dict:
+1650:         "query": query,
+1658: def ask_status_payload(query: str) -> dict:
+1660:     return build_ask_result(query, "status", result)
+1663: def ask_read_payload(query: str, lookup_query: str) -> dict:
+1664:     result = read_doc_from_query_payload(lookup_query)
+1665:     return build_ask_result(query, "read-doc-from-query", result)
+1668: def ask_google_id_payload(query: str, lookup_query: str) -> dict:
+1669:     found = find_doc_any_payload(lookup_query)
+1671:         return build_ask_result(query, "find-doc-any", found)
+1673:     file_result = run_docs_agent_with_retry(["get-file", lookup_query])
+1677:         "query": query,
+1684: def ask_find_payload(query: str, lookup_query: str) -> dict:
+1685:     found = find_doc_any_payload(lookup_query)
+1686:     return build_ask_result(query, "find-doc-any", found)
+1689: def ask_payload(query: str) -> dict:
+1690:     q = query.strip()
+1692:     lookup_query = normalize_query_for_lookup(q)
+1694:     if is_status_query(ql):
+1695:         return ask_status_payload(query)
+1697:     if is_read_query(ql):
+1698:         return ask_read_payload(query, lookup_query)
+1700:     if looks_like_google_id(lookup_query):
+1701:         return ask_google_id_payload(query, lookup_query)
+1703:     return ask_find_payload(query, lookup_query)
+1710:     query = payload.get("query", "")
+1714:     lines.append(f"query: {query}")
+1767:     if routed == "read-doc-from-query":
+1784:                 next_step = "Проверь точное имя/Document ID или сначала выполни python agent_cli.py f <query>."
+1865:         "open-doc-from-query",
+1866:         "read-doc-from-query",
+1999:                             "query": item,
+2008:                             "query": item,
+2019:                         "query": item,
+2030:                         "query": item,
+2053:                         "query": item,
+2065:                         "query": item,
+2074:                         "query": item,
+2244:         item.get("query")
+2246:         if item.get("query")
+2459: def cmd_ask(query: str, json_output: bool = False) -> int:
+2460:     payload = ask_payload(query)
+2477: def require_query_args(
+2488: def handle_query_command(
+2500:         print_usage_error("Missing query argument.")
+2509: def run_query_command(
+2533:         "  python agent_cli.py find-doc-any [--json] <query>        | f [--json] <query>\n"
+2534:         "  python agent_cli.py open-doc-from-query [--json] <query> | o [--json] <query>\n"
+2535:         "  python agent_cli.py read-doc-from-query [--json] <query> | r [--json] <query>\n"
+2538:         "  python agent_cli.py ask [--json] <free text query>       | q [--json] <query>\n"
+2554: def run_query_handler(argv: list[str], handler) -> int:
+2663:             return handle_query_command(argv, cmd_find_doc_name)
+2666:             return handle_query_command(argv, cmd_find_link)
+2669:             return handle_query_command(argv, cmd_find_doc_any, allow_json_flag=True)
+2671:         if cmd in {"open-doc-from-query", "o"}:
+2672:             return handle_query_command(
+2673:                 argv, cmd_open_doc_from_query, allow_json_flag=True
+2676:         if cmd in {"read-doc-from-query", "r"}:
+2677:             return handle_query_command(
+2678:                 argv, cmd_read_doc_from_query, allow_json_flag=True
+2696:             return handle_query_command(argv, cmd_ask, allow_json_flag=True)

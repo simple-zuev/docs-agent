@@ -1,0 +1,30 @@
+agent_cli query-wrapper audit review
+date: 2026-05-12
+
+Scope
+- query-wrapper and query-dispatch surface in agent_cli.py
+- focus symbols:
+  - run_query_command
+  - handle_query_command
+
+Findings
+- handle_query_command is an active query-dispatch helper
+- confirmed call sites from main() for:
+  - find-doc-name / fdn
+  - find-link / fl
+  - find-doc-any / f
+  - open-doc-from-query / o
+  - read-doc-from-query / r
+  - ask / q
+- run_query_command definition is present
+- no call sites for run_query_command were found in agent_cli.py
+- run_query_command is a dead helper candidate on current main baseline 4d3cbe1
+
+Risk assessment
+- removing handle_query_command would be unsafe in a narrow cleanup because it is on active dispatch paths
+- removing run_query_command appears low-risk, subject to single-symbol mutation and verification
+
+Recommended next iteration
+- separate clean-refactor branch or follow-up commit in dedicated PR scope
+- remove only run_query_command
+- do not mix with broader query routing refactors
