@@ -1,0 +1,18 @@
+Audit scope
+- adjacent candidate selection after PR #42
+- focus only on docs_agent_v2.py::print_dry_run()
+- compare against docs_agent.py output helper surface
+
+Observed premise
+- docs_agent_v2.py::replace_doc_text() is already parity-aligned in body with docs_agent.py::replace_doc_text()
+- therefore replace_doc_text is not the next useful implementation candidate
+
+Decision rule
+- allow only output-format normalization
+- no new command surface
+- no mutation semantics changes
+- no multi-route migration
+
+Expected safe outcome
+- determine whether print_dry_run() is the next adjacent narrow candidate
+- otherwise conclude no-go and stop the line

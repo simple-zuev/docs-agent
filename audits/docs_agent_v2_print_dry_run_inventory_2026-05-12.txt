@@ -1,0 +1,50 @@
+==== print_dry_run adjacent audit ====
+
+==== definition points ====
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:65:def emit_json(payload: dict):
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:66:    print(json.dumps(payload, ensure_ascii=False, indent=2))
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:159:def print_dry_run(payload: dict):
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:161:    print(json.dumps(payload, ensure_ascii=False, indent=2))
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:166:        print(json.dumps(payload, ensure_ascii=False, indent=2))
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:217:        print(json.dumps(payload, ensure_ascii=False, indent=2))
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:446:    out.write_text(json.dumps(snapshot, ensure_ascii=False, indent=2), encoding="utf-8")
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:561:        print_dry_run(
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:690:        print_dry_run(
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:768:        print_dry_run(
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:859:        print_dry_run(
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:944:        print_dry_run(
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:1193:        print_dry_run(
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:1372:        print_dry_run(
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:1448:        print_dry_run(
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:1547:                json.dumps(meta, ensure_ascii=False, indent=2),
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:1613:    print(json.dumps(mapping, ensure_ascii=False, indent=2))
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:1635:        print(f"ROW {row_num}: {json.dumps(row, ensure_ascii=False)}")
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:1688:                f"ROW {item['row_number']}: {json.dumps(item['row_values'], ensure_ascii=False)}"
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:1743:    print(json.dumps(payload, ensure_ascii=False, indent=2))
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:1824:    print(json.dumps(current_row, ensure_ascii=False, indent=2))
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:1827:    print(json.dumps(payload, ensure_ascii=False, indent=2))
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:1830:    print(json.dumps(new_row, ensure_ascii=False, indent=2))
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:1886:                f"ROW {item['row_number']}: {json.dumps(item['row_values'], ensure_ascii=False)}"
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:1921:                json.dumps(payload, ensure_ascii=False, indent=2),
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:1950:                json.dumps(payload, ensure_ascii=False, indent=2),
+/Users/zuevvladimir/AI/docs-agent/docs_agent.py:1967:        json.dumps(
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:52:def print_dry_run(payload: dict):
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:54:    print(json.dumps(payload, ensure_ascii=False, indent=2))
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:280:    out.write_text(json.dumps(snapshot, ensure_ascii=False, indent=2), encoding="utf-8")
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:395:        print_dry_run(
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:524:        print_dry_run(
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:735:        print_dry_run(
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:914:        print_dry_run(
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:990:        print_dry_run(
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:1077:    print(json.dumps(meta, ensure_ascii=False, indent=2))
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:1139:    print(json.dumps(mapping, ensure_ascii=False, indent=2))
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:1161:        print(f"ROW {row_num}: {json.dumps(row, ensure_ascii=False)}")
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:1199:            f"ROW {item['row_number']}: {json.dumps(item['row_values'], ensure_ascii=False)}"
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:1250:    print(json.dumps(payload, ensure_ascii=False, indent=2))
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:1331:    print(json.dumps(current_row, ensure_ascii=False, indent=2))
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:1334:    print(json.dumps(payload, ensure_ascii=False, indent=2))
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:1337:    print(json.dumps(new_row, ensure_ascii=False, indent=2))
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:1378:            f"ROW {item['row_number']}: {json.dumps(item['row_values'], ensure_ascii=False)}"
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:1387:        json.dumps(
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:1413:        json.dumps(
+/Users/zuevvladimir/AI/docs-agent/docs_agent_v2.py:1439:        json.dumps(
