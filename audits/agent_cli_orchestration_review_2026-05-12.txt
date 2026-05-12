@@ -1,0 +1,76 @@
+agent_cli.py orchestration review
+date: 2026-05-12
+
+Summary
+The current orchestration layer in agent_cli.py is functional but structurally drifted. main() is a large dispatch choke point combining routing, local normalization, argument validation, and direct handler invocation. Audit confirms at least one real duplicate branch and multiple near-duplicate wrapper paths around query-style commands.
+
+Confirmed findings
+1. main() is not a thin entrypoint; it is the effective orchestration layer.
+2. The doctor/diagnose dispatch branch is duplicated in main().
+3. parse_json_flag is used as a repeated local normalization helper rather than a single normalization boundary.
+4. Query-style command handling is split across multiple near-duplicate wrappers.
+5. handle_query_command performs both argument normalization and handler signature adaptation.
+6. CLI orchestration concerns and docs_agent adapter concerns remain colocated in the same module.
+
+Boundary assessment
+Recommended conceptual boundaries:
+- raw argv -> normalized command intent
+- normalized command intent -> route target
+- route target -> command policy / output mode policy
+- command policy -> docs_agent adapter or local handler
+
+Current code does not clearly enforce these boundaries.
+
+Risk assessment
+Low-risk next moves:
+- audit-only documentation
+- dispatch topology inventory
+- command family classification inventory
+- duplicate branch documentation
+
+Medium-risk moves:
+- introducing a non-behavioral command family classification table
+- consolidating query wrapper behavior without changing CLI surface
+
+Higher-risk moves and not recommended yet:
+- extracting main() dispatch wholesale
+- changing branch order
+- centralizing all normalization before a complete dispatch inventory
+- changing docs_agent invocation boundaries in the same step
+
+Recommended next clean refactor order
+1. audit-first inventory and review documents
+2. command family grouping map (non-behavioral)
+3. evaluate whether query wrapper consolidation can be done as a pure refactor
+4. only then consider isolated normalization extraction
+5. defer large orchestration extraction until after branch topology is stabilized
+
+Safe candidate for the next code refactor
+Most likely safe next refactor candidate:
+- unify query wrapper paths or introduce a route classification helper without changing actual command behavior
+
+Explicitly defer
+- docs_agent adapter extraction
+- full main() decomposition
+- output/exit policy redesign
+
+Applied narrow cleanup
+- Removed one duplicate unreachable dispatch branch for {"doctor", "diagnose"} from main().
+- This change is topology cleanup only and does not expand CLI surface or alter docs_agent boundaries.
+
+
+Applied narrow cleanup
+- Removed dead helper run_query_handler from agent_cli.py after confirming zero call sites.
+- Preserved current observed help behavior snapshot:
+  - `python3 agent_cli.py --help` -> stdout usage/error envelope
+  - stderr empty
+  - exit code observed: 1
+  - `--help` still treated as unknown command
+
+Applied narrow cleanup
+- Removed dead helper run_query_command from agent_cli.py after confirming zero call sites.
+- Preserved current observed help behavior snapshot:
+  - `python3 agent_cli.py --help` -> stdout usage/error envelope
+  - stderr empty
+  - exit code observed: 1
+  - `--help` still treated as unknown command

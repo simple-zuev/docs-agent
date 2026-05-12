@@ -1,0 +1,82 @@
+agent_cli.py orchestration audit snapshot
+date: 2026-05-12
+
+branch: feature/explicit-command-catalog-contract
+
+1. main() dispatch location
+- def main() -> int: line 2565
+
+2. confirmed dispatch hotspots
+- main() contains command matching, alias handling, json flag parsing, positional validation, structured argument validation, handler invocation, and usage/error routing.
+- main() acts as orchestration choke point rather than thin entrypoint.
+
+3. confirmed duplicate dispatch branch
+- command family {"doctor", "diagnose"} appears twice in main():
+  - first branch: lines 2602-2607
+  - second branch: lines 2648-2653
+
+4. parse_json_flag call sites
+- def parse_json_flag: line 2468
+- refs:
+  - 2482
+  - 2495
+  - 2513
+  - 2555
+  - 2575
+  - 2582
+  - 2589
+  - 2596
+  - 2603
+  - 2610
+  - 2617
+  - 2640
+  - 2649
+
+5. query wrapper/helper functions near dispatch layer
+- require_query_args: line 2477
+- handle_query_command: line 2488
+- run_query_command: line 2509
+- run_query_handler: line 2554
+
+6. query-routed commands via handle_query_command()
+- find-doc-name
+- find-link
+- find-doc-any / f
+- open-doc-from-query / o
+- read-doc-from-query / r
+- ask / q
+
+7. zero-positional commands with local json parsing in main()
+- status
+- repo-state / rs
+- doctor-lite / diagnose-lite
+- capabilities
+- doctor / diagnose
+
+8. structured-argument commands with local validation in main()
+- assemble-context
+- doc-body-only
+- artifact-state
+
+9. direct positional commands in main()
+- find-doc-id
+- get-file
+- read-doc
+
+10. docs_agent adapter presence in same file
+- DOCS_AGENT constant at line 10
+- run_docs_agent_with_retry at line 928
+- run_docs_agent at line 971
+- multiple command payload/build flows invoke docs_agent adapter layer from same module
+
+11. current boundary observations
+- json normalization is dispersed, not centralized.
+- query command handling has multiple near-duplicate wrappers.
+- dispatch, normalization, and handler signature adaptation overlap.
+- CLI orchestration and docs_agent adapter logic coexist in the same module.
+
+12. observed help behavior during duplicate-branch cleanup verification
+- `python3 agent_cli.py --help` prints help text to stdout
+- stderr remained empty during verification
+- exit code observed during verification: 1
+- treat this as current behavior snapshot, not as part of the duplicate-branch cleanup scope

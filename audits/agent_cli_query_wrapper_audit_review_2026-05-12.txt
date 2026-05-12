@@ -1,0 +1,38 @@
+AGENT_CLI QUERY WRAPPER AUDIT REVIEW
+date: 2026-05-12
+
+Scope
+- audit-only review of query wrapper family
+- no runtime mutation
+- intended to prepare future narrow consolidation step
+
+handle_query_command: def handle_query_command(
+run_query_command: def run_query_command(
+run_query_handler: def run_query_handler(argv: list[str], handler) -> int:
+
+Questions to answer in next code step
+- Are all three wrappers part of the same command family?
+- Which wrapper is the thinnest canonical façade candidate?
+- Where is json normalization applied redundantly?
+- Which wrapper owns rendering/output vs docs_agent invocation?
+- Can one wrapper be deleted without changing help/output/exit behavior?
+
+Safe next mutation candidate after this audit
+- narrow consolidation of one wrapper into another
+- only if call graph and return/exit semantics are confirmed equivalent
+- no main() decomposition
+- no CLI contract expansion
+
+
+Observed findings after call-site verification
+- run_query_command: no call sites found
+- run_query_handler: no call sites found
+- run_query_handler is currently dead helper code candidate
+- run_query_command may also be dead, but should remain out of current mutation scope
+- safer next step is dead-code removal of run_query_handler only
+
+Additional audit finding
+- run_query_command definition present
+- run_query_command call-site verification: no call sites found
+- run_query_command is a dead helper candidate
+- safe next mutation: remove run_query_command only

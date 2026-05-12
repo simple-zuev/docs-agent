@@ -1,0 +1,21 @@
+agent_cli command family map
+date: 2026-05-12
+
+2574: if cmd == "status":
+2581: if cmd in {"repo-state", "rs"}:
+2588: if cmd in {"doctor-lite", "diagnose-lite"}:
+2595: if cmd == "capabilities":
+2602: if cmd in {"doctor", "diagnose"}:
+2609: if cmd == "assemble-context":
+2616: if cmd == "doc-body-only":
+2639: if cmd == "artifact-state":
+2648: if cmd in {"doctor", "diagnose"}:
+2655: if cmd == "find-doc-id":
+2662: if cmd == "find-doc-name":
+2665: if cmd == "find-link":
+2668: if cmd in {"find-doc-any", "f"}:
+2671: if cmd in {"open-doc-from-query", "o"}:
+2676: if cmd in {"read-doc-from-query", "r"}:
+2681: if cmd == "get-file":
+2688: if cmd == "read-doc":
+2695: if cmd in {"ask", "q"}:

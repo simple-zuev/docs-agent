@@ -1,0 +1,89 @@
+AGENT_CLI QUERY WRAPPER AUDIT SNAPSHOT
+date: 2026-05-12
+source: agent_cli.py
+
+=== handle_query_command ===
+signature: def handle_query_command(
+line_count: 19
+has_return: True
+has_raise: False
+has_sys_exit: False
+uses_parse_json_flag: True
+touches_docs_agent_adapter_surface: False
+
+body:
+def handle_query_command(
+    argv: list[str],
+    handler,
+    *,
+    allow_json_flag: bool = False,
+) -> int:
+    if allow_json_flag:
+        json_output, args = parse_json_flag(argv)
+    else:
+        json_output, args = False, argv[:]
+
+    if not args:
+        print_usage_error("Missing query argument.")
+        return EXIT_USAGE_ERROR
+
+    value = " ".join(args)
+    if allow_json_flag:
+        return handler(value, json_output=json_output)
+    return handler(value)
+
+=== run_query_command ===
+signature: def run_query_command(
+line_count: 11
+has_return: True
+has_raise: False
+has_sys_exit: False
+uses_parse_json_flag: True
+touches_docs_agent_adapter_surface: False
+
+body:
+def run_query_command(
+    argv: list[str],
+    handler,
+) -> int:
+    json_output, args = parse_json_flag(argv)
+    if not args:
+        usage()
+        return 1
+    value = " ".join(args)
+    handler(value, json_output=json_output)
+    return 0
+
+=== run_query_handler ===
+signature: def run_query_handler(argv: list[str], handler) -> int:
+line_count: 9
+has_return: True
+has_raise: False
+has_sys_exit: False
+uses_parse_json_flag: True
+touches_docs_agent_adapter_surface: False
+
+body:
+def run_query_handler(argv: list[str], handler) -> int:
+    json_output, args = parse_json_flag(argv)
+    if not args:
+        usage()
+        return 1
+
+    value = " ".join(args)
+    handler(value, json_output=json_output)
+    return 0
+
+=== CALL SITES ===
+-- handle_query_command --
+2656:             return handle_query_command(argv, cmd_find_doc_name)
+2659:             return handle_query_command(argv, cmd_find_link)
+2662:             return handle_query_command(argv, cmd_find_doc_any, allow_json_flag=True)
+2665:             return handle_query_command(
+2670:             return handle_query_command(
+2689:             return handle_query_command(argv, cmd_ask, allow_json_flag=True)
+
+-- run_query_command --
+
+-- run_query_handler --
+
