@@ -1,0 +1,24 @@
+Open-doc-from-query verdict
+
+Scope
+- open-doc-from-query / o
+
+Observed evidence
+- repeated direct open by Document ID succeeded
+- repeated direct open by document name succeeded
+- repeated JSON-form runs succeeded
+- contract shape remained stable across repeated runs
+- query-routed success behavior appears consistent across ID and exact-name lookup forms
+- normal successful runs did not show retry/network noise
+- explicit not-found behavior is present and predictable
+- not-found behavior is non-retryable and non-network-related
+
+Verdict
+- open-doc-from-query is ready for bounded baseline promotion
+
+Constraints
+- this promotion does not widen launch to full autonomous all-file-operations mode
+- this promotion does not imply similar readiness for read-doc-from-query or ask
+
+Decision
+- promote open-doc-from-query / o from non-baseline to bounded baseline

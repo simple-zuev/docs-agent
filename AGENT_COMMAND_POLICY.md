@@ -14,6 +14,7 @@ Treat the following as the current usable assisted bounded baseline:
 - artifact-state
 - get-file
 - read-doc
+- open-doc-from-query / o
 - doc-body-only --profile exchange-docs
 
 ## 2. Default usage policy
@@ -29,7 +30,6 @@ Default preference order:
 
 The following commands are available and may be functionally useful, but must not be treated as baseline:
 
-- open-doc-from-query / o
 - read-doc-from-query / r
 
 ## 4. Helper surface
@@ -57,6 +57,7 @@ Do not use command success in degraded/helper surfaces as justification to:
 Current promotion note:
 - get-file has been validated as suitable for bounded baseline inclusion
 - read-doc has been validated as suitable for bounded baseline inclusion
+- open-doc-from-query / o has been validated as suitable for bounded baseline inclusion
 
 This does not widen launch to full autonomous file operations.
 It only records that these routes no longer need to be treated as non-baseline.

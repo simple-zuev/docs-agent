@@ -45,6 +45,7 @@ Treat the following as the current usable baseline:
 - artifact-state
 - get-file
 - read-doc
+- open-doc-from-query / o
 - doc-body-only --profile exchange-docs
 
 Default working style:
