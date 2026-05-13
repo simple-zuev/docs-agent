@@ -1,0 +1,24 @@
+Smoke gate split review
+
+Scope
+- scripts/regression_exit_codes.sh
+- scripts/regression_smoke_explain.sh
+- assisted bounded launch contour
+
+Confirmed findings
+- regression_exit_codes.sh originally depended on bare python/PATH behavior
+- exit-code regression also mixed:
+  - bounded launch baseline checks
+  - degraded document-access checks
+  - helper/query checks
+- this made regression_smoke_explain.sh unsuitable as a clean launch gate for assisted bounded mode
+- runtime validation confirmed the usable bounded contour separately from degraded/helper routes
+
+Decision
+- split launch-blocking bounded checks from extended non-baseline checks
+- keep bounded smoke deterministic and aligned with launch contour
+- preserve visibility of extended checks as a separate script
+
+Expected outcome
+- regression_smoke_explain.sh blocks launch only on bounded baseline regressions
+- degraded/helper regressions remain inspectable without redefining launch boundary

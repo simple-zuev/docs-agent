@@ -32,16 +32,16 @@ if [[ "$rc" -ne 0 ]]; then
 fi
 
 echo
-echo "== step: regression_exit_codes_bounded =="
+echo "== step: regression_exit_codes =="
 set +e
-bash ./scripts/regression_exit_codes_bounded.sh >/dev/null 2>&1
+bash ./scripts/regression_exit_codes.sh >/dev/null 2>&1
 rc=$?
 set -e
 echo "rc=$rc"
 if [[ "$rc" -ne 0 ]]; then
   echo "diagnosis: internal"
-  echo "likely_cause: Нарушен контракт bounded exit codes."
-  echo "recommended_action: Запусти bash ./scripts/regression_exit_codes_bounded.sh без >/dev/null и найди первый FAIL."
+  echo "likely_cause: Нарушен контракт exit codes."
+  echo "recommended_action: Запусти bash ./scripts/regression_exit_codes.sh без >/dev/null и найди первый FAIL."
   exit 1
 fi
 
