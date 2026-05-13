@@ -74,6 +74,18 @@ Interpretation:
 - SVG/PNG/PDF are render/export artifacts
 - Google Slides is treated as presentation layer by default
 
+## 4B. Diagram workflow contour
+
+The repository now also formalizes a minimum supported diagram workflow contour:
+
+- source intake through Mermaid / `.drawio`
+- source-first review/validation
+- render/export packaging through SVG / PNG / PDF
+- Google Slides publication path through exported artifacts
+- operator-supervised use with retained canonical source
+
+This does not imply universal autonomous diagram round-trip editing.
+
 ## 5. Non-baseline routes
 
 The following routes may be available and useful, but remain outside the current bounded baseline:

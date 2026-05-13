@@ -90,3 +90,15 @@ For diagram-related work, prefer this interpretation:
 
 Do not assume that export/presentation formats replace source-of-truth diagram formats.
 
+## Diagram workflow contour
+
+For diagram tasks, prefer this workflow:
+
+1. source in Mermaid or `.drawio`
+2. validate source semantics/layout
+3. package SVG/PNG/PDF intentionally
+4. publish to Slides via export artifacts
+5. retain canonical source
+
+Do not treat Slides, PNG, or PDF as default replacement for source-of-truth.
+

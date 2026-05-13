@@ -1,0 +1,24 @@
+Diagram workflow contour review
+
+Purpose
+- harden the pre-launch diagram workflow contour without expanding runtime scope
+- define the minimum supported workflow for Mermaid / draw.io / SVG / PNG / PDF / Google Slides
+- clarify source intake, export/package expectations, Slides publication path, and operator guardrails
+- avoid implying full autonomous multi-format round-trip editing
+
+Workflow contour to formalize
+1. source intake
+2. source validation / review
+3. render/export package
+4. presentation/publication path
+5. operator guardrails and non-goals
+
+Interpretation
+- this wave is workflow hardening, not broad runtime expansion
+- this wave is compatible with current assisted bounded release
+- this wave should improve launch clarity for today's controlled use
+
+Decision
+- one narrow doc/workflow/governance wave is justified
+- no runtime mutation is required
+- no baseline expansion is required
