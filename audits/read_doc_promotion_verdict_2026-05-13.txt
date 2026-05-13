@@ -1,0 +1,23 @@
+Read-doc promotion verdict
+
+Scope
+- read-doc
+
+Observed evidence
+- repeated direct read-doc runs succeeded
+- contract shape remained stable across repeated runs
+- truncation behavior was explicit and repeatable
+- missing-id handling is explicit and contract-aligned
+- bad-id handling is explicit, non-retryable, and non-network-related
+- direct route avoids query-routing ambiguity
+
+Verdict
+- read-doc is ready for bounded baseline promotion
+
+Constraints
+- this promotion does not widen launch to full autonomous all-file-operations mode
+- this promotion does not imply similar readiness for open-doc-from-query, read-doc-from-query, or ask
+- truncation remains an accepted baseline contract behavior for read-doc
+
+Decision
+- promote read-doc from non-baseline to bounded baseline

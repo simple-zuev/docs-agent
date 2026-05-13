@@ -44,6 +44,7 @@ Treat the following as the current usable baseline:
 - find-doc-any / f
 - artifact-state
 - get-file
+- read-doc
 - doc-body-only --profile exchange-docs
 
 Default working style:
@@ -59,8 +60,6 @@ The following commands are available and may be functionally useful, but must no
 
 - open-doc-from-query / o
 - read-doc-from-query / r
-- get-file
-- read-doc
 
 ## 5. Helper surface
 
@@ -120,6 +119,14 @@ Reason:
 - direct and narrower contract
 - repeated successful controlled runtime evidence
 - explicit and predictable metadata-oriented behavior
+
+The next content-bearing route `read-doc` has now also been validated for bounded baseline inclusion.
+
+Reason:
+- repeated successful controlled runtime evidence
+- stable direct contract shape
+- explicit truncation behavior
+- explicit non-retryable negative-path behavior
 
 
 ## 10. Practical operator rule

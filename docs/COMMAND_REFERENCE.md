@@ -80,9 +80,6 @@ read-doc-from-query
 - python agent_cli.py r "DOC-0002"
 - python agent_cli.py r --json "DOC-0002"
 
-read-doc
-- python agent_cli.py read-doc "<google_doc_id>"
-
 ## Query/helper surface
 
 ask
@@ -103,11 +100,11 @@ ask
   - find-doc-any / f
   - artifact-state
   - get-file
+  - read-doc
   - doc-body-only
 - The following commands are available in CLI but should not be treated as baseline by default:
   - open-doc-from-query / o
   - read-doc-from-query / r
-  - read-doc
 - Query/helper surface exists, but should not replace direct bounded inspection flow by default:
   - ask / q
 
