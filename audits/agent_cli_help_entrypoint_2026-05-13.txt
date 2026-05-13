@@ -1,0 +1,32 @@
+agent_cli help entrypoint audit
+Date: 2026-05-13
+Scope: narrow runtime contract alignment
+
+Context
+- Project mode: Path A assisted bounded mode.
+- This audit covers only local CLI usage/help behavior.
+- This audit does not promote read-doc, get-file, or read-doc-from-query.
+- This audit does not change Google Drive or Google Docs live mutation behavior.
+
+Finding
+- agent_cli.py already contains a usage() helper that prints stable CLI help text.
+- When called with no command, agent_cli.py emits a UsageError and returns usage-error status.
+- When called as `python3 agent_cli.py --help` or `python3 agent_cli.py help`,
+  agent_cli.py currently treats the value as an unknown command, prints a UsageError,
+  then prints usage text and exits non-zero.
+
+Contract mismatch
+- `--help` and `help` are operator/agent discovery entrypoints, not failed commands.
+- Returning a usage error for these entrypoints makes the command surface look less
+  reliable to supervised ChatGPT/Codex wrappers.
+
+Recommended narrow fix
+- Add an early dispatch branch for `--help`, `-h`, and `help`.
+- Print existing usage text unchanged.
+- Return success.
+
+Non-goals
+- Do not change usage text content beyond what is needed by the help entrypoint.
+- Do not change repo-state behavior.
+- Do not change read-doc, get-file, or read-doc-from-query.
+- Do not change live Google Drive or Google Docs mutation behavior.
