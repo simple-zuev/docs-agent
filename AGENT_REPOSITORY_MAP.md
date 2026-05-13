@@ -15,6 +15,7 @@ This repository provides a controlled CLI and related operational artifacts for 
 - `README.md`
 - `docs/`
 - `DIAGRAM_FORMAT_SUPPORT.md`
+- `DIAGRAM_WORKFLOW_CONTOUR.md`
 - `AGENT_CURRENT_CHECKPOINT.md`
 - `AGENT_RELEASE_CHECKPOINT.md`
 - `AGENT_OPERATING_PROMPT.md`

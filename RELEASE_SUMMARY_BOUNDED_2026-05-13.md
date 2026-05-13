@@ -63,6 +63,18 @@ The release wave now also formalizes this support model:
 
 This does not imply universal autonomous round-trip editing across all formats.
 
+## 4C. Diagram workflow hardening
+
+The release wave now also includes a hardened diagram workflow interpretation:
+
+- source-first intake
+- source validation before export
+- explicit export package model
+- Slides as presentation path
+- retained Mermaid/`.drawio` canonical source
+
+This improves launch clarity without expanding runtime scope.
+
 ## 5. What is still outside scope
 
 This release does not include:

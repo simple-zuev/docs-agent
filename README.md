@@ -109,3 +109,13 @@ Available but non-baseline by default:
 - SVG / PNG / PDF — export artifacts
 - Google Slides — presentation layer
 
+## Diagram workflow contour
+
+Current supported diagram workflow:
+
+1. maintain source in `Mermaid` or `.drawio`
+2. review source before export
+3. export into `SVG` / `PNG` / `PDF` as needed
+4. use Google Slides as presentation layer when needed
+5. retain canonical source separately from publish artifacts
+
