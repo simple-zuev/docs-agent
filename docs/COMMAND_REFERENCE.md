@@ -86,6 +86,10 @@ read-doc-from-query
 - python agent_cli.py r "DOC-0002"
 - python agent_cli.py r --json "DOC-0002"
 
+doc-body-only
+- python agent_cli.py doc-body-only --profile "<profile>" --document-type "<type>" --title "<title>"
+- python agent_cli.py doc-body-only --json --profile "<profile>" --document-type "<type>" --title "<title>"
+
 ## Query/helper surface
 
 ask
@@ -108,9 +112,9 @@ ask
   - get-file
   - read-doc
   - open-doc-from-query / o
+  - read-doc-from-query / r
   - doc-body-only
 - The following commands are available in CLI but should not be treated as baseline by default:
-  - read-doc-from-query / r
 - Query/helper surface exists, but should not replace direct bounded inspection flow by default:
   - ask / q
 

@@ -46,6 +46,7 @@ Treat the following as the current usable baseline:
 - get-file
 - read-doc
 - open-doc-from-query / o
+- read-doc-from-query / r
 - doc-body-only --profile exchange-docs
 
 Default working style:
