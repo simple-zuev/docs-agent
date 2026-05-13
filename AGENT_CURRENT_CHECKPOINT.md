@@ -1,5 +1,10 @@
 # AGENT CURRENT CHECKPOINT
 
+
+Authority note:
+- Project governance authority remains in `Cass`.
+- This document describes `docs-agent` application/runtime behavior and must not be treated as a replacement project governance source.
+
 ## 1. Current operating mode
 
 The repository is currently ready for **assisted bounded mode**.

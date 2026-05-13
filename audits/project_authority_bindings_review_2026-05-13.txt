@@ -1,0 +1,19 @@
+Project authority bindings review
+
+Purpose
+- formalize the authority relationship between `Cass` governance documents and `docs-agent` application/repository docs
+- prevent policy duplication and governance drift
+- make explicit which layer is authoritative and which layer is execution-oriented
+
+Findings
+- `Cass` already contains project-level governance for runtime, document workflow, and diagram workflow
+- `docs-agent` already contains useful execution-layer and release-layer docs
+- some app/repository docs overlap with diagram/workflow authority and therefore need explicit authority-aware interpretation
+- the right correction is binding/clarification, not runtime expansion
+
+Decision
+- add one repository-level authority binding document
+- keep `Cass` as project governance source-of-truth
+- keep `docs-agent` as execution/orchestration/operator layer
+- do not expand runtime
+- do not expand baseline

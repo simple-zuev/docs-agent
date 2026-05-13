@@ -1,5 +1,10 @@
 # DIAGRAM FORMAT SUPPORT
 
+
+Authority note:
+- Project governance authority remains in `Cass`.
+- This document describes `docs-agent` application/runtime behavior and must not be treated as a replacement project governance source.
+
 ## 1. Purpose
 
 This document defines the supported diagram/code/artifact format contour for the current assisted bounded operating model.
