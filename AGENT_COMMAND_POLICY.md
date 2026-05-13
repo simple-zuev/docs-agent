@@ -52,7 +52,15 @@ Do not use command success in degraded/helper surfaces as justification to:
 - claim broader readiness;
 - treat those commands as production baseline.
 
-## 7. Branch discipline
+## 7. Next promotion candidate
+
+Current preferred candidate for future bounded promotion work:
+- get-file
+
+This does not change the current launch boundary.
+It only records prioritization for a future bounded stabilization wave.
+
+## 8. Branch discipline
 
 - do not mutate from main
 - use a feature branch for reviewable changes

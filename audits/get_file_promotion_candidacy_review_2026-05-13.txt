@@ -1,0 +1,36 @@
+Get-file promotion candidacy review
+
+Scope
+- get-file
+- read-doc
+- open-doc-from-query / o
+- read-doc-from-query / r
+- ask / q where relevant
+
+Purpose
+- do not promote any non-baseline route yet
+- select the safest next bounded candidate for future stabilization/promotion work
+
+Confirmed runtime observations
+- get-file succeeded in direct runtime check
+- read-doc succeeded in direct runtime check
+- query-routed document-access paths also succeeded in controlled scenarios
+- degraded contour remains external-sensitive and non-baseline
+
+Selection rationale
+- get-file is a direct file-metadata access route
+- get-file has a narrower and more explicit contract than query-routed routes
+- get-file avoids extra ambiguity from lookup/routing layers
+- get-file appears to be the safest next bounded candidate for stabilization work
+
+Decision
+- select get-file as the next promotion candidate
+- keep get-file non-baseline for now
+- do not widen launch boundary in this wave
+- use a later bounded wave for actual stabilization/promotion if justified
+
+Non-selected candidates
+- read-doc: promising, but broader and content-bearing
+- open-doc-from-query / o: query-routed, more ambiguity
+- read-doc-from-query / r: query-routed and document-access sensitive
+- ask / q: helper surface, not a good promotion candidate
