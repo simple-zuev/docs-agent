@@ -13,6 +13,7 @@ Treat the following as the current usable assisted bounded baseline:
 - find-doc-any / f
 - artifact-state
 - get-file
+- read-doc
 - doc-body-only --profile exchange-docs
 
 ## 2. Default usage policy
@@ -30,8 +31,6 @@ The following commands are available and may be functionally useful, but must no
 
 - open-doc-from-query / o
 - read-doc-from-query / r
-- get-file
-- read-doc
 
 ## 4. Helper surface
 
@@ -57,9 +56,10 @@ Do not use command success in degraded/helper surfaces as justification to:
 
 Current promotion note:
 - get-file has been validated as suitable for bounded baseline inclusion
+- read-doc has been validated as suitable for bounded baseline inclusion
 
 This does not widen launch to full autonomous file operations.
-It only records that get-file no longer needs to be treated as non-baseline.
+It only records that these routes no longer need to be treated as non-baseline.
 
 ## 8. Branch discipline
 
