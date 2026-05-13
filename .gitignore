@@ -71,3 +71,6 @@ agent_cli.py.bak-stage*
 
 # Local ad-hoc recheck artifacts
 audits/stage30_recheck_doctor_lite.json
+
+operator_app/node_modules/
+operator_app/dist/
