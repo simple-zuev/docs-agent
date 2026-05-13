@@ -71,3 +71,25 @@ agent_cli.py.bak-stage*
 
 # Local ad-hoc recheck artifacts
 audits/stage30_recheck_doctor_lite.json
+
+# Local Codex / operator / recovery artifacts
+_local_recovery/
+operator_app/
+venv_agent/
+docs-agent-local-excluded-*/
+
+# Local audit snapshots that may contain credentials or exported private data
+audits/full_project_snapshot/
+audits/artifacts_*/
+audits/snapshots_*/
+
+# OAuth / credentials / secrets
+credentials/
+**/credentials/
+token.json
+**/token.json
+client_secret.json
+**/client_secret.json
+*.env
+.env
+.env.*
