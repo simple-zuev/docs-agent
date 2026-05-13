@@ -14,7 +14,8 @@ This repository provides a controlled CLI and related operational artifacts for 
 ### Operational documentation
 - `README.md`
 - `docs/`
-- `AGENT_CURRENT_CHECKPOINT.md` (when present on the active branch)
+- `AGENT_CURRENT_CHECKPOINT.md`
+- `AGENT_RELEASE_CHECKPOINT.md`
 - `AGENT_OPERATING_PROMPT.md`
 - `AGENT_COMMAND_POLICY.md`
 - `AGENT_REPOSITORY_MAP.md`
