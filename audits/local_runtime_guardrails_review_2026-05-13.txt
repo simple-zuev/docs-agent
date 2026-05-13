@@ -1,0 +1,16 @@
+Local runtime guardrails review
+
+Purpose
+- define the minimum local deployment guardrails for docs-agent on operator hardware
+- clarify scope, mutation, approval, storage, resource, and quota limits
+- avoid treating local deployment as unrestricted autonomous execution
+
+Findings
+- current repository already defines bounded runtime, authority awareness, task model, approval layer, Drive structure, and implementation plan
+- local deployment needs an explicit runtime-control layer before live integration work deepens
+- guardrails are needed for safety, quota control, storage discipline, and governance discipline, not because operator hardware is weak
+
+Decision
+- add a dedicated local runtime guardrails document
+- keep local deployment bounded and operator-supervised
+- do not expand runtime or baseline in this wave
