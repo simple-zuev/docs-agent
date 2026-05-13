@@ -25,7 +25,7 @@ Default preference order:
 
 ## 3. Degraded / non-baseline contour
 
-The following commands may exist and may sometimes work, but must not be treated as baseline:
+The following commands are available and may be functionally useful, but must not be treated as baseline:
 
 - open-doc-from-query / o
 - read-doc-from-query / r

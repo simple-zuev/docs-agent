@@ -1,0 +1,29 @@
+Degraded contour reclassification review
+
+Scope
+- open-doc-from-query / o
+- read-doc-from-query / r
+- get-file
+- read-doc
+- ask / q where relevant
+
+Confirmed runtime findings
+- open-doc-from-query succeeded on DOC-0002
+- read-doc-from-query succeeded on 00_PROJECT_AI_OPERATING_PROMPT_АСТЦВ
+- get-file succeeded on MASTER_INDEX spreadsheet id
+- read-doc direct succeeded on a known Google Doc id
+
+Interpretation
+- degraded contour is not accurately described as non-working
+- degraded contour is better described as:
+  - available
+  - functionally useful
+  - not baseline
+  - external-sensitive
+  - not suitable yet as launch-blocking contour
+
+Decision
+- keep the current launch boundary unchanged
+- reclassify degraded contour language from broken/implicitly unreliable to working-but-non-baseline
+- do not promote degraded routes to baseline
+- do not widen assisted bounded launch claim
