@@ -1,0 +1,28 @@
+Bounded mutation release verdict
+
+Scope
+- artifact-state
+- doc-body-only --profile exchange-docs
+- current release / authority / command-reference docs
+
+Observed state
+- bounded mutation contour is already included in the documented assisted bounded baseline
+- governance language already states that mutation must remain controlled, reviewed, and branch-disciplined
+- release language already excludes broad autonomous mutation and full autonomous all-file-operations mode
+- artifact-state is framed as classification-before-write surface
+- doc-body-only is framed as bounded document preparation rather than direct mutation
+
+Interpretation
+- bounded mutation contour is ready for explicit release-level formalization
+- this can be stated without implying broad autonomous write readiness
+- the required next step is documentation clarification, not runtime expansion
+
+Narrow cleanup also required
+- docs/COMMAND_REFERENCE.md currently contains duplicated doc-body-only command block
+
+Decision
+- perform one doc-only clarification wave
+- explicitly name the bounded mutation subset in release/governance docs
+- remove command-reference duplication
+- do not change runtime
+- do not widen launch boundary

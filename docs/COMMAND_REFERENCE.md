@@ -86,9 +86,6 @@ read-doc-from-query
 - python agent_cli.py r "DOC-0002"
 - python agent_cli.py r --json "DOC-0002"
 
-doc-body-only
-- python agent_cli.py doc-body-only --profile "<profile>" --document-type "<type>" --title "<title>"
-- python agent_cli.py doc-body-only --json --profile "<profile>" --document-type "<type>" --title "<title>"
 
 ## Supported helper surface
 

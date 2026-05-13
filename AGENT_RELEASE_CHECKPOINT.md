@@ -37,6 +37,19 @@ This release allows:
 - safe document-body preparation through doc-body-only
 - controlled branch-based improvement waves
 
+## 3A. Bounded mutation subset
+
+Within the current assisted bounded baseline, the bounded mutation-related subset is:
+
+- artifact-state
+- doc-body-only --profile exchange-docs
+
+Interpretation:
+- artifact-state is used to classify artifact placement/readiness before any write decision
+- doc-body-only is used to prepare document body content without direct mutation
+- this subset supports controlled operator-supervised write preparation
+- this does not authorize broad autonomous mutation across arbitrary files/documents
+
 ## 4. What this release does not allow
 
 This release does not allow:

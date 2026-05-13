@@ -41,6 +41,18 @@ This release wave established or consolidated:
 - aligned repository docs and operator docs
 - helper-only interpretation for ask / q
 
+## 4A. Bounded mutation subset in this release
+
+The bounded mutation-related subset in this release is:
+
+- artifact-state
+- doc-body-only --profile exchange-docs
+
+This means:
+- mutation preparation is included
+- placement/readiness classification before write is included
+- broad autonomous document/file mutation is still out of scope
+
 ## 5. What is still outside scope
 
 This release does not include:
