@@ -1,0 +1,19 @@
+Authority registry model review
+
+Purpose
+- move from documented authority split to explicit application-model design
+- define a minimal authority registry model for authority-aware task execution
+- define a minimal Instruction Panel contract for operator-facing use
+- avoid any runtime or baseline expansion
+
+Findings
+- authority split between `Cass` and `docs-agent` is now documented
+- the next missing layer is application-side authority binding and visibility
+- current repository state justifies a thin design/model wave rather than runtime mutation
+
+Decision
+- add `AUTHORITY_REGISTRY_MODEL.md`
+- add `INSTRUCTION_PANEL_CONTRACT.md`
+- keep the model reference-oriented and thin
+- do not expand runtime
+- do not expand baseline
