@@ -54,6 +54,7 @@ Default working style:
 - diagnose second
 - prefer state and lookup before mutation
 - use bounded document preparation instead of direct write by default
+- treat artifact-state + doc-body-only(exchange-docs) as the bounded mutation-preparation subset, not as broad autonomous write authority
 - keep main clean
 
 ## 4. Degraded / non-baseline contour
