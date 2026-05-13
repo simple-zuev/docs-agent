@@ -111,6 +111,24 @@ Next bounded milestone:
 - make the smoke gate deterministic for the assisted bounded contour
 - keep degraded/helper checks visible but non-blocking for bounded launch
 
+## 9A. Next promotion candidate
+
+The current safest non-baseline promotion candidate is:
+
+- get-file
+
+Reason:
+- direct and narrower contract
+- less routing ambiguity than query-driven routes
+- successful controlled runtime evidence already exists
+
+
+Next bounded milestone:
+
+- separate bounded baseline verification from degraded/helper verification
+- make the smoke gate deterministic for the assisted bounded contour
+- keep degraded/helper checks visible but non-blocking for bounded launch
+
 ## 10. Practical operator rule
 
 Until the next milestone is completed, use this rule:
