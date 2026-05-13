@@ -1,5 +1,10 @@
 # AGENT RELEASE CHECKPOINT
 
+
+Authority note:
+- Project governance authority remains in `Cass`.
+- This document describes `docs-agent` application/runtime behavior and must not be treated as a replacement project governance source.
+
 ## 1. Release status
 
 The repository is now ready for **assisted bounded integration release**.
