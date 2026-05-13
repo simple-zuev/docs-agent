@@ -1,0 +1,18 @@
+P1 diagram flow specs review
+
+Purpose
+- add the next mandatory practical flow layer after app shell/task model specs
+- define Mermaid pipeline, draw.io pipeline, export package model, Slides publication flow, and preview/compare behavior
+- keep the wave design-only and authority-aware
+
+Findings
+- authority/model/app-shell layers are now documented
+- the next missing layer is concrete bounded workflow specification for source/export/publication handling
+- this wave is justified without runtime expansion
+
+Decision
+- add P1 flow specs
+- keep source-first interpretation
+- keep Slides as publication layer
+- do not expand runtime
+- do not expand baseline
