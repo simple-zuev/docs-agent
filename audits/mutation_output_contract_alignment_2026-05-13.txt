@@ -1,0 +1,224 @@
+Mutation output/result contract alignment audit
+Date: 2026-05-13
+Scope: audit-only, no runtime behavior change
+
+Context
+- Project mode: Path A assisted bounded mode.
+- Safe assisted surfaces remain: repo-state, lookup/navigation commands, artifact-state, doc-body-only.
+- read-doc, get-file, and read-doc-from-query remain degraded by default for assisted baseline purposes.
+- This audit does not promote any degraded read surface.
+- This audit does not authorize live Google Drive or Google Docs mutations.
+
+Audit target
+Map mutation-related commands to their current result/output style and identify the narrowest output-contract alignment candidate.
+
+Primary finding
+The current bounded mutation problem is not primarily write gating. The narrow mismatch is result/output shape.
+
+Several low-level mutation helpers already return structured dictionaries, but command handlers often discard those return values and print ad hoc human-readable success lines.
+
+Several dry-run paths emit a human banner followed by JSON. This is useful for operators but not a clean machine-readable JSON envelope.
+
+Mutation-related command map
+
+1. create-temp-doc
+- Mutation type: creates Google Doc, inserts text, appends Change Log.
+- Dry-run: not identified.
+- Current success output: human-readable lines.
+- Clean JSON success envelope: not identified.
+- Contract note: live write surface; not a Path A baseline target.
+
+2. append-log
+- Mutation type: appends Change Log row.
+- Dry-run: not identified.
+- Current success output: human-readable lines.
+- Clean JSON success envelope: not identified.
+- Contract note: live write surface; not a Path A baseline target.
+
+3. create-staging-copy
+- Mutation type: copies Drive file into review/staging folder.
+- Dry-run: present.
+- Current dry-run output: DRY RUN OK banner plus JSON payload.
+- Current live success output: human-readable lines.
+- Clean JSON success envelope: not identified.
+- Contract note: partially machine-readable dry-run, but stdout is not a single JSON document.
+
+4. patch-doc
+- Mutation type: inserts text into document.
+- Dry-run: not identified.
+- Current success output: human-readable lines.
+- Clean JSON success envelope: not identified.
+- Contract note: supervised/high-risk write path; not a Path A baseline target.
+
+5. create-doc-in-folder
+- Mutation type: creates Google Doc in selected folder.
+- Dry-run: present.
+- Current dry-run output: DRY RUN OK banner plus JSON payload.
+- Current live success output: human-readable lines.
+- Clean JSON success envelope: not identified.
+- Contract note: bounded by folder targeting, but still live mutation.
+
+6. create-draft-doc
+- Mutation type: creates review-scoped draft document.
+- Dry-run: present.
+- Current dry-run output: DRY RUN OK banner plus JSON payload.
+- Current live success output: human-readable lines.
+- Clean JSON success envelope: not identified.
+- Contract note: best first production candidate because it is review-scoped and bounded.
+
+7. append-review-note
+- Mutation type: appends note to review-scoped draft.
+- Dry-run: present.
+- Current dry-run output: DRY RUN OK banner plus JSON payload.
+- Current live success output: human-readable lines.
+- Clean JSON success envelope: not identified.
+- Contract note: good second production candidate after create-draft-doc dry-run JSON alignment.
+
+8. write-draft-doc
+- Mutation type: replaces review-scoped draft body.
+- Dry-run: present.
+- Current dry-run output: DRY RUN OK banner plus JSON payload.
+- Current live success output: human-readable lines.
+- Clean JSON success envelope: not identified.
+- Contract note: good third production candidate after create-draft-doc and append-review-note dry-run JSON alignment.
+
+9. replace-doc-text
+- Mutation type: direct text replacement.
+- Dry-run: not identified.
+- Current success output: human-readable lines.
+- Clean JSON success envelope: not identified.
+- Contract note: direct mutation surface; not a first production target.
+
+10. replace-doc-text-safe
+- Mutation type: backup copy, then text replace.
+- Dry-run: present.
+- Current dry-run output: DRY RUN OK banner plus JSON payload.
+- Current live success output: human-readable lines.
+- Clean JSON success envelope: not identified.
+- Contract note: safer than direct replacement but still not the narrowest first production target.
+
+11. upload-file-to-folder
+- Mutation type: uploads local file to Drive folder.
+- Dry-run: present.
+- Current dry-run output: DRY RUN OK banner plus JSON payload.
+- Current live success output: human-readable lines.
+- Clean JSON success envelope: not identified.
+- Contract note: Drive write path; not a first production target.
+
+12. move-file-with-log
+- Mutation type: moves Drive file and logs movement.
+- Dry-run: present.
+- Current dry-run output: DRY RUN OK banner plus JSON payload.
+- Current live success output: human-readable lines.
+- Clean JSON success envelope: not identified.
+- Contract note: multi-step write path; not a first production target.
+
+13. append-master-index-row
+- Mutation type: appends row to Master Index sheet.
+- Dry-run: not identified in this audit.
+- Current success output: human-readable lines.
+- Clean JSON success envelope: not identified.
+- Contract note: guarded by Master Index write config; not a first production target.
+
+14. update-master-index-row
+- Mutation type: updates one Master Index sheet row.
+- Dry-run: not identified in this audit.
+- Current success output: human-readable lines.
+- Clean JSON success envelope: not identified.
+- Contract note: guarded by Master Index write config; not a first production target.
+
+15. set-safety-mode
+- Mutation type: mutates local safety/config mode.
+- Dry-run: not applicable.
+- Current output: human banner plus JSON-like payload.
+- Clean JSON success envelope: not identified.
+- Contract note: local config mutation; separate from Google Drive write surfaces.
+
+Related non-mutating preparation surfaces
+
+1. doc-body-only
+- Mutation type: none.
+- Current output: supports clean --json.
+- Contract note: safe Path A preparation surface.
+
+2. artifact-state
+- Mutation type: none.
+- Current output: supports clean --json.
+- Contract note: safe Path A classification-before-write surface.
+
+3. assemble-context
+- Mutation type: none.
+- Current output: supports clean --json.
+- Contract note: safe preparation surface.
+
+4. capabilities
+- Mutation type: none.
+- Current output: supports clean --json.
+- Contract note: useful for operator visibility.
+
+Contract gaps
+
+Gap 1: Dry-run output is not clean JSON
+- Current style: DRY RUN OK banner followed by JSON payload.
+- Effect: operator-readable, but not a single machine-readable JSON document.
+- Narrow fix direction: add json_output-aware dry-run emission.
+
+Gap 2: Live success output is mostly human-only
+- Current style: command handlers print ad hoc success lines.
+- Effect: hard for ChatGPT/Codex/operator wrappers to consume deterministically.
+- Narrow fix direction: start with dry-run envelopes only; defer live success envelope standardization.
+
+Gap 3: Low-level structured results are not consistently propagated
+- Current style: helpers can return dictionaries, but command handlers may discard them.
+- Effect: structured mutation facts are lost at command boundary.
+- Narrow fix direction: preserve return dictionaries in JSON mode after dry-run alignment proves safe.
+
+Non-goals for the next production PR
+- Do not promote read-doc, get-file, or read-doc-from-query.
+- Do not change live Google Drive mutation behavior first.
+- Do not route live mutation commands through agent_cli.py.
+- Do not perform broad refactors of docs_agent.py or agent_cli.py.
+- Do not change write gates, confirmation gates, or safety mode semantics.
+
+Recommended narrow production candidate
+
+First production PR:
+- Add clean --json-output support only to dry-run paths for bounded review-safe mutation commands:
+  - create-draft-doc
+  - append-review-note
+  - write-draft-doc
+
+Preferred implementation contour:
+- Keep live mutation behavior unchanged.
+- Keep write gates unchanged.
+- Keep confirmation gates unchanged.
+- Make dry-run output choose between:
+  - human banner plus pretty JSON for default human mode;
+  - clean single JSON envelope for --json-output mode.
+- Standard envelope keys:
+  - ok
+  - command
+  - dry_run
+  - write_mode_required
+  - target identifiers
+  - next_safe_step
+
+Suggested validation for audit-only PR
+- git status --short --branch
+- python3 agent_cli.py --help || true
+- python3 agent_cli.py repo-state --json || true
+- python3 -m ruff check agent_cli.py --no-cache
+- python3 -m ruff format --check agent_cli.py --no-cache
+
+Suggested validation for later dry-run-only production PR
+- python3 docs_agent.py create-draft-doc "CONTRACT_AUDIT_DRY_RUN" --dry-run
+- python3 docs_agent.py append-review-note "DRY_RUN_DOC_ID" "Contract audit note" --dry-run
+- python3 docs_agent.py write-draft-doc "DRY_RUN_DOC_ID" "Contract audit body" --dry-run
+
+Optional later JSON validation after production change
+- python3 docs_agent.py create-draft-doc "CONTRACT_AUDIT_DRY_RUN" --dry-run --json-output
+- python3 docs_agent.py append-review-note "DRY_RUN_DOC_ID" "Contract audit note" --dry-run --json-output
+- python3 docs_agent.py write-draft-doc "DRY_RUN_DOC_ID" "Contract audit body" --dry-run --json-output
+
+Conclusion
+The next safe step is an audit-only PR containing this contract map. The narrowest later production change should target clean JSON output for dry-run mode on review-scoped mutation commands only. Live mutation success envelopes should be deferred until the dry-run contract is stable.
