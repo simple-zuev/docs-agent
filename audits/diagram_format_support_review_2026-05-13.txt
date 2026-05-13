@@ -1,0 +1,36 @@
+Diagram format support review
+
+Purpose
+- formalize supported diagram/code/artifact formats for the current agent operating contour
+- define canonical editable sources versus derived/export/presentation artifacts
+- clarify Google Slides usage as presentation layer
+- avoid implying full autonomous round-trip editing across all formats
+
+Supported format families
+- Mermaid
+- draw.io / .drawio
+- SVG
+- PNG
+- PDF
+- Google Slides
+
+Canonical editable sources
+- Mermaid text
+- draw.io / .drawio XML
+
+Derived / publish / presentation artifacts
+- SVG
+- PNG
+- PDF
+- Google Slides
+
+Interpretation
+- Mermaid and .drawio are the preferred editable/source-of-truth formats
+- SVG/PNG/PDF are render/export artifacts
+- Google Slides is presentation/publishing layer rather than primary editable diagram source
+- this support model does not imply broad autonomous multi-format round-trip editing
+
+Decision
+- one doc/design/governance wave is justified
+- no runtime mutation is required in this wave
+- no launch-boundary expansion is required

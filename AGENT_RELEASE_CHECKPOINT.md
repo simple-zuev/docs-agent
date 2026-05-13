@@ -58,6 +58,22 @@ This release does not allow:
 - promotion of query-routed document-access paths into baseline without separate hardening
 - broad capability claims based on helper/query routes
 
+## 4A. Diagram/artifact format contour
+
+The current assisted bounded contour also recognizes these diagram/artifact families:
+
+- Mermaid
+- draw.io / `.drawio`
+- SVG
+- PNG
+- PDF
+- Google Slides
+
+Interpretation:
+- Mermaid and `.drawio` are preferred editable/source-of-truth formats
+- SVG/PNG/PDF are render/export artifacts
+- Google Slides is treated as presentation layer by default
+
 ## 5. Non-baseline routes
 
 The following routes may be available and useful, but remain outside the current bounded baseline:

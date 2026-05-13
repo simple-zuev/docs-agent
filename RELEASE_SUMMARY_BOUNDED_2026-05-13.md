@@ -53,6 +53,16 @@ This means:
 - placement/readiness classification before write is included
 - broad autonomous document/file mutation is still out of scope
 
+## 4B. Diagram/artifact format support
+
+The release wave now also formalizes this support model:
+
+- Mermaid and `.drawio` as preferred editable sources
+- SVG/PNG/PDF as derived render/export artifacts
+- Google Slides as presentation layer
+
+This does not imply universal autonomous round-trip editing across all formats.
+
 ## 5. What is still outside scope
 
 This release does not include:
