@@ -3,7 +3,7 @@ from __future__ import annotations
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routes.tasks import router as tasks_router
+from .routes.tasks import router as tasks_router
 
 app = FastAPI(title="docs-agent operator backend", version="0.1.0")
 

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter
 
-from app.models import (
+from ..models import (
     AppendHistoryRequest,
     CreateTaskRequest,
     HistoryEvent,
@@ -10,7 +10,7 @@ from app.models import (
     TaskSummary,
     UpdateTaskStateRequest,
 )
-from app.services import task_service
+from ..services import task_service
 
 router = APIRouter(prefix="/api/tasks", tags=["tasks"])
 

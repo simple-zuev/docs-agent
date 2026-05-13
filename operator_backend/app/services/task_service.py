@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from fastapi import HTTPException
 
-from app.data import mock_store
-from app.models import TaskDetails
+from ..data import mock_store
+from ..models import TaskDetails
 
 
 def list_task_summaries() -> list[dict]:
