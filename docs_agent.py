@@ -161,6 +161,14 @@ def print_dry_run(payload: dict):
     print(json.dumps(payload, ensure_ascii=False, indent=2))
 
 
+def print_review_dry_run(payload: dict, json_output: bool):
+    if json_output:
+        emit_json(payload)
+        return
+
+    print_dry_run(payload)
+
+
 def emit_output(json_output: bool, payload: dict, human_lines=None):
     if json_output:
         print(json.dumps(payload, ensure_ascii=False, indent=2))
@@ -760,18 +768,23 @@ def create_draft_doc(
     title: str,
     dry_run: bool = False,
     confirm: bool = False,
+    json_output: bool = typer.Option(False, "--json-output"),
 ):
     """Create a new draft Google Doc in Cass / 13_Черновики_и_review and log it."""
     target_folder = "13_Черновики_и_review"
 
     if should_dry_run(dry_run):
-        print_dry_run(
+        print_review_dry_run(
             {
+                "ok": True,
                 "command": "create-draft-doc",
+                "dry_run": True,
                 "target_folder": target_folder,
                 "title": title,
                 "write_mode_required": True,
-            }
+                "next_safe_step": "Prepare or place reviewed body content into this draft through bounded workflow.",
+            },
+            json_output,
         )
         return
 
@@ -850,20 +863,25 @@ def append_review_note(
     note_text: str,
     dry_run: bool = False,
     confirm: bool = False,
+    json_output: bool = typer.Option(False, "--json-output"),
 ):
     """Append bounded review note to an existing review-scoped draft and log it."""
     target_folder_name = "13_Черновики_и_review"
     target_folder_id = "1rZtuXOyThzFf_LFWaD4w5nHwuXCDIHQh"
 
     if should_dry_run(dry_run):
-        print_dry_run(
+        print_review_dry_run(
             {
+                "ok": True,
                 "command": "append-review-note",
+                "dry_run": True,
                 "document_id": document_id,
                 "target_folder": target_folder_name,
                 "note_chars": len(note_text),
                 "write_mode_required": True,
-            }
+                "next_safe_step": "Review accumulated notes and decide whether another bounded draft update is needed.",
+            },
+            json_output,
         )
         return
 
@@ -935,20 +953,25 @@ def write_draft_doc(
     body_text: str,
     dry_run: bool = False,
     confirm: bool = False,
+    json_output: bool = typer.Option(False, "--json-output"),
 ):
     """Write prepared body into an existing review-scoped draft document and log it."""
     target_folder_name = "13_Черновики_и_review"
     target_folder_id = "1rZtuXOyThzFf_LFWaD4w5nHwuXCDIHQh"
 
     if should_dry_run(dry_run):
-        print_dry_run(
+        print_review_dry_run(
             {
+                "ok": True,
                 "command": "write-draft-doc",
+                "dry_run": True,
                 "document_id": document_id,
                 "target_folder": target_folder_name,
                 "body_chars": len(body_text),
                 "write_mode_required": True,
-            }
+                "next_safe_step": "Review resulting draft content and decide whether review note or further bounded update is needed.",
+            },
+            json_output,
         )
         return
 
