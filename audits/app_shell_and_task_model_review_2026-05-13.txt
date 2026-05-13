@@ -1,0 +1,19 @@
+App shell and task model review
+
+Purpose
+- move from authority-aware model documents to minimum application/MVP execution specs
+- define the next mandatory practical layer for operator use
+- cover shell, task model, approval layer, structured Drive layer, and task history
+- avoid runtime or baseline expansion
+
+Findings
+- authority split is documented
+- authority registry model is documented
+- instruction panel contract is documented
+- the next required layer is MVP application execution specification
+
+Decision
+- add app shell and task model specs
+- keep the wave design-only
+- do not expand runtime
+- do not expand baseline
