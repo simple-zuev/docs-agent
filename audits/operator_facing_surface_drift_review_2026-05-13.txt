@@ -1,0 +1,33 @@
+Operator-facing surface drift audit
+
+Scope
+- README.md
+- docs/HUMAN_OPERATOR_GUIDE.md
+- docs/COMMAND_REFERENCE.md
+- agent_cli.py usage surface
+
+Confirmed findings
+- COMMAND_REFERENCE was aligned to the bounded CLI surface in a prior bounded doc-only step
+- README.md still presents old quick-start work commands:
+  - f
+  - o
+  - r
+  - q
+- HUMAN_OPERATOR_GUIDE.md still presents old operator examples:
+  - f
+  - o
+  - r
+  - q
+- These examples do not clearly distinguish:
+  - usable assisted bounded baseline
+  - degraded document-access contour
+  - helper/query surface
+- TROUBLESHOOTING.md only references find-doc-any and does not require mutation in this step
+
+Conclusion
+- residual operator-facing documentation drift is confirmed
+- safe next mutation is doc-only alignment of:
+  - README.md
+  - docs/HUMAN_OPERATOR_GUIDE.md
+- no CLI/runtime mutation is required
+- scope should remain limited to operator-facing command examples and command grouping

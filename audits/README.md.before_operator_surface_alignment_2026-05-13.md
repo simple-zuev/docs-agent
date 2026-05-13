@@ -42,16 +42,9 @@ Deep:
 
 ## Основные CLI-команды
 
-Usable assisted bounded baseline:
 - python agent_cli.py status
 - python agent_cli.py status --json
-- python agent_cli.py repo-state
-- python agent_cli.py repo-state --json
-- python agent_cli.py doctor
-- python agent_cli.py doctor --json
 - python agent_cli.py f "DOC-0001"
-
-Available but non-baseline by default:
 - python agent_cli.py o "DOC-0002"
 - python agent_cli.py r "DOC-0002"
 - python agent_cli.py q "прочитай DOC-0002"
