@@ -1,0 +1,19 @@
+Operator UI screen specs review
+
+Purpose
+- add the next practical UI layer after app shell/task/flow specs
+- define minimum operator screens and UI state contracts
+- keep the wave design-only and bounded
+
+Findings
+- governance layer exists
+- authority/model layer exists
+- shell/task/approval/drive/history layer exists
+- diagram/source/export/publication flow layer exists
+- the next required layer is screen/state/UI formalization
+
+Decision
+- add screen map and UI state specs
+- keep the UI task-centered and authority-aware
+- do not expand runtime
+- do not expand baseline
