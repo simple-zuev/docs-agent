@@ -1,0 +1,27 @@
+Read-doc-from-query verdict
+
+Scope
+- read-doc-from-query / r
+
+Observed evidence
+- repeated direct read by Document ID succeeded
+- repeated direct read by exact document name succeeded
+- repeated JSON-form runs succeeded
+- contract shape remained stable across repeated runs
+- content_preview behavior was stable
+- truncation behavior was explicit and repeatable
+- missing-query handling is explicit and contract-aligned
+- not-found behavior is explicit and predictable
+- not-found behavior is non-retryable and non-network-related
+- not-found exit behavior returned rc=2
+- normal successful runs did not show retry/network noise
+
+Verdict
+- read-doc-from-query is ready for bounded baseline promotion
+
+Constraints
+- this promotion does not widen launch to full autonomous all-file-operations mode
+- this promotion does not imply similar readiness for ask / q
+
+Decision
+- promote read-doc-from-query / r from non-baseline to bounded baseline
