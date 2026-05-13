@@ -266,6 +266,54 @@ def local_vs_origin_reconciliation_snapshot(repo_path: Path) -> dict[str, Any]:
     }
 
 
+def local_branch_safety_snapshot(repo_path: Path) -> dict[str, Any]:
+    verify = verify_repo_path(repo_path)
+    if not verify.get("ok"):
+        return verify
+
+    status = git_status_snapshot(repo_path)
+    if not status.get("ok"):
+        return status
+
+    head = git_head_sha(repo_path)
+    if not head.get("ok"):
+        return head
+
+    branch = status.get("branch") or ""
+    working_tree_clean = bool(status.get("working_tree_clean"))
+    is_main = branch == "main"
+    safe_for_mutation = (not is_main) and working_tree_clean
+
+    if is_main:
+        recommended_next_step = (
+            "Create or switch to a non-main feature branch before mutations."
+        )
+    elif not working_tree_clean:
+        recommended_next_step = (
+            "Commit, stash, or inspect local changes before mutations."
+        )
+    else:
+        recommended_next_step = (
+            "Safe to begin controlled additive work in current feature branch."
+        )
+
+    return {
+        "ok": True,
+        "command": "local-branch-safety-snapshot",
+        "repo_path": str(Path(repo_path).expanduser().resolve()),
+        "branch": branch,
+        "is_main": is_main,
+        "working_tree_clean": working_tree_clean,
+        "local_equals_origin_main": None,
+        "safe_for_mutation": safe_for_mutation,
+        "recommended_next_step": recommended_next_step,
+        "head_sha": head.get("head_sha"),
+        "origin_main_sha": None,
+        "diff_name_status_entries": [],
+        "remote_checked": False,
+    }
+
+
 def branch_safety_snapshot(repo_path: Path) -> dict[str, Any]:
     snapshot = local_vs_origin_reconciliation_snapshot(repo_path)
     if not snapshot.get("ok"):
