@@ -23,6 +23,7 @@ The current assisted bounded baseline is:
 - artifact-state
 - get-file
 - read-doc
+- open-doc-from-query / o
 - doc-body-only --profile exchange-docs
 
 ## 3. What this release allows
@@ -47,7 +48,6 @@ This release does not allow:
 
 The following routes may be available and useful, but remain outside the current bounded baseline:
 
-- open-doc-from-query / o
 - read-doc-from-query / r
 - ask / q
 
@@ -67,8 +67,7 @@ Do not widen operating assumptions based on incidental success outside the bound
 ## 8. Next capability frontier
 
 The next capability frontier should be assessed separately and explicitly.
-Likely next candidates:
-- open-doc-from-query / o
+Likely next candidate:
 - read-doc-from-query / r
 
 No frontier promotion is included in this release checkpoint.

@@ -68,17 +68,17 @@ get-file
 read-doc
 - python agent_cli.py read-doc "<google_doc_id>"
 
-doc-body-only
-- python agent_cli.py doc-body-only --profile "<profile>" --document-type "<type>" --title "<title>"
-- python agent_cli.py doc-body-only --json --profile "<profile>" --document-type "<type>" --title "<title>"
-
-## Degraded contour
-
 open-doc-from-query
 - python agent_cli.py open-doc-from-query "DOC-0002"
 - python agent_cli.py open-doc-from-query --json "DOC-0002"
 - python agent_cli.py o "DOC-0002"
 - python agent_cli.py o --json "DOC-0002"
+
+doc-body-only
+- python agent_cli.py doc-body-only --profile "<profile>" --document-type "<type>" --title "<title>"
+- python agent_cli.py doc-body-only --json --profile "<profile>" --document-type "<type>" --title "<title>"
+
+## Degraded contour
 
 read-doc-from-query
 - python agent_cli.py read-doc-from-query "DOC-0002"
@@ -107,9 +107,9 @@ ask
   - artifact-state
   - get-file
   - read-doc
+  - open-doc-from-query / o
   - doc-body-only
 - The following commands are available in CLI but should not be treated as baseline by default:
-  - open-doc-from-query / o
   - read-doc-from-query / r
 - Query/helper surface exists, but should not replace direct bounded inspection flow by default:
   - ask / q
