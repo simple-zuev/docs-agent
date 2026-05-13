@@ -1,0 +1,17 @@
+Helper surface wording fix review
+
+Purpose
+- remove duplicated wording introduced during helper-surface language consolidation
+- keep helper-only interpretation unchanged
+- avoid any runtime or baseline change
+
+Finding
+- duplicated phrase "supported supported helper surface" appeared in:
+  - AGENT_CURRENT_CHECKPOINT.md
+  - docs/COMMAND_REFERENCE.md
+
+Decision
+- apply narrow wording-only correction
+- no runtime mutation
+- no launch-boundary change
+- no baseline change
