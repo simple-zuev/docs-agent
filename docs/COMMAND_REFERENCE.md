@@ -115,7 +115,7 @@ ask
   - read-doc-from-query / r
   - doc-body-only
 - The following commands are available in CLI but should not be treated as baseline by default:
-- Supported supported helper surface exists, but should not replace direct bounded inspection flow by default:
+- Supported helper surface exists, but should not replace direct bounded inspection flow by default:
   - ask / q
 
 ## Exit codes
