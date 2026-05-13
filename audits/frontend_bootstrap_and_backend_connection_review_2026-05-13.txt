@@ -1,0 +1,11 @@
+Frontend bootstrap and backend connection review
+
+Purpose
+- create the first real operator_app frontend
+- connect it to the backend task API skeleton
+- move from specs plus backend into a living local app loop
+
+Decision
+- bootstrap operator_app with Vite + React
+- connect frontend to backend task endpoints
+- keep scope bounded and mock-backed on the backend side
