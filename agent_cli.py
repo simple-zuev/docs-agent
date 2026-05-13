@@ -4,7 +4,7 @@ import re
 import subprocess
 import sys
 from pathlib import Path
-from repo_state import branch_safety_snapshot
+from repo_state import branch_safety_snapshot, local_branch_safety_snapshot
 
 BASE = Path.home() / "AI" / "docs-agent"
 DOCS_AGENT = BASE / "docs_agent.py"
@@ -1241,8 +1241,40 @@ def repo_state_payload() -> dict:
     }
 
 
+def repo_state_local_payload() -> dict:
+    payload = local_branch_safety_snapshot(BASE)
+
+    if payload.get("ok"):
+        return payload
+
+    return {
+        "ok": False,
+        "command": "repo-state-local",
+        "error_type": payload.get("error_type", "RepoStateError"),
+        "error_message": payload.get(
+            "error_message", "Failed to build local repo state snapshot."
+        ),
+        "retryable": bool(payload.get("retryable")),
+        "auth_related": False,
+        "network_related": False,
+        "details": payload,
+    }
+
+
 def cmd_repo_state(json_output: bool = False) -> int:
     payload = repo_state_payload()
+    if json_output:
+        print_json(payload)
+    else:
+        if payload.get("ok"):
+            print_compact_repo_state(payload)
+        else:
+            print_compact_error(payload)
+    return resolve_command_exit_code(payload)
+
+
+def cmd_repo_state_local(json_output: bool = False) -> int:
+    payload = repo_state_local_payload()
     if json_output:
         print_json(payload)
     else:
@@ -2523,6 +2555,7 @@ def usage() -> None:
     print(
         "Usage:\n"
         "  python agent_cli.py status [--json]\n  python agent_cli.py repo-state [--json]    | rs [--json]\n"
+        "  python agent_cli.py repo-state-local [--json]\n"
         "  python agent_cli.py doctor [--json]        | diagnose [--json]\n"
         "  python agent_cli.py assemble-context [--json] --profile <profile>\n"
         "  python agent_cli.py doc-body-only [--json] --profile <profile> --document-type <type> --title <title>\n"
@@ -2540,6 +2573,7 @@ def usage() -> None:
         "Examples:\n"
         "  python agent_cli.py status\n"
         "  python agent_cli.py status --json\n  python agent_cli.py repo-state\n  python agent_cli.py repo-state --json\n"
+        "  python agent_cli.py repo-state-local --json\n"
         "  python agent_cli.py f DOC-0001\n"
         "  python agent_cli.py o DOC-0002\n"
         "  python agent_cli.py r DOC-0002\n"
@@ -2588,6 +2622,15 @@ def main() -> int:
                 print_usage_error("repo-state does not accept positional arguments.")
                 return EXIT_USAGE_ERROR
             return cmd_repo_state(json_output=json_output)
+
+        if cmd == "repo-state-local":
+            json_output, args = parse_json_flag(argv)
+            if args:
+                print_usage_error(
+                    "repo-state-local does not accept positional arguments."
+                )
+                return EXIT_USAGE_ERROR
+            return cmd_repo_state_local(json_output=json_output)
 
         if cmd in {"doctor-lite", "diagnose-lite"}:
             json_output, args = parse_json_flag(argv)
