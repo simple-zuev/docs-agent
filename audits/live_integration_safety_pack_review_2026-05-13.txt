@@ -1,0 +1,17 @@
+Live integration safety pack review
+
+Purpose
+- define the first live Google Drive integration contour after implementation planning, runtime guardrails, and comfort profile
+- make allowed operations, approval-required operations, and first rollout scope explicit
+- avoid accidental expansion into broad autonomous Drive mutation
+
+Findings
+- repository already contains bounded runtime, authority-aware execution, task model, approval model, structured Drive model, implementation plan, and local runtime guardrails
+- first live integration now needs explicit operation and rollout boundaries
+- this wave should remain execution-policy documentation only
+
+Decision
+- add operation matrix
+- add approval-required matrix
+- add first live rollout definition
+- do not expand baseline or runtime in this wave
