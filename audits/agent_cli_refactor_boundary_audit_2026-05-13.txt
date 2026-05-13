@@ -1,0 +1,169 @@
+agent_cli refactor boundary audit
+Date: 2026-05-13
+Scope: audit-only, no runtime behavior change
+
+Context
+- Project mode: Path A assisted bounded mode.
+- This audit maps safe future decomposition boundaries for agent_cli.py.
+- This audit does not change live Google Drive or Google Docs behavior.
+- This audit does not promote read-doc, get-file, or read-doc-from-query.
+- This audit does not remove or modify docs_agent_v2.py.
+
+Current role of agent_cli.py
+- agent_cli.py is the operator/agent-facing bounded CLI surface.
+- It wraps docs_agent.py through subprocess calls.
+- It normalizes JSON/output contracts for supervised ChatGPT/Codex use.
+- It exposes local repo-state, doctor/status, lookup/navigation, ask routing,
+  artifact-state, doc-body-only, and helper output formatting.
+
+Observed concentration
+- agent_cli.py is currently a monolithic file of roughly 2700 lines.
+- It contains command dispatch, output formatting, subprocess execution,
+  retry/error handling, MASTER_INDEX cache behavior, query normalization,
+  lookup routing, ask routing, doctor/status logic, repo-state wrapping,
+  and document-preparation helpers.
+- The file is still workable, but its size makes future bounded changes slower
+  to review and increases the chance of unrelated regressions.
+
+Recommended future module boundaries
+
+1. agent_cli_output.py
+- Candidate contents:
+  - print_json
+  - print_human_lines
+  - print_usage_error
+  - build_error_payload
+  - build_compact_error_output
+  - print_compact_error
+  - compact output helpers for status, repo-state, doctor, lookup, read, ask
+- Why this boundary is safe:
+  - Output helpers are mostly pure formatting functions.
+  - They do not need Google API access.
+  - They can be covered with local tests.
+- Suggested first production refactor:
+  - Move only print_json and print_human_lines after adding import-level tests.
+
+2. agent_cli_subprocess.py
+- Candidate contents:
+  - resolve_python_bin
+  - run_docs_agent
+  - run_docs_agent_with_retry
+  - is_retryable_network_error
+  - DOCS_AGENT_TIMEOUT_SEC related constants
+- Why this boundary is safe:
+  - Subprocess behavior is already a separate conceptual adapter.
+  - It can be tested with fake commands or monkeypatching.
+- Risk:
+  - Many command payload functions depend on this adapter.
+  - Move in very small steps only.
+
+3. agent_cli_master_index_cache.py
+- Candidate contents:
+  - MASTER_INDEX cache constants
+  - normalize_cell / safe_lower
+  - cache header and row helpers
+  - load_master_index_cache
+  - save_master_index_cache
+  - find_doc_any_payload_from_cache
+  - extend_master_index_cache_from_success
+- Why this boundary is safe:
+  - Cache operations are local filesystem operations.
+  - They are a distinct concern from command dispatch.
+- Risk:
+  - Cache behavior participates in lookup fallback and quota mitigation.
+  - Add fixture-backed tests before moving behavior.
+
+4. agent_cli_lookup.py
+- Candidate contents:
+  - extract_first_match_value
+  - extract_google_id_from_link
+  - looks_like_google_id
+  - normalize_query_for_lookup
+  - build_doc_summary
+  - build_find_doc_success_payload
+  - find_doc_any_payload_live
+  - find_doc_any_payload
+  - open_doc_from_query_payload
+  - read_doc_from_query_payload
+- Why this boundary is useful:
+  - Lookup/navigation is one of the main Path A surfaces.
+  - Separating it would reduce the blast radius of future fixes.
+- Risk:
+  - read_doc_from_query remains degraded by default.
+  - Do not use this refactor to promote degraded routes.
+
+5. agent_cli_doctor.py
+- Candidate contents:
+  - payload_contains_quota_or_rate_limit
+  - summarize_payload_ok
+  - safe_error_type / safe_error_message
+  - build_doctor_summary
+  - diagnose_payload_failure
+  - build_doctor_next_step
+  - doctor_payload
+  - doctor_lite_payload
+  - run_smoke_explain_payload
+  - capabilities_payload
+- Why this boundary is useful:
+  - Doctor/status behavior is a diagnostic surface, not core command dispatch.
+  - It can be tested through deterministic payload fixtures.
+- Risk:
+  - Some doctor paths call multiple lower-level commands.
+  - Keep extraction mechanical and test before/after output.
+
+6. agent_cli_preparation.py
+- Candidate contents:
+  - assemble_context_payload
+  - doc_body_only_outline
+  - build_doc_body_only_body
+  - doc_body_only_payload
+  - artifact_state_payload
+- Why this boundary is useful:
+  - These are safe Path A preparation surfaces.
+  - They should remain clearly separated from live mutation behavior.
+- Risk:
+  - Preserve JSON envelopes exactly.
+
+7. agent_cli_dispatch.py or keep dispatch in agent_cli.py
+- Candidate contents:
+  - parse_json_flag
+  - handle_query_command
+  - usage
+  - main
+- Recommended direction:
+  - Keep dispatch in agent_cli.py until helper extraction is complete.
+  - agent_cli.py should become a thin public entrypoint only after tests cover
+    the extracted helpers.
+
+Recommended sequencing
+
+First audit/test PRs
+1. Add this boundary audit.
+2. Add local tests for output helpers and usage behavior.
+3. Add fixture tests for repo-state/network failure envelopes.
+4. Add fixture tests for MASTER_INDEX cache lookup behavior.
+
+First production refactor PRs
+1. Move the smallest output helpers into agent_cli_output.py.
+2. Move subprocess adapter helpers into agent_cli_subprocess.py.
+3. Move MASTER_INDEX cache helpers after fixture coverage exists.
+4. Move lookup payload helpers only after baseline lookup tests exist.
+
+Non-goals for refactor sequence
+- Do not rewrite agent_cli.py broadly.
+- Do not change command names or help text unless a separate audit requires it.
+- Do not change live Google Drive or Google Docs mutation behavior.
+- Do not promote read-doc, get-file, or read-doc-from-query.
+- Do not remove docs_agent_v2.py in the same sequence.
+- Do not add new runtime dependencies.
+
+Validation for this audit-only PR
+- python3 -m pytest -q
+- python3 -m ruff check agent_cli.py docs_agent.py repo_state.py
+- python3 -m ruff format --check agent_cli.py docs_agent.py repo_state.py
+
+Conclusion
+- agent_cli.py is still the correct public agent/operator CLI entrypoint.
+- Its current monolithic shape is the main refactor target.
+- The safest path is incremental extraction of pure/local helpers with tests,
+  while preserving Path A boundaries and avoiding degraded read promotion.
