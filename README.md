@@ -92,3 +92,20 @@ Available but non-baseline by default:
 ## Следующий технический шаг
 
 - MASTER_INDEX cache + memoization
+
+## Поддержка диаграмм и форматов
+
+Текущий repository contour дополнительно формализует поддержку:
+
+- Mermaid
+- draw.io / `.drawio`
+- SVG
+- PNG
+- PDF
+- Google Slides
+
+Правило:
+- Mermaid и `.drawio` — preferred editable sources
+- SVG / PNG / PDF — export artifacts
+- Google Slides — presentation layer
+

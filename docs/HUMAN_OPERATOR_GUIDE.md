@@ -97,3 +97,14 @@ Explainable smoke:
 - audits/ — результаты проверок, snapshots, status notes
 - docs/ — документация
 - scripts/ — operational и regression scripts
+
+## Диаграммы и форматы артефактов
+
+Для задач по схемам и диаграммам использовать такую модель:
+
+- Mermaid и `.drawio` — основные редактируемые исходники
+- SVG / PNG / PDF — форматы экспорта и публикации
+- Google Slides — presentation layer по умолчанию
+
+По умолчанию не считать PNG / PDF / Slides первичным редактируемым source-of-truth.
+
