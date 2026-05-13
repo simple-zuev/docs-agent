@@ -1,0 +1,16 @@
+Local operator comfort profile review
+
+Purpose
+- define the minimum comfort/runtime behavior for local docs-agent deployment on a working MacBook
+- ensure the operator can continue normal work while the app is running
+- make resource discipline explicit beyond general safety guardrails
+
+Findings
+- local runtime guardrails already define bounded scope, mutation discipline, storage discipline, and quota-safe behavior
+- a separate comfort profile is still needed to formalize low-impact local operation during parallel daily work
+- the need is operational comfort and responsiveness, not hardware weakness
+
+Decision
+- add a dedicated local operator comfort profile
+- keep default mode quiet, serial, and review-friendly
+- do not expand runtime or baseline in this wave
