@@ -1,0 +1,29 @@
+Bounded baseline consolidation verdict
+
+Current status
+- authority files are aligned with the expanded bounded baseline
+- command reference notes are aligned with the expanded bounded baseline
+- degraded routes remain clearly separated
+
+Residual drift
+- README.md still reflects an older narrower baseline example set
+- HUMAN_OPERATOR_GUIDE.md still reflects an older narrower baseline example set
+- COMMAND_REFERENCE.md notes include get-file and read-doc in baseline, but usable contour blocks do not list them explicitly
+
+Decision
+- one narrow doc-only cleanup wave is justified
+- no runtime change is required
+- no launch-boundary change is required
+
+Target bounded baseline to reflect consistently
+- status
+- repo-state / rs
+- doctor / diagnose
+- find-doc-id
+- find-doc-name
+- find-link
+- find-doc-any / f
+- artifact-state
+- get-file
+- read-doc
+- doc-body-only --profile exchange-docs

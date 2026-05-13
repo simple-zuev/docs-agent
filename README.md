@@ -50,6 +50,10 @@ Usable assisted bounded baseline:
 - python agent_cli.py doctor
 - python agent_cli.py doctor --json
 - python agent_cli.py f "DOC-0001"
+- python agent_cli.py artifact-state --file-id "<google_drive_file_id>"
+- python agent_cli.py get-file "<google_drive_file_id>"
+- python agent_cli.py read-doc "<google_doc_id>"
+- python agent_cli.py doc-body-only --profile "exchange-docs" --document-type "note" --title "example_title"
 
 Available but non-baseline by default:
 - python agent_cli.py o "DOC-0002"
