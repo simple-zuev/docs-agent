@@ -62,6 +62,12 @@ artifact-state
 - python agent_cli.py artifact-state --file-id "<google_drive_file_id>"
 - python agent_cli.py artifact-state --json --file-id "<google_drive_file_id>"
 
+get-file
+- python agent_cli.py get-file "<google_drive_file_id>"
+
+read-doc
+- python agent_cli.py read-doc "<google_doc_id>"
+
 doc-body-only
 - python agent_cli.py doc-body-only --profile "<profile>" --document-type "<type>" --title "<title>"
 - python agent_cli.py doc-body-only --json --profile "<profile>" --document-type "<type>" --title "<title>"

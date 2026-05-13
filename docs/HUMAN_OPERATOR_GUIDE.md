@@ -33,12 +33,24 @@ Usable assisted bounded baseline
 Найти документ:
 - python agent_cli.py f "DOC-0001"
 
+Проверить артефакт:
+- python agent_cli.py artifact-state --file-id "<google_drive_file_id>"
+
+Получить метаданные файла:
+- python agent_cli.py get-file "<google_drive_file_id>"
+
+Прочитать документ напрямую:
+- python agent_cli.py read-doc "<google_doc_id>"
+
+Подготовить тело документа:
+- python agent_cli.py doc-body-only --profile "exchange-docs" --document-type "note" --title "example_title"
+
 Available but non-baseline by default
 
-Открыть документ:
+Открыть документ через query-routing:
 - python agent_cli.py o "DOC-0002"
 
-Прочитать документ:
+Прочитать документ через query-routing:
 - python agent_cli.py r "DOC-0002"
 
 Query/helper surface:
