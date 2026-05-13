@@ -12,6 +12,7 @@ Treat the following as the current usable assisted bounded baseline:
 - find-link
 - find-doc-any / f
 - artifact-state
+- get-file
 - doc-body-only --profile exchange-docs
 
 ## 2. Default usage policy
@@ -54,11 +55,11 @@ Do not use command success in degraded/helper surfaces as justification to:
 
 ## 7. Next promotion candidate
 
-Current preferred candidate for future bounded promotion work:
-- get-file
+Current promotion note:
+- get-file has been validated as suitable for bounded baseline inclusion
 
-This does not change the current launch boundary.
-It only records prioritization for a future bounded stabilization wave.
+This does not widen launch to full autonomous file operations.
+It only records that get-file no longer needs to be treated as non-baseline.
 
 ## 8. Branch discipline
 

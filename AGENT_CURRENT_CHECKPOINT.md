@@ -43,6 +43,7 @@ Treat the following as the current usable baseline:
 - find-link
 - find-doc-any / f
 - artifact-state
+- get-file
 - doc-body-only --profile exchange-docs
 
 Default working style:
@@ -113,14 +114,12 @@ Next bounded milestone:
 
 ## 9A. Next promotion candidate
 
-The current safest non-baseline promotion candidate is:
-
-- get-file
+The previously selected promotion candidate `get-file` has now been validated for bounded baseline inclusion.
 
 Reason:
 - direct and narrower contract
-- less routing ambiguity than query-driven routes
-- successful controlled runtime evidence already exists
+- repeated successful controlled runtime evidence
+- explicit and predictable metadata-oriented behavior
 
 
 ## 10. Practical operator rule

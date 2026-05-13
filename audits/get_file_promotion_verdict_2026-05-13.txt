@@ -1,0 +1,21 @@
+Get-file promotion verdict
+
+Scope
+- get-file
+
+Observed evidence
+- repeated direct get-file runs succeeded
+- repeated structured/json-style runs succeeded
+- usage error for missing id is explicit and contract-aligned
+- get-file has a narrow and explicit file-metadata contract
+- get-file avoids query-routing ambiguity
+
+Verdict
+- get-file is ready for bounded baseline promotion
+
+Constraints
+- this promotion does not widen launch to full autonomous file operations
+- this promotion does not imply similar readiness for read-doc, open-doc-from-query, read-doc-from-query, or ask
+
+Decision
+- promote get-file from non-baseline to bounded baseline
