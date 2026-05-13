@@ -1,0 +1,12 @@
+Backend task API skeleton review
+
+Purpose
+- move from implementation planning and UI prototype into the first real backend runtime layer
+- provide a minimal task-centered API for the operator application
+- keep the step bounded and mock-backed
+
+Decision
+- add FastAPI-based task API skeleton
+- keep it mock-backed and local
+- avoid Drive mutation/runtime coupling in this wave
+- preserve bounded scope
