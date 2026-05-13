@@ -33,17 +33,24 @@ fi
 
 echo
 echo "== step: regression_exit_codes_bounded =="
+bounded_gate_log="$(mktemp)"
 set +e
-bash ./scripts/regression_exit_codes_bounded.sh >/dev/null 2>&1
+bash ./scripts/regression_exit_codes_bounded.sh >"$bounded_gate_log" 2>&1
 rc=$?
 set -e
 echo "rc=$rc"
 if [[ "$rc" -ne 0 ]]; then
   echo "diagnosis: internal"
   echo "likely_cause: Нарушен контракт bounded exit codes."
-  echo "recommended_action: Запусти bash ./scripts/regression_exit_codes_bounded.sh без >/dev/null и найди первый FAIL."
+  echo "recommended_action: Проверь полный вывод bounded gate ниже и найди первый FAIL."
+  echo
+  echo "---- bounded gate output start ----"
+  cat "$bounded_gate_log"
+  echo "---- bounded gate output end ----"
+  rm -f "$bounded_gate_log"
   exit 1
 fi
+rm -f "$bounded_gate_log"
 
 echo
 echo "smoke_explain: OK"

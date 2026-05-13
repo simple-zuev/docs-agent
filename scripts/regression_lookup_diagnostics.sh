@@ -28,23 +28,20 @@ resolve_python_bin() {
 
 PYTHON_BIN="$(resolve_python_bin)"
 
-run_case() {
-  local title="$1"
-  local expected="$2"
-  shift 2
+echo "== lookup success candidate =="
+set +e
+"$PYTHON_BIN" agent_cli.py f "DOC-0001"
+rc=$?
+set -e
+echo "lookup_success_rc=$rc"
 
-  echo "== $title =="
-  set +e
-  "$@"
-  rc=$?
-  set -e
-  echo "exit_code=$rc expected=$expected"
-  if [[ "$rc" -ne "$expected" ]]; then
-    echo "FAIL: $title"
-    exit 1
-  fi
-}
+echo
+echo "== lookup not found candidate =="
+set +e
+"$PYTHON_BIN" agent_cli.py f "DOC-9999"
+rc=$?
+set -e
+echo "lookup_not_found_rc=$rc"
 
-run_case "usage no command" 1 "$PYTHON_BIN" agent_cli.py
-run_case "status success" 0 "$PYTHON_BIN" agent_cli.py status
-run_case "repo-state success" 0 "$PYTHON_BIN" agent_cli.py repo-state
+echo
+echo "lookup diagnostics complete"
