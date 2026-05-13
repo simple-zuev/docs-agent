@@ -1,0 +1,37 @@
+Bounded surface drift audit
+
+Scope
+- docs/COMMAND_REFERENCE.md
+- agent_cli.py
+- operator-provided assisted bounded mode authority
+
+Confirmed findings
+- main baseline inspected at commit 4d3cbe1
+- operator authority files were not present in the local repository under maxdepth 3 search
+- agent_cli.py exposes the following bounded command surface:
+  - status
+  - repo-state / rs
+  - doctor / diagnose
+  - find-doc-id
+  - find-doc-name
+  - find-link
+  - find-doc-any / f
+  - artifact-state
+  - doc-body-only
+- agent_cli.py also exposes degraded document-access contour:
+  - read-doc-from-query / r
+- docs/COMMAND_REFERENCE.md does not reflect the bounded surface above
+- docs/COMMAND_REFERENCE.md still reflects older/partial command documentation and omits:
+  - repo-state
+  - find-doc-id
+  - find-doc-name
+  - find-link
+  - artifact-state
+  - doc-body-only
+
+Conclusion
+- documented command surface drift is confirmed
+- current source of truth for command availability is agent_cli.py, not docs/COMMAND_REFERENCE.md
+- safe next mutation is doc-only alignment of docs/COMMAND_REFERENCE.md
+- no code mutation is required for this step
+- degraded document-access commands should remain documented as degraded/non-baseline
