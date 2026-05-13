@@ -1,0 +1,17 @@
+Helper surface language consolidation review
+
+Purpose
+- normalize repository language for ask / q after helper-surface verdict
+- keep helper wording consistent across authority files, release checkpoint, command reference, README, and operator guide
+- avoid any runtime or launch-boundary change
+
+Target interpretation
+- ask / q is a supported helper surface
+- ask / q remains outside bounded baseline
+- ask / q should not be described as degraded runtime functionality
+- ask / q should not be described as baseline
+
+Decision
+- one narrow doc-only cleanup wave is justified
+- no runtime mutation is required
+- no baseline expansion is required

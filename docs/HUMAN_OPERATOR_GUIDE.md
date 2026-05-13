@@ -53,7 +53,7 @@ Available but non-baseline by default
 Прочитать документ через query-routing:
 - python agent_cli.py r "DOC-0002"
 
-Query/helper surface:
+Supported helper surface:
 - python agent_cli.py q "прочитай DOC-0002"
 
 ## 5. Диагностика

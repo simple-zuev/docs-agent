@@ -65,7 +65,7 @@ The following commands are available and may be functionally useful, but must no
 
 ## 5. Helper surface
 
-The following helper/query surface exists, but should not replace explicit bounded workflows:
+The following supported supported helper surface exists, but should not replace explicit bounded workflows:
 
 - ask / q
 - assemble-context
