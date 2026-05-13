@@ -3,8 +3,10 @@ from __future__ import annotations
 import json
 
 from agent_cli_output import (
+    build_compact_ask_output,
     build_compact_error_output,
     build_error_payload,
+    print_compact_find,
     print_json,
 )
 
@@ -61,4 +63,58 @@ def test_print_json_emits_pretty_json(capsys) -> None:
 
     captured = capsys.readouterr()
     assert json.loads(captured.out) == {"ok": True, "message": "Привет"}
+    assert captured.err == ""
+
+
+def test_build_compact_ask_output_formats_find_result() -> None:
+    lines = build_compact_ask_output(
+        {
+            "ok": True,
+            "command": "ask",
+            "query": "DOC-0001",
+            "routed_to": "find-doc-any",
+            "result": {
+                "ok": True,
+                "command": "find-doc-any",
+                "summary": {
+                    "document_id": "DOC-0001",
+                    "document_name": "Operating Prompt",
+                    "link": "https://example.test/doc",
+                },
+            },
+        }
+    )
+
+    assert lines == [
+        "ok: True",
+        "route: find-doc-any",
+        "query: DOC-0001",
+        "document_id: DOC-0001",
+        "document_name: Operating Prompt",
+        "link: https://example.test/doc",
+    ]
+
+
+def test_print_compact_find_emits_summary(capsys) -> None:
+    print_compact_find(
+        {
+            "ok": True,
+            "query": "DOC-0001",
+            "summary": {
+                "document_id": "DOC-0001",
+                "document_name": "Operating Prompt",
+                "link": "https://example.test/doc",
+            },
+        }
+    )
+
+    captured = capsys.readouterr()
+    assert captured.out.splitlines() == [
+        "ok: True",
+        "route: find-doc-any",
+        "query: DOC-0001",
+        "document_id: DOC-0001",
+        "document_name: Operating Prompt",
+        "link: https://example.test/doc",
+    ]
     assert captured.err == ""
