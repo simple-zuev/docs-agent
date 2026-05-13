@@ -1,0 +1,35 @@
+Ask helper surface verdict
+
+Scope
+- ask / q
+
+Observed evidence
+- repeated status-like ask runs succeeded
+- repeated find-like ask runs succeeded
+- repeated read-like ask runs succeeded
+- compact output remained stable across repeated runs
+- json output remained stable across repeated runs
+- missing-query handling is explicit and contract-aligned
+- not-found behavior is explicit and predictable
+- not-found exit behavior returned rc=2
+- normal successful runs did not show retry/network noise
+
+Important interpretation
+- ask / q is a routing/helper surface rather than a direct bounded command surface
+- ask routing is useful, but not fully explicit as a baseline contract
+- direct Google ID input routed to find-doc-any in the observed scenario rather than cleanly expressing a strict get-file-only contract
+- this makes ask less suitable as baseline than direct commands with narrower contracts
+
+Verdict
+- ask / q should remain supported helper surface
+- ask / q should remain outside bounded baseline
+
+Constraints
+- this does not reduce current bounded release scope
+- this does not change the bounded baseline
+- this does not imply runtime degradation of ask / q
+- this only preserves launch discipline around direct explicit routes
+
+Decision
+- do not promote ask / q to bounded baseline
+- keep ask / q documented as helper-only
