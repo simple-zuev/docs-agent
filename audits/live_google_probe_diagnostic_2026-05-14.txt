@@ -1,0 +1,23 @@
+Live Google probe diagnostic audit
+Date: 2026-05-14
+
+Problem
+- doctor-lite and doctor can intentionally pass from cache-backed MASTER_INDEX lookup.
+- Operators need a separate way to verify live Google OAuth/DNS reachability without changing Drive or Docs data.
+
+Decision
+- Add live-google-probe as a read-only diagnostic command.
+- The command bypasses the local MASTER_INDEX cache and calls the existing live find-row-by-column path for DOC-0001.
+- The probe reports live_google_verified=true only when the live call reaches MASTER_INDEX and finds DOC-0001.
+
+Safety boundary
+- No Google Drive or Google Docs mutation behavior is changed.
+- No read-doc, get-file, or read-doc-from-query promotion is included.
+- The probe uses an existing read-only Sheets lookup path and returns a bounded diagnostic envelope.
+
+Validation expectation
+- Unit tests cover successful live verification and auth failure classification.
+- Runtime validation should include live-google-probe --json where OAuth/network access is available.
+
+Rollback
+- Remove live-google-probe dispatch, payload helper, tests, and this audit artifact.
