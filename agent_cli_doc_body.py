@@ -58,7 +58,7 @@ def assemble_context_payload(
         for item in items:
             if item == "DOC-0001":
                 payload = find_doc_any_payload_from_cache("DOC-0001")
-                if payload.get("ok"):
+                if isinstance(payload, dict) and payload.get("ok"):
                     resolved_sources.append(
                         {
                             "group": group_name,
@@ -124,7 +124,7 @@ def assemble_context_payload(
                 continue
 
             payload = find_doc_any_payload_from_cache(item)
-            if payload.get("ok"):
+            if isinstance(payload, dict) and payload.get("ok"):
                 resolved_sources.append(
                     {
                         "group": group_name,
