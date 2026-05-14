@@ -49,6 +49,10 @@ bash scripts/preflight_check.sh
 python agent_cli.py status
 python agent_cli.py f "DOC-0001"
 
+Если нужно отдельно подтвердить live Google/OAuth, а не только routine cache-backed readiness:
+
+python agent_cli.py live-google-probe --json
+
 ## 7. Если что-то пошло не так
 
 Смотри:

@@ -18,8 +18,10 @@
 - bash scripts/operator_start.sh
 - bash scripts/preflight_check.sh
 - python agent_cli.py doctor-lite
+- python agent_cli.py live-google-probe --json
 - python agent_cli.py status
-- основные query routes f / o / r / q
+- основные lookup/navigation routes f / o
+- helper route q доступен, но не заменяет direct bounded inspection flow
 
 ### Documentation
 Подтверждено наличие:
@@ -73,6 +75,13 @@
 
 - added MASTER_INDEX disk cache path with TTL-based reuse
 - doctor-lite confirmed healthy with cache-backed MASTER_INDEX lookup
+
+## Live Google probe note
+
+- added read-only `live-google-probe`
+- the probe bypasses MASTER_INDEX cache and verifies live Google/OAuth through DOC-0001 lookup
+- this does not change Google Drive / Google Docs mutation behavior
+- read-doc, get-file, and read-doc-from-query remain degraded/non-baseline by default
 
 ## Baseline restore note
 

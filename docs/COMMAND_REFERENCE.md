@@ -12,6 +12,10 @@ doctor-lite
 - python agent_cli.py doctor-lite
 - python agent_cli.py doctor-lite --json
 
+live-google-probe
+- python agent_cli.py live-google-probe
+- python agent_cli.py live-google-probe --json
+
 ## Deep
 
 doctor
@@ -39,6 +43,10 @@ doctor
 - python agent_cli.py diagnose
 - python agent_cli.py diagnose --json
 
+live-google-probe
+- python agent_cli.py live-google-probe
+- python agent_cli.py live-google-probe --json
+
 assemble-context
 - python agent_cli.py assemble-context --profile "<profile>"
 - python agent_cli.py assemble-context --json --profile "<profile>"
@@ -62,12 +70,6 @@ artifact-state
 - python agent_cli.py artifact-state --file-id "<google_drive_file_id>"
 - python agent_cli.py artifact-state --json --file-id "<google_drive_file_id>"
 
-get-file
-- python agent_cli.py get-file "<google_drive_file_id>"
-
-read-doc
-- python agent_cli.py read-doc "<google_doc_id>"
-
 open-doc-from-query
 - python agent_cli.py open-doc-from-query "DOC-0002"
 - python agent_cli.py open-doc-from-query --json "DOC-0002"
@@ -79,6 +81,12 @@ doc-body-only
 - python agent_cli.py doc-body-only --json --profile "<profile>" --document-type "<type>" --title "<title>"
 
 ## Degraded contour
+
+get-file
+- python agent_cli.py get-file "<google_drive_file_id>"
+
+read-doc
+- python agent_cli.py read-doc "<google_doc_id>"
 
 read-doc-from-query
 - python agent_cli.py read-doc-from-query "DOC-0002"
@@ -101,19 +109,21 @@ ask
   - status
   - repo-state / rs
   - doctor / diagnose
+  - live-google-probe
   - find-doc-id
   - find-doc-name
   - find-link
   - find-doc-any / f
   - artifact-state
-  - get-file
-  - read-doc
   - open-doc-from-query / o
-  - read-doc-from-query / r
   - doc-body-only
 - The following commands are available in CLI but should not be treated as baseline by default:
+  - get-file
+  - read-doc
+  - read-doc-from-query / r
 - Supported helper surface exists, but should not replace direct bounded inspection flow by default:
   - ask / q
+- `doctor-lite` and `doctor` may be cache-backed. Use `live-google-probe` when the operator needs an explicit live Google/OAuth check.
 
 ## Exit codes
 
