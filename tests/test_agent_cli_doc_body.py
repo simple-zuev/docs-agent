@@ -55,6 +55,27 @@ def test_assemble_context_uses_cache_only_lookup_and_marks_partial() -> None:
     )
 
 
+def test_assemble_context_treats_empty_cache_payload_as_miss() -> None:
+    def fake_cache(query):
+        if query == "DOC-0001":
+            return None
+        return {"ok": False}
+
+    payload = agent_cli_doc_body.assemble_context_payload(
+        "exchange-docs",
+        capabilities_payload=lambda: {"ok": True},
+        status_payload=lambda: {"ok": True, "config": {}},
+        find_doc_any_payload_from_cache=fake_cache,
+    )
+
+    assert payload["ok"] is True
+    assert payload["context_summary"]["partial_context"] is True
+    assert any(
+        item["query"] == "DOC-0001" and item["reason"] == "CacheMiss"
+        for item in payload["unresolved_sources"]
+    )
+
+
 def test_doc_body_only_payload_builds_body_without_mutation() -> None:
     context_payload = {
         "ok": True,
