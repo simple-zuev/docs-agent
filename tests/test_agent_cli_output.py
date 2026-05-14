@@ -6,6 +6,7 @@ from agent_cli_output import (
     build_compact_ask_output,
     build_compact_error_output,
     build_error_payload,
+    print_compact_doctor_lite,
     print_compact_find,
     print_json,
 )
@@ -118,3 +119,29 @@ def test_print_compact_find_emits_summary(capsys) -> None:
         "link: https://example.test/doc",
     ]
     assert captured.err == ""
+
+
+def test_print_compact_doctor_lite_includes_google_verification_flags(
+    capsys,
+) -> None:
+    print_compact_doctor_lite(
+        {
+            "ok": True,
+            "checks": {
+                "environment": {"ok": True},
+                "status": {"ok": True},
+                "master_index_lookup": {"ok": True},
+            },
+            "cache_backed": True,
+            "live_google_verified": False,
+            "summary": "cache-backed",
+            "next_step": "live not checked",
+            "diagnosis": "healthy",
+            "likely_cause": "none",
+            "recommended_action": "continue",
+        }
+    )
+
+    captured = capsys.readouterr()
+    assert "cache_backed: True" in captured.out.splitlines()
+    assert "live_google_verified: False" in captured.out.splitlines()

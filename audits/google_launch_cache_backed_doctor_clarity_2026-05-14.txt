@@ -1,0 +1,26 @@
+Google launch cache-backed doctor clarity audit
+Date: 2026-05-14
+
+Problem
+- doctor-lite and doctor may pass MASTER_INDEX lookup from the local cache.
+- A cache-backed pass is useful for routine launch, but it does not prove that live Google OAuth/DNS is currently reachable.
+- This matters for Path A assisted bounded mode because launch readiness must not overstate live Google availability.
+
+Observed runtime
+- doctor-lite --json returned healthy with master_index_lookup.cache.used=true.
+- A separate cache-miss find-doc-any probe reached the live lookup path and returned a normal NotFound response in this environment.
+
+Decision
+- Keep doctor-lite and doctor behavior read-only.
+- Do not widen command surfaces.
+- Do not change live Google Drive or Google Docs mutation behavior.
+- Add explicit output flags:
+  - cache_backed
+  - live_google_verified
+
+Expected operator impact
+- A routine cache-backed launch can remain healthy.
+- Operators can now distinguish cache-backed readiness from live Google/OAuth verification.
+
+Rollback
+- Revert the diagnostic flag addition if downstream tooling requires the exact previous output envelope.

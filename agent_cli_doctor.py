@@ -31,6 +31,31 @@ def safe_error_message(payload: dict | None) -> str | None:
     return payload.get("error_message")
 
 
+def master_index_lookup_uses_cache(payload: dict | None) -> bool:
+    if not isinstance(payload, dict):
+        return False
+    cache = payload.get("cache")
+    return isinstance(cache, dict) and bool(cache.get("used"))
+
+
+def live_google_verified_from_lookup(payload: dict | None) -> bool:
+    return summarize_payload_ok(payload) and not master_index_lookup_uses_cache(payload)
+
+
+def master_index_access_phrase(cache_backed: bool) -> str:
+    if cache_backed:
+        return "cache-backed MASTER_INDEX lookup"
+    return "live MASTER_INDEX lookup"
+
+
+def google_verification_next_step(cache_backed: bool, deep: bool) -> str:
+    if cache_backed:
+        return "Рутинный старт прошел по cache-backed lookup; live Google/OAuth не проверялся этим запуском."
+    if deep:
+        return "Можно начинать штатную работу."
+    return "Можно начинать штатную работу. Для углубленной проверки при необходимости запусти doctor."
+
+
 def build_doctor_summary(
     *, env_ok: bool, status_ok: bool, master_index_ok: bool, smoke_ok: bool
 ) -> str:
@@ -173,6 +198,8 @@ def doctor_payload(
     status = status_payload()
     master_index_lookup = find_doc_any_payload("DOC-0001")
     smoke_probe = run_smoke_explain_payload()
+    cache_backed = master_index_lookup_uses_cache(master_index_lookup)
+    live_google_verified = live_google_verified_from_lookup(master_index_lookup)
 
     checks = {
         "environment": env,
@@ -188,11 +215,15 @@ def doctor_payload(
             "ok": True,
             "command": "doctor",
             "checks": checks,
-            "summary": "CLI выглядит работоспособным: окружение, status, доступ к MASTER_INDEX и smoke-проверка прошли успешно.",
-            "next_step": "Можно начинать штатную работу.",
+            "summary": f"CLI выглядит работоспособным: окружение, status, {master_index_access_phrase(cache_backed)} и smoke-проверка прошли успешно.",
+            "next_step": google_verification_next_step(cache_backed, deep=True),
+            "cache_backed": cache_backed,
+            "live_google_verified": live_google_verified,
             "diagnosis": "healthy",
             "likely_cause": "Проблем не обнаружено.",
-            "recommended_action": "Можно начинать штатную работу.",
+            "recommended_action": google_verification_next_step(
+                cache_backed, deep=True
+            ),
         }
 
     sample = checks[failed[0]]
@@ -215,6 +246,8 @@ def doctor_payload(
         "checks": checks,
         "summary": f"Обнаружены проблемы в следующих зонах: {', '.join(failed)}.",
         "next_step": "Проверь diagnosis / likely_cause / recommended_action или запусти bash scripts/regression_smoke_explain.sh.",
+        "cache_backed": cache_backed,
+        "live_google_verified": live_google_verified,
         "diagnosis": diagnosis,
         "likely_cause": likely_cause,
         "recommended_action": recommended_action,
@@ -235,6 +268,8 @@ def doctor_lite_payload(
 
     status = status_payload()
     master_index_lookup = find_doc_any_payload("DOC-0001")
+    cache_backed = master_index_lookup_uses_cache(master_index_lookup)
+    live_google_verified = live_google_verified_from_lookup(master_index_lookup)
 
     checks = {
         "environment": env,
@@ -249,11 +284,15 @@ def doctor_lite_payload(
             "ok": True,
             "command": "doctor-lite",
             "checks": checks,
-            "summary": "CLI выглядит работоспособным для рутинного старта: окружение, status и доступ к MASTER_INDEX проверены.",
-            "next_step": "Можно начинать штатную работу. Для углубленной проверки при необходимости запусти doctor.",
+            "summary": f"CLI выглядит работоспособным для рутинного старта: окружение, status и {master_index_access_phrase(cache_backed)} проверены.",
+            "next_step": google_verification_next_step(cache_backed, deep=False),
+            "cache_backed": cache_backed,
+            "live_google_verified": live_google_verified,
             "diagnosis": "healthy",
             "likely_cause": "Проблем не обнаружено.",
-            "recommended_action": "Можно начинать штатную работу.",
+            "recommended_action": google_verification_next_step(
+                cache_backed, deep=False
+            ),
         }
 
     sample = checks[failed[0]]
@@ -282,6 +321,8 @@ def doctor_lite_payload(
         "checks": checks,
         "summary": f"Обнаружены проблемы в следующих зонах: {', '.join(failed)}.",
         "next_step": "Запусти doctor --json для расширенной диагностики.",
+        "cache_backed": cache_backed,
+        "live_google_verified": live_google_verified,
         "diagnosis": diagnosis,
         "likely_cause": likely_cause,
         "recommended_action": recommended_action,

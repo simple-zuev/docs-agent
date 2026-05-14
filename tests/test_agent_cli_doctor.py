@@ -37,6 +37,25 @@ def test_doctor_lite_payload_reports_healthy_with_injected_checks() -> None:
         "query": "DOC-0001",
     }
     assert payload["diagnosis"] == "healthy"
+    assert payload["cache_backed"] is False
+    assert payload["live_google_verified"] is True
+
+
+def test_doctor_lite_payload_reports_cache_backed_lookup() -> None:
+    payload = agent_cli_doctor.doctor_lite_payload(
+        status_payload=lambda: {"ok": True},
+        find_doc_any_payload=lambda query: {
+            "ok": True,
+            "query": query,
+            "cache": {"used": True},
+        },
+    )
+
+    assert payload["ok"] is True
+    assert payload["cache_backed"] is True
+    assert payload["live_google_verified"] is False
+    assert "cache-backed" in payload["summary"]
+    assert "live Google/OAuth не проверялся" in payload["next_step"]
 
 
 def test_doctor_payload_uses_injected_status_lookup_and_smoke(monkeypatch) -> None:
@@ -60,3 +79,5 @@ def test_doctor_payload_uses_injected_status_lookup_and_smoke(monkeypatch) -> No
     assert payload["checks"]["status"]["command"] == "status"
     assert payload["checks"]["master_index_lookup"]["query"] == "DOC-0001"
     assert payload["checks"]["smoke_probe"]["command"] == "smoke-explain"
+    assert payload["cache_backed"] is False
+    assert payload["live_google_verified"] is True
