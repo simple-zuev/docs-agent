@@ -16,18 +16,21 @@
 - 429
 - RATE_LIMIT_EXCEEDED
 - quota exceeded
+- TransportError
+- Unable to find the server at oauth2.googleapis.com
 
 Значение:
 - quota pressure
 - временный внешний сбой
 - нестабильность Google API
-- транспортная проблема
+- транспортная или DNS/OAuth reachability проблема
 
 Действие:
 1. Подождать 60-90 секунд
 2. Повторить команду
 3. Не запускать серийно deep checks
 4. При повторении смотреть doctor --json
+5. Если падает live-google-probe, считать это внешней live Google/OAuth недоступностью, а не поломкой cache-backed routine path
 
 ## auth
 
