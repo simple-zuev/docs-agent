@@ -21,6 +21,9 @@ from agent_cli_lookup import (
     open_doc_from_query_payload as lookup_open_doc_from_query_payload,
     read_doc_from_query_payload as lookup_read_doc_from_query_payload,
 )
+from agent_cli_live_probe import (
+    live_google_probe_payload as build_live_google_probe_payload,
+)
 from agent_cli_output import (
     build_compact_ask_output,
     print_compact_error,
@@ -61,6 +64,10 @@ def doctor_lite_payload() -> dict:
         status_payload=cmd_status_payload,
         find_doc_any_payload=find_doc_any_payload,
     )
+
+
+def live_google_probe_payload() -> dict:
+    return build_live_google_probe_payload(run_docs_agent_with_retry)
 
 
 def is_retryable_network_error(payload: dict) -> bool:
@@ -226,6 +233,23 @@ def cmd_doctor(json_output: bool = False) -> int:
     return resolve_command_exit_code(payload)
 
 
+def cmd_live_google_probe(json_output: bool = False) -> int:
+    payload = live_google_probe_payload()
+    if json_output:
+        print_json(payload)
+    elif payload.get("ok"):
+        print("ok: True")
+        print("route: live-google-probe")
+        print(f"target: {payload.get('target')}")
+        print(f"cache_bypassed: {payload.get('cache_bypassed')}")
+        print(f"live_google_verified: {payload.get('live_google_verified')}")
+        print(f"summary: {payload.get('summary')}")
+        print(f"next_step: {payload.get('next_step')}")
+    else:
+        print_compact_error(payload)
+    return resolve_command_exit_code(payload)
+
+
 def cmd_find_doc_id(value: str) -> None:
     payload = find_doc_id_payload(value, run_docs_agent_with_retry)
     print_json(payload)
@@ -383,6 +407,7 @@ def capabilities_payload() -> dict:
         "status",
         "doctor-lite",
         "doctor",
+        "live-google-probe",
         "repo-state",
         "ask",
     ]
@@ -660,6 +685,7 @@ def usage() -> None:
         "  python agent_cli.py status [--json]\n  python agent_cli.py repo-state [--json]    | rs [--json]\n"
         "  python agent_cli.py repo-state-local [--json]\n"
         "  python agent_cli.py doctor [--json]        | diagnose [--json]\n"
+        "  python agent_cli.py live-google-probe [--json]\n"
         "  python agent_cli.py assemble-context [--json] --profile <profile>\n"
         "  python agent_cli.py doc-body-only [--json] --profile <profile> --document-type <type> --title <title>\n"
         "  python agent_cli.py artifact-state [--json] --file-id <google_drive_file_id>\n"
@@ -685,6 +711,7 @@ def usage() -> None:
         '  python agent_cli.py q --json "прочитай 00_PROJECT_AI_OPERATING_PROMPT_АСТЦВ"\n'
         "  python agent_cli.py doctor\n"
         "  python agent_cli.py doctor --json\n"
+        "  python agent_cli.py live-google-probe --json\n"
     )
 
 
@@ -755,6 +782,15 @@ def main() -> int:
                 print_usage_error("doctor does not accept positional arguments.")
                 return EXIT_USAGE_ERROR
             return cmd_doctor(json_output=json_output)
+
+        if cmd == "live-google-probe":
+            json_output, args = parse_json_flag(argv)
+            if args:
+                print_usage_error(
+                    "live-google-probe does not accept positional arguments."
+                )
+                return EXIT_USAGE_ERROR
+            return cmd_live_google_probe(json_output=json_output)
 
         if cmd == "assemble-context":
             json_output, args = parse_json_flag(argv)

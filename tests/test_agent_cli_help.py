@@ -23,6 +23,7 @@ def assert_help_success(result: subprocess.CompletedProcess[str]) -> None:
     assert result.returncode == 0
     assert "Usage:" in result.stdout
     assert "python agent_cli.py repo-state [--json]" in result.stdout
+    assert "python agent_cli.py live-google-probe [--json]" in result.stdout
     assert "UsageError" not in result.stdout
     assert result.stderr == ""
 
