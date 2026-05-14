@@ -72,6 +72,17 @@
 - повторить deep run позже
 - использовать reconciliation logic
 
+## doctor-lite зеленый, но live_google_verified = false
+
+Значение:
+- routine path прошел через cache-backed MASTER_INDEX lookup
+- live Google/OAuth не был подтвержден этим запуском
+
+Действие:
+- если нужна только routine readiness, можно продолжать
+- если нужна live-проверка, выполнить python agent_cli.py live-google-probe --json
+- если live-google-probe падает как auth/network, разбирать именно этот диагностический результат
+
 ## Git push / auth problem
 
 Действие:

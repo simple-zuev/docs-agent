@@ -1,0 +1,31 @@
+Live Google probe operator docs alignment audit
+Date: 2026-05-14
+
+Problem
+- PR #126 added live-google-probe as a read-only diagnostic command.
+- Operator-facing docs still described routine diagnostics before the cache-backed vs live distinction.
+- Some docs also risked presenting degraded commands as part of the usable baseline.
+
+Decision
+- Update operator-facing docs to explain:
+  - doctor-lite remains the routine entrypoint.
+  - doctor-lite and doctor may be cache-backed.
+  - live-google-probe is the explicit live Google/OAuth check.
+- Keep read-doc, get-file, and read-doc-from-query non-baseline/degraded by default.
+
+Observed validation
+- pytest and CLI help validation passed.
+- live-google-probe currently reports live_google_verified=false in this environment because oauth2.googleapis.com is not resolvable/reachable.
+- TransportError classification should be handled in a separate runtime PR if needed.
+
+Safety boundary
+- Documentation-only change.
+- No Google Drive or Google Docs mutation behavior is changed.
+- No command implementation is changed.
+
+Validation expectation
+- CLI help still lists live-google-probe.
+- command reference and operator guide should agree on routine, live probe, deep, and degraded contours.
+
+Rollback
+- Revert this docs-only alignment commit.

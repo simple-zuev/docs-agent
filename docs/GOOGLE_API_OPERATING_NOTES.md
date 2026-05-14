@@ -36,6 +36,9 @@ Routine:
 - bash scripts/preflight_check.sh
 - python agent_cli.py doctor-lite
 
+Live OAuth/network check:
+- python agent_cli.py live-google-probe --json
+
 Deep:
 - python agent_cli.py doctor
 - bash scripts/regression_smoke_explain.sh
@@ -44,3 +47,10 @@ Deep:
 
 После heavy deep run:
 - подождать 60-90 секунд перед новым quota-sensitive run
+
+## Cache-backed vs live checks
+
+- doctor-lite и doctor могут подтверждать MASTER_INDEX через локальный cache.
+- `cache_backed=true` полезен для routine readiness, но не доказывает текущий live OAuth/DNS.
+- live-google-probe обходит cache и выполняет read-only lookup DOC-0001 в MASTER_INDEX.
+- Не запускать live-google-probe сериями без необходимости: это настоящий Google Sheets lookup.

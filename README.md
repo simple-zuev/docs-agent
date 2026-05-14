@@ -35,6 +35,10 @@ Routine:
 - python agent_cli.py doctor-lite
 - python agent_cli.py doctor-lite --json
 
+Live Google/OAuth check:
+- python agent_cli.py live-google-probe
+- python agent_cli.py live-google-probe --json
+
 Deep:
 - python agent_cli.py doctor
 - python agent_cli.py doctor --json
@@ -49,21 +53,24 @@ Usable assisted bounded baseline:
 - python agent_cli.py repo-state --json
 - python agent_cli.py doctor
 - python agent_cli.py doctor --json
+- python agent_cli.py live-google-probe --json
 - python agent_cli.py f "DOC-0001"
+- python agent_cli.py o "DOC-0002"
 - python agent_cli.py artifact-state --file-id "<google_drive_file_id>"
-- python agent_cli.py get-file "<google_drive_file_id>"
-- python agent_cli.py read-doc "<google_doc_id>"
 - python agent_cli.py doc-body-only --profile "exchange-docs" --document-type "note" --title "example_title"
 
 Available but non-baseline by default:
-- python agent_cli.py o "DOC-0002"
 - python agent_cli.py r "DOC-0002"
+- python agent_cli.py get-file "<google_drive_file_id>"
+- python agent_cli.py read-doc "<google_doc_id>"
 - python agent_cli.py q "прочитай DOC-0002"
 
 ## Ключевая operational-модель
 
 - doctor-lite — основной ежедневный entrypoint
+- live-google-probe — ручная read-only проверка live Google/OAuth без cache
 - doctor — углубленная диагностика
+- doctor-lite/doctor могут проходить через cache-backed MASTER_INDEX lookup; смотри `cache_backed` и `live_google_verified`
 - deep checks quota-sensitive
 - итоговые выводы по deep path лучше подтверждать reconciliation run при нестабильности
 
@@ -118,4 +125,3 @@ Current supported diagram workflow:
 3. export into `SVG` / `PNG` / `PDF` as needed
 4. use Google Slides as presentation layer when needed
 5. retain canonical source separately from publish artifacts
-
