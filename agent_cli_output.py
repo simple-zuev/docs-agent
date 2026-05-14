@@ -208,6 +208,8 @@ def print_compact_doctor_lite(payload: dict):
     print(
         f"master_index_ok: {(payload.get('checks') or {}).get('master_index_lookup', {}).get('ok')}"
     )
+    print(f"cache_backed: {payload.get('cache_backed')}")
+    print(f"live_google_verified: {payload.get('live_google_verified')}")
     print(f"summary: {payload.get('summary')}")
     print(f"next_step: {payload.get('next_step')}")
     print(f"diagnosis: {payload.get('diagnosis')}")
@@ -231,6 +233,8 @@ def print_compact_doctor(payload: dict):
     print(f"environment_ok: {env_check.get('ok')}")
     print(f"status_ok: {status_check.get('ok')}")
     print(f"master_index_ok: {mi_check.get('ok')}")
+    print(f"cache_backed: {payload.get('cache_backed')}")
+    print(f"live_google_verified: {payload.get('live_google_verified')}")
     print(f"smoke_ok: {smoke_check.get('ok')}")
     print(f"summary: {payload.get('summary')}")
     print(f"next_step: {payload.get('next_step')}")
