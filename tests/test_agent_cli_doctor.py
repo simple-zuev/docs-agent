@@ -23,6 +23,22 @@ def test_diagnose_payload_failure_detects_nested_quota_message() -> None:
     assert "60-90" in recommended_action
 
 
+def test_diagnose_payload_failure_detects_transport_dns_error() -> None:
+    diagnosis, likely_cause, recommended_action = (
+        agent_cli_doctor.diagnose_payload_failure(
+            {
+                "ok": False,
+                "error_type": "TransportError",
+                "error_message": "Unable to find the server at oauth2.googleapis.com",
+            }
+        )
+    )
+
+    assert diagnosis == "network"
+    assert "сетевую" in likely_cause
+    assert "повтори" in recommended_action.lower()
+
+
 def test_doctor_lite_payload_reports_healthy_with_injected_checks() -> None:
     payload = agent_cli_doctor.doctor_lite_payload(
         status_payload=lambda: {"ok": True},

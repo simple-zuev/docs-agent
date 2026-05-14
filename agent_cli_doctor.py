@@ -4,6 +4,7 @@ import subprocess
 from collections.abc import Callable
 from pathlib import Path
 
+from agent_cli_error_classification import is_network_error_text, is_network_error_type
 from agent_cli_lookup import payload_contains_quota_or_rate_limit
 from agent_cli_output import build_error_payload
 from agent_cli_subprocess import (
@@ -122,8 +123,8 @@ def diagnose_payload_failure(payload: dict | None) -> tuple[str, str, str]:
     if (
         network_related
         or retryable
-        or "ssl" in joined_text
-        or "eof occurred in violation of protocol" in joined_text
+        or is_network_error_type(error_type)
+        or is_network_error_text(joined_text)
     ):
         return (
             "network",
