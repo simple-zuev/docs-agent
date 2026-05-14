@@ -46,6 +46,7 @@ Retry разрешен только для:
 - RATE_LIMIT_EXCEEDED
 - User rate limit exceeded
 - SSL / временных транспортных ошибок
+- TransportError / DNS reachability failures
 - временных network failures
 
 Не retry:
@@ -81,6 +82,8 @@ Routine path:
 - quota exceeded
 - RATE_LIMIT_EXCEEDED
 - User rate limit exceeded
+- TransportError
+- Unable to find the server at oauth2.googleapis.com
 
 то итоговая классификация должна быть:
 - diagnosis = network

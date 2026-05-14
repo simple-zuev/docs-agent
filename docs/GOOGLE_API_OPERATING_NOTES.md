@@ -22,6 +22,7 @@
    - RATE_LIMIT_EXCEEDED
    - quota exceeded
    - User rate limit exceeded
+   - TransportError / Unable to find the server at oauth2.googleapis.com
    должны интерпретироваться как network/retryable.
 4. Такие ошибки не должны деградировать в ложный NotFound.
 5. Следующий шаг после текущего патча:
@@ -54,3 +55,4 @@ Deep:
 - `cache_backed=true` полезен для routine readiness, но не доказывает текущий live OAuth/DNS.
 - live-google-probe обходит cache и выполняет read-only lookup DOC-0001 в MASTER_INDEX.
 - Не запускать live-google-probe сериями без необходимости: это настоящий Google Sheets lookup.
+- Если live-google-probe падает на `oauth2.googleapis.com`, это live OAuth/DNS reachability issue; routine cache-backed path может оставаться рабочим.

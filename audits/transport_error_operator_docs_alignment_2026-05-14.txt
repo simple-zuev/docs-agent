@@ -1,0 +1,23 @@
+TransportError operator docs alignment audit
+Date: 2026-05-14
+
+Problem
+- PR #128 changed runtime classification so TransportError/DNS failures are network/retryable.
+- Operator docs should name that case explicitly so live-google-probe failures are not interpreted as internal CLI breakage.
+
+Decision
+- Update troubleshooting, AI agent, Google API operating, and quota/rate-limit docs.
+- Document that `Unable to find the server at oauth2.googleapis.com` is a live OAuth/DNS reachability issue.
+- Keep routine cache-backed readiness distinct from live Google/OAuth verification.
+
+Safety boundary
+- Documentation-only change.
+- No Google Drive or Google Docs mutation behavior is changed.
+- No read-doc, get-file, or read-doc-from-query promotion is included.
+
+Validation expectation
+- CLI help remains unchanged.
+- Full pytest should remain green because no runtime code is changed.
+
+Rollback
+- Revert this docs-only alignment commit.
