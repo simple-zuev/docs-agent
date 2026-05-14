@@ -13,6 +13,7 @@ from agent_cli_doctor import (
     doctor_lite_payload as build_doctor_lite_payload,
     doctor_payload as build_doctor_payload,
 )
+from agent_cli_error_classification import is_network_error_text, is_network_error_type
 from agent_cli_lookup import (
     find_doc_any_payload as lookup_find_doc_any_payload,
     find_doc_id_payload,
@@ -80,18 +81,10 @@ def is_retryable_network_error(payload: dict) -> bool:
     err = str(payload.get("error_type") or "")
     msg = str(payload.get("error_message") or "")
 
-    retryable_error_types = {
-        "SSLEOFError",
-        "TimeoutError",
-        "ConnectionResetError",
-        "ServerNotFoundError",
-    }
-
-    if err in retryable_error_types:
+    if is_network_error_type(err):
         return True
 
-    msg_upper = msg.upper()
-    if "EOF" in msg_upper or "SSL" in msg_upper or "TIMEOUT" in msg_upper:
+    if is_network_error_text(msg):
         return True
 
     return False

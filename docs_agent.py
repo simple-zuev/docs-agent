@@ -11,6 +11,7 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from googleapiclient.http import MediaIoBaseDownload
 from doc_text_mutation import insert_text_at_index, replace_all_text
+from agent_cli_error_classification import is_network_error_text, is_network_error_type
 from runtime_config import (
     CONFIG_PATH,
     config_get,
@@ -194,11 +195,11 @@ def classify_error(exc: Exception):
         if status in {401, 403}:
             auth_related = True
 
-    if name in {"SSLEOFError", "TimeoutError", "ConnectionResetError"}:
+    if is_network_error_type(name):
         retryable = True
         network_related = True
 
-    if "EOF occurred in violation of protocol" in msg:
+    if is_network_error_text(msg):
         retryable = True
         network_related = True
 

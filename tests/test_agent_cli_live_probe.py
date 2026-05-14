@@ -45,3 +45,23 @@ def test_live_google_probe_classifies_auth_failure() -> None:
     assert payload["network_related"] is False
     assert payload["live_google_verified"] is False
     assert payload["cache_bypassed"] is True
+
+
+def test_live_google_probe_classifies_transport_dns_failure_as_network() -> None:
+    def fake_run(_args):
+        return {
+            "ok": False,
+            "command": "find-row-by-column",
+            "error_type": "TransportError",
+            "error_message": "Unable to find the server at oauth2.googleapis.com",
+        }
+
+    payload = agent_cli_live_probe.live_google_probe_payload(fake_run)
+
+    assert payload["ok"] is False
+    assert payload["command"] == "live-google-probe"
+    assert payload["retryable"] is True
+    assert payload["auth_related"] is False
+    assert payload["network_related"] is True
+    assert payload["diagnosis"] == "network"
+    assert payload["live_google_verified"] is False

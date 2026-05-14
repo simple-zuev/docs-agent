@@ -1,0 +1,27 @@
+TransportError network classification audit
+Date: 2026-05-14
+
+Problem
+- live-google-probe can fail while resolving oauth2.googleapis.com.
+- The observed error was:
+  - error_type=TransportError
+  - error_message=Unable to find the server at oauth2.googleapis.com
+- Before this change, the diagnostic path classified that as internal instead of network/retryable.
+
+Decision
+- Treat TransportError and common DNS/transport text as network-related retryable failures.
+- Share the matcher across:
+  - docs_agent classify_error
+  - agent_cli retry classifier
+  - doctor/live-probe diagnostic classification
+
+Safety boundary
+- No Google Drive or Google Docs mutation behavior is changed.
+- No read-doc, get-file, or read-doc-from-query promotion is included.
+- This only changes error classification and retry behavior for transport/network failures.
+
+Observed validation
+- live-google-probe --json now returns retryable=true, network_related=true, diagnosis=network, and exit code 4 for the oauth2.googleapis.com TransportError.
+
+Rollback
+- Revert the shared network classification helper and call-site changes.
