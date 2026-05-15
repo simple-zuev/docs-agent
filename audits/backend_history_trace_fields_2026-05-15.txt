@@ -1,0 +1,24 @@
+Backend history trace fields audit
+Date: 2026-05-15
+
+Problem
+- TASK_HISTORY_AUDIT_LOG.md defines actor, authority, Drive context, and approval references as minimum event fields.
+- The operator backend history response exposed authority_source but did not include the explicit trace fields.
+
+Decision
+- Add actor, authority_reference, drive_context_reference, and approval_reference to HistoryEvent.
+- Populate those fields in the mock runtime seed events, task-created events, and appended history events.
+- Preserve authority_source for compatibility with the current API tests and clients.
+
+Safety boundary
+- Mock backend contract only.
+- No Google Drive or Google Docs behavior is changed.
+- No live Google API calls or mutation handlers are introduced.
+
+Validation
+- make test-backend: passed, 7 tests.
+- make test-all: passed, 56 CLI tests and 7 backend tests. CLI suite still emits the existing Python 3.9 Google dependency warnings.
+- git diff --check: clean.
+
+Rollback
+- Revert operator_backend history model/store/test changes and this audit note.
