@@ -123,6 +123,7 @@ ask
   - read-doc-from-query / r
 - Supported helper surface exists, but should not replace direct bounded inspection flow by default:
   - ask / q
+- `capabilities --json` is descriptive. Its `read_only` category may include degraded commands; use `assisted_bounded_baseline`, `degraded`, and `helper_surface` for Path A interpretation.
 - `doctor-lite` and `doctor` may be cache-backed. Use `live-google-probe` when the operator needs an explicit live Google/OAuth check.
 
 ## Exit codes

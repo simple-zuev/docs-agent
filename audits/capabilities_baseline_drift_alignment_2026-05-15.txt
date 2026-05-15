@@ -1,0 +1,25 @@
+Capabilities baseline drift alignment audit
+Date: 2026-05-15
+
+Problem
+- README and docs/COMMAND_REFERENCE.md distinguish Path A baseline commands from degraded commands.
+- capabilities --json previously exposed a descriptive read_only category that included read-doc, get-file, and read-doc-from-query.
+- That could be misread as promoting degraded commands into the assisted bounded baseline.
+
+Decision
+- Keep categories.read_only as descriptive command-surface discovery.
+- Add categories.assisted_bounded_baseline for current Path A interpretation.
+- Add categories.degraded for commands available in CLI but non-baseline by default.
+- Add categories.helper_surface for ask/q.
+
+Safety boundary
+- No Google Drive or Google Docs mutation behavior is changed.
+- No read-doc, get-file, or read-doc-from-query promotion is included.
+- This is an additive output-envelope clarification.
+
+Validation expectation
+- capabilities tests should verify degraded commands stay out of assisted_bounded_baseline.
+- README and command reference should describe the distinction.
+
+Rollback
+- Revert the additive capabilities category and docs alignment.

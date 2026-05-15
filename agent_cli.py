@@ -404,12 +404,33 @@ def capabilities_payload() -> dict:
         "repo-state",
         "ask",
     ]
+    assisted_bounded_baseline = [
+        "status",
+        "repo-state",
+        "doctor",
+        "live-google-probe",
+        "find-doc-id",
+        "find-doc-name",
+        "find-link",
+        "find-doc-any",
+        "artifact-state",
+        "open-doc-from-query",
+        "doc-body-only",
+    ]
     read_only = [
         "find-doc-any",
         "open-doc-from-query",
         "read-doc-from-query",
         "read-doc",
         "get-file",
+    ]
+    degraded = [
+        "get-file",
+        "read-doc",
+        "read-doc-from-query",
+    ]
+    helper_surface = [
+        "ask",
     ]
     bounded_write = [
         "create-temp-doc",
@@ -467,6 +488,9 @@ def capabilities_payload() -> dict:
 
     notes = [
         "Capability discovery is descriptive and reflects currently surfaced CLI/document operations.",
+        "categories.read_only is descriptive and is not the assisted bounded baseline.",
+        "Use categories.assisted_bounded_baseline for the current Path A baseline.",
+        "Use categories.degraded for commands that remain available but non-baseline by default.",
         "Safe autonomous mode should prefer read-only, draft-first, create-staging-copy, and replace-doc-text-safe.",
         "patch-doc exists but should be treated as supervised-only for autonomous agent workflows.",
         "Master Index writes and delete operations remain constrained by current safety settings.",
@@ -477,7 +501,10 @@ def capabilities_payload() -> dict:
         "command": "capabilities",
         "categories": {
             "diagnostics": diagnostics,
+            "assisted_bounded_baseline": assisted_bounded_baseline,
             "read_only": read_only,
+            "degraded": degraded,
+            "helper_surface": helper_surface,
             "bounded_write": bounded_write,
             "registry_and_sheet_helpers": registry_and_sheet_helpers,
             "config_and_safety": config_and_safety,
