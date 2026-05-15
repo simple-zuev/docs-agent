@@ -1,0 +1,23 @@
+Backend missing task contracts audit
+Date: 2026-05-15
+
+Problem
+- The backend task API had a contract test for missing task details.
+- Missing-task behavior for patch and history subroutes was implemented but not pinned by tests.
+
+Decision
+- Add a backend API contract test covering missing task PATCH, history list, and history append routes.
+- Require the same 404 envelope across those routes.
+
+Safety boundary
+- Test-only change.
+- No runtime behavior is changed.
+- No Google Drive or Google Docs behavior is changed.
+
+Validation
+- make test-backend: passed, 8 tests.
+- make test-all: passed, 56 CLI tests and 8 backend tests. CLI suite still emits the existing Python 3.9 Google dependency warnings.
+- git diff --check: clean.
+
+Rollback
+- Revert the test and this audit note.
