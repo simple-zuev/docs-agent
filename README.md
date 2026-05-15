@@ -71,6 +71,7 @@ Available but non-baseline by default:
 - live-google-probe — ручная read-only проверка live Google/OAuth без cache
 - doctor — углубленная диагностика
 - doctor-lite/doctor могут проходить через cache-backed MASTER_INDEX lookup; смотри `cache_backed` и `live_google_verified`
+- capabilities --json разделяет `assisted_bounded_baseline`, descriptive `read_only`, `degraded` и `helper_surface`
 - deep checks quota-sensitive
 - итоговые выводы по deep path лучше подтверждать reconciliation run при нестабильности
 
