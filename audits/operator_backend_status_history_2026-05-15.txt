@@ -1,0 +1,21 @@
+Operator backend status history audit
+Date: 2026-05-15
+
+Problem
+- The task model says tasks must not lose event history.
+- The backend PATCH /api/tasks/{task_id} endpoint updated task status but did not record a history event.
+
+Decision
+- When status changes through update_task_state, append a bounded history event.
+- Do not append history for non-status-only updates, such as approval_state changes.
+
+Safety boundary
+- Mock backend runtime only.
+- No Google Drive or Google Docs behavior is changed.
+- No live Google API calls are made.
+
+Validation expectation
+- Backend API tests should confirm status changes append history and non-status patches do not.
+
+Rollback
+- Revert the task_service status history change and related tests.

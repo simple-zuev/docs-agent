@@ -99,6 +99,7 @@ def test_update_task_state_and_append_history(client: TestClient) -> None:
     patched = patch_response.json()
     assert patched["status"] == "awaiting_operator_review"
     assert patched["approval_state"] == "requested"
+    assert patched["history_count"] == 3
 
     append_response = client.post(
         "/api/tasks/task-001/history",
@@ -117,7 +118,25 @@ def test_update_task_state_and_append_history(client: TestClient) -> None:
 
     history_response = client.get("/api/tasks/task-001/history")
     assert history_response.status_code == 200
-    assert len(history_response.json()) == 3
+    history = history_response.json()
+    assert len(history) == 4
+    assert history[2]["event_type"] == "status_changed_to_awaiting_operator_review"
+    assert history[2]["result_state"] == "awaiting_operator_review"
+    assert history[3]["event_type"] == "operator_review_requested"
+
+
+def test_update_without_status_change_does_not_append_history(
+    client: TestClient,
+) -> None:
+    response = client.patch(
+        "/api/tasks/task-001",
+        json={"approval_state": "approved"},
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["approval_state"] == "approved"
+    assert payload["history_count"] == 2
 
 
 def test_create_task_validation_errors_are_explicit(client: TestClient) -> None:
