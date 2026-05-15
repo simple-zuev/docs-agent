@@ -1,0 +1,27 @@
+Makefile test gates audit
+Date: 2026-05-15
+
+Problem
+- The repository Makefile only exposed the legacy smoke test target.
+- The CLI and operator backend now have separate useful test suites, but no single documented local test gate.
+
+Decision
+- Add make test-cli for the root pytest suite.
+- Add make test-backend for operator_backend tests through operator_backend/.venv.
+- Add make test-all as the combined local gate.
+- Use the repository venv for the CLI gate so it does not depend on the caller's system Python.
+- Document the gates in the AI agent guide.
+
+Safety boundary
+- Tooling/docs only.
+- No Google Drive or Google Docs behavior is changed.
+- No live Google API calls are introduced.
+
+Validation
+- make test-cli: passed, 56 tests, 3 existing Python 3.9 Google dependency warnings.
+- make test-backend: passed, 7 tests.
+- make test-all: passed, 56 CLI tests and 7 backend tests.
+- make check: passed.
+
+Rollback
+- Revert Makefile and AI agent guide changes.
