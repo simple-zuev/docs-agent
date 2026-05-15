@@ -1,0 +1,23 @@
+Operator backend API contract tests audit
+Date: 2026-05-15
+
+Problem
+- The operator_backend FastAPI skeleton had a task API but no API contract tests.
+- Without tests, future task orchestration work could break the mock runtime surface silently.
+
+Decision
+- Add backend-only tests under operator_backend/tests.
+- Use operator_backend/.venv for FastAPI/TestClient dependencies.
+- Cover health, task list/details, task creation defaults, task state update, history append, 404, and validation errors.
+
+Safety boundary
+- No Google Drive or Google Docs behavior is changed.
+- No live Google API calls are made.
+- Tests exercise only the in-memory mock task store.
+
+Validation expectation
+- Run: operator_backend/.venv/bin/python -m pytest operator_backend/tests
+- Root pytest remains focused on the CLI test suite via pytest.ini.
+
+Rollback
+- Remove operator_backend/tests/test_task_api.py and this audit note.
