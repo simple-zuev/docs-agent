@@ -202,6 +202,9 @@ Recommended shape:
 Do not combine repository extraction with database implementation unless the
 patch is still small and fully tested.
 
+The detailed SQLite schema and migration planning artifact is
+`docs/SQLITE_PERSISTENCE_SCHEMA_PLAN.md`.
+
 ## Migration Strategy
 
 Suggested sequence:
