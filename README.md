@@ -19,7 +19,7 @@ docs-agent — это локальный инструмент, который п
 
 ## Текущий baseline
 
-- stage27-reconciled
+- main after mock operator backend contract baseline through PR #137
 
 ## Быстрый старт
 
@@ -64,6 +64,12 @@ Available but non-baseline by default:
 - python agent_cli.py get-file "<google_drive_file_id>"
 - python agent_cli.py read-doc "<google_doc_id>"
 - python agent_cli.py q "прочитай DOC-0002"
+
+Operator backend status:
+- current backend readiness is mock-runtime only
+- production persistence is not complete
+- live Google-backed task execution is not complete
+- live Google Drive / Google Docs mutation behavior is not expanded by this baseline
 
 ## Ключевая operational-модель
 

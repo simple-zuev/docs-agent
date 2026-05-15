@@ -2,7 +2,7 @@
 
 ## Текущий baseline
 
-- main after backend contract alignment through PR #137
+- main after mock operator backend contract baseline through PR #137
 
 ## Git status
 
@@ -49,6 +49,13 @@
 - missing-task and validation error envelopes are pinned by API contract tests
 - backend tests run through `make test-backend`
 
+Ограничения:
+- backend readiness is mock-runtime only
+- production persistence is not complete
+- live Google-backed task execution is not complete
+- live Google Drive / Google Docs mutation behavior is not expanded by this baseline
+- read-doc, get-file, and read-doc-from-query remain degraded by default
+
 ## Что остается чувствительным
 
 ### Deep diagnostic path
@@ -77,6 +84,7 @@
 - частых серийных deep checks
 - безоглядочного масштабирования без cache/memoization
 - production backend persistence or live Google-backed task execution
+- live Google-backed operator task execution
 
 ## Следующий инженерный приоритет
 
