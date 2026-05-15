@@ -34,8 +34,14 @@ class TaskSummary(BaseModel):
     title: str
     task_type: str
     status: TaskStatus
+    created_at: str
+    updated_at: str
+    created_by: str
+    authority_binding_id: str
+    drive_context_id: str
     output_state: OutputState
     approval_state: ApprovalState
+    notes: str
 
 
 class TaskDetails(TaskSummary):
