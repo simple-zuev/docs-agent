@@ -66,8 +66,12 @@ class HistoryEvent(BaseModel):
     event_id: str
     task_id: str
     event_type: str
+    actor: str
     summary: str
     authority_source: str
+    authority_reference: str
+    drive_context_reference: str
+    approval_reference: str
     timestamp: str
     result_state: str
 

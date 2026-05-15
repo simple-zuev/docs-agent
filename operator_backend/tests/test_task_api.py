@@ -86,7 +86,12 @@ def test_create_task_defaults_to_unbound_non_mutating_state(
 
     history_response = client.get(f"/api/tasks/{payload['task_id']}/history")
     assert history_response.status_code == 200
-    assert history_response.json()[0]["event_type"] == "task_created"
+    history_event = history_response.json()[0]
+    assert history_event["event_type"] == "task_created"
+    assert history_event["actor"] == "operator_backend"
+    assert history_event["authority_reference"] == "UNBOUND"
+    assert history_event["drive_context_reference"] == "unbound"
+    assert history_event["approval_reference"] == "not_required"
 
 
 def test_update_task_state_and_append_history(client: TestClient) -> None:
@@ -114,6 +119,10 @@ def test_update_task_state_and_append_history(client: TestClient) -> None:
     event = append_response.json()
     assert event["task_id"] == "task-001"
     assert event["authority_source"] == "00_DIAGRAM_LAYOUT_STANDARD_АСТЦВ"
+    assert event["authority_reference"] == "00_DIAGRAM_LAYOUT_STANDARD_АСТЦВ"
+    assert event["drive_context_reference"] == "obj-001"
+    assert event["approval_reference"] == "requested"
+    assert event["actor"] == "operator_backend"
     assert event["result_state"] == "awaiting_operator_review"
 
     history_response = client.get("/api/tasks/task-001/history")
@@ -121,6 +130,10 @@ def test_update_task_state_and_append_history(client: TestClient) -> None:
     history = history_response.json()
     assert len(history) == 4
     assert history[2]["event_type"] == "status_changed_to_awaiting_operator_review"
+    assert history[2]["actor"] == "operator_backend"
+    assert history[2]["authority_reference"] == "00_DIAGRAM_LAYOUT_STANDARD_АСТЦВ"
+    assert history[2]["drive_context_reference"] == "obj-001"
+    assert history[2]["approval_reference"] == "requested"
     assert history[2]["result_state"] == "awaiting_operator_review"
     assert history[3]["event_type"] == "operator_review_requested"
 
