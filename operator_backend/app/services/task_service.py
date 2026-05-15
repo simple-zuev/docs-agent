@@ -25,9 +25,22 @@ def create_task(title: str, task_type: str) -> TaskDetails:
 
 
 def update_task_state(task_id: str, patch: dict) -> TaskDetails:
+    existing = mock_store.get_task(task_id)
+    if not existing:
+        raise HTTPException(status_code=404, detail="Task not found.")
+
+    previous_status = existing.get("status")
+    next_status = patch.get("status")
     task = mock_store.update_task(task_id, patch)
     if not task:
         raise HTTPException(status_code=404, detail="Task not found.")
+    if next_status and next_status != previous_status:
+        mock_store.append_history(
+            task_id,
+            event_type=f"status_changed_to_{next_status}",
+            summary=f"Task status changed from {previous_status} to {next_status}.",
+            result_state=next_status,
+        )
     task["history_count"] = len(mock_store.list_history(task_id))
     return TaskDetails(**task)
 
