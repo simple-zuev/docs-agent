@@ -74,6 +74,26 @@ def test_missing_task_returns_404(client: TestClient) -> None:
     assert response.json() == {"detail": "Task not found."}
 
 
+def test_missing_task_subroutes_return_404(client: TestClient) -> None:
+    patch_response = client.patch(
+        "/api/tasks/missing-task",
+        json={"status": "blocked"},
+    )
+    history_response = client.get("/api/tasks/missing-task/history")
+    append_response = client.post(
+        "/api/tasks/missing-task/history",
+        json={
+            "event_type": "task_blocked",
+            "summary": "Missing task should not accept history.",
+            "result_state": "blocked",
+        },
+    )
+
+    for response in (patch_response, history_response, append_response):
+        assert response.status_code == 404
+        assert response.json() == {"detail": "Task not found."}
+
+
 def test_create_task_defaults_to_unbound_non_mutating_state(
     client: TestClient,
 ) -> None:
