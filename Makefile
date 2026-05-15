@@ -1,4 +1,4 @@
-ROOT := /Users/zuevvladimir/AI/docs-agent
+ROOT := $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 ROOT_PYTHON := $(ROOT)/venv/bin/python
 BACKEND_PYTHON := $(ROOT)/operator_backend/.venv/bin/python
 FOUNDATION_FILES := \
