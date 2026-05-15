@@ -1,0 +1,24 @@
+Backend validation contracts audit
+Date: 2026-05-15
+
+Problem
+- Create-task validation had explicit API contract coverage.
+- Update-task and append-history validation were enforced by Pydantic models but not pinned by tests.
+
+Decision
+- Add test-only coverage for invalid task state patch payloads.
+- Add test-only coverage for too-short history append payload fields.
+- Require explicit 422 envelopes with field locations.
+
+Safety boundary
+- Test-only change.
+- No runtime behavior is changed.
+- No Google Drive or Google Docs behavior is changed.
+
+Validation
+- make test-backend: passed, 10 tests.
+- make test-all: passed, 56 CLI tests and 10 backend tests. CLI suite still emits the existing Python 3.9 Google dependency warnings.
+- git diff --check: clean.
+
+Rollback
+- Revert the tests and this audit note.

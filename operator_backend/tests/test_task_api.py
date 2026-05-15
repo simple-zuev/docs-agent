@@ -194,3 +194,28 @@ def test_create_task_validation_errors_are_explicit(client: TestClient) -> None:
     error_fields = {tuple(error["loc"]) for error in response.json()["detail"]}
     assert ("body", "title") in error_fields
     assert ("body", "task_type") in error_fields
+
+
+def test_update_task_validation_errors_are_explicit(client: TestClient) -> None:
+    response = client.patch(
+        "/api/tasks/task-001",
+        json={"status": "not_a_real_state", "approval_state": "not_real"},
+    )
+
+    assert response.status_code == 422
+    error_fields = {tuple(error["loc"]) for error in response.json()["detail"]}
+    assert ("body", "status") in error_fields
+    assert ("body", "approval_state") in error_fields
+
+
+def test_append_history_validation_errors_are_explicit(client: TestClient) -> None:
+    response = client.post(
+        "/api/tasks/task-001/history",
+        json={"event_type": "x", "summary": "No", "result_state": "x"},
+    )
+
+    assert response.status_code == 422
+    error_fields = {tuple(error["loc"]) for error in response.json()["detail"]}
+    assert ("body", "event_type") in error_fields
+    assert ("body", "summary") in error_fields
+    assert ("body", "result_state") in error_fields
