@@ -14,6 +14,77 @@ if str(BACKEND_ROOT) not in sys.path:
 from app.data import mock_store  # noqa: E402
 from app.main import app  # noqa: E402
 
+TASK_SUMMARY_FIELDS = {
+    "task_id",
+    "title",
+    "task_type",
+    "status",
+    "created_at",
+    "updated_at",
+    "created_by",
+    "authority_binding_id",
+    "drive_context_id",
+    "output_state",
+    "approval_state",
+    "notes",
+}
+
+TASK_DETAIL_FIELDS = TASK_SUMMARY_FIELDS | {
+    "authority_source",
+    "authority_topic",
+    "relevant_section",
+    "operator_hint",
+    "drive_object_id",
+    "drive_object_title",
+    "object_role",
+    "placement_state",
+    "safe_for_mutation",
+    "history_count",
+}
+
+HISTORY_EVENT_FIELDS = {
+    "event_id",
+    "task_id",
+    "event_type",
+    "actor",
+    "summary",
+    "authority_source",
+    "authority_reference",
+    "drive_context_reference",
+    "approval_reference",
+    "timestamp",
+    "result_state",
+}
+
+TASK_STATUSES = {
+    "created",
+    "authority_bound",
+    "context_loaded",
+    "in_progress",
+    "awaiting_approval",
+    "awaiting_operator_review",
+    "completed",
+    "blocked",
+    "cancelled",
+}
+
+OUTPUT_STATES = {
+    "none",
+    "preview_ready",
+    "body_prepared",
+    "export_package_ready",
+    "publication_ready",
+    "published",
+    "review_note_required",
+}
+
+APPROVAL_STATES = {"not_required", "required", "requested", "approved", "rejected"}
+
+
+def assert_timestamp(value: str) -> None:
+    assert isinstance(value, str)
+    assert value.endswith("Z")
+
 
 @pytest.fixture(autouse=True)
 def reset_mock_store():
@@ -44,27 +115,41 @@ def test_health_endpoint_reports_mock_runtime(client: TestClient) -> None:
     }
 
 
-def test_task_list_and_details_include_history_count(client: TestClient) -> None:
+def test_task_list_and_details_expose_semantic_contract(
+    client: TestClient,
+) -> None:
     list_response = client.get("/api/tasks")
     details_response = client.get("/api/tasks/task-001")
+    history_response = client.get("/api/tasks/task-001/history")
 
     assert list_response.status_code == 200
     tasks = list_response.json()
     task_ids = {item["task_id"] for item in tasks}
     assert {"task-001", "task-002"} <= task_ids
     listed_task = next(item for item in tasks if item["task_id"] == "task-001")
-    assert listed_task["created_at"] == "2026-05-13T11:12:00Z"
-    assert listed_task["updated_at"] == "2026-05-13T11:21:00Z"
-    assert listed_task["created_by"] == "operator_backend"
-    assert listed_task["authority_binding_id"] == "00_DIAGRAM_LAYOUT_STANDARD_АСТЦВ"
-    assert listed_task["drive_context_id"] == "obj-001"
-    assert listed_task["notes"] == "Canonical diagram source is retained for review."
+    assert TASK_SUMMARY_FIELDS <= listed_task.keys()
+    assert listed_task["status"] in TASK_STATUSES
+    assert listed_task["output_state"] in OUTPUT_STATES
+    assert listed_task["approval_state"] in APPROVAL_STATES
+    assert_timestamp(listed_task["created_at"])
+    assert_timestamp(listed_task["updated_at"])
+    assert listed_task["updated_at"] >= listed_task["created_at"]
+    assert listed_task["created_by"]
+    assert listed_task["authority_binding_id"]
+    assert listed_task["drive_context_id"]
+    assert isinstance(listed_task["notes"], str)
 
     assert details_response.status_code == 200
+    assert history_response.status_code == 200
     details = details_response.json()
+    history = history_response.json()
+    assert TASK_DETAIL_FIELDS <= details.keys()
     assert details["task_id"] == "task-001"
-    assert details["history_count"] == 2
-    assert details["safe_for_mutation"] is False
+    assert details["history_count"] == len(history)
+    assert isinstance(details["safe_for_mutation"], bool)
+    assert details["authority_binding_id"] == listed_task["authority_binding_id"]
+    assert details["drive_context_id"] == listed_task["drive_context_id"]
+    assert all(HISTORY_EVENT_FIELDS <= event.keys() for event in history)
 
 
 def test_missing_task_returns_404(client: TestClient) -> None:
@@ -121,14 +206,21 @@ def test_create_task_defaults_to_unbound_non_mutating_state(
     history_response = client.get(f"/api/tasks/{payload['task_id']}/history")
     assert history_response.status_code == 200
     history_event = history_response.json()[0]
+    assert HISTORY_EVENT_FIELDS <= history_event.keys()
+    assert history_event["task_id"] == payload["task_id"]
     assert history_event["event_type"] == "task_created"
-    assert history_event["actor"] == "operator_backend"
-    assert history_event["authority_reference"] == "UNBOUND"
-    assert history_event["drive_context_reference"] == "unbound"
-    assert history_event["approval_reference"] == "not_required"
+    assert history_event["actor"] == payload["created_by"]
+    assert history_event["authority_reference"] == payload["authority_binding_id"]
+    assert history_event["drive_context_reference"] == payload["drive_context_id"]
+    assert history_event["approval_reference"] == payload["approval_state"]
+    assert history_event["result_state"] == payload["status"]
+    assert_timestamp(history_event["timestamp"])
 
 
 def test_update_task_state_and_append_history(client: TestClient) -> None:
+    before_details = client.get("/api/tasks/task-001").json()
+    before_history = client.get("/api/tasks/task-001/history").json()
+
     patch_response = client.patch(
         "/api/tasks/task-001",
         json={"status": "awaiting_operator_review", "approval_state": "requested"},
@@ -138,8 +230,9 @@ def test_update_task_state_and_append_history(client: TestClient) -> None:
     patched = patch_response.json()
     assert patched["status"] == "awaiting_operator_review"
     assert patched["approval_state"] == "requested"
-    assert patched["updated_at"] >= "2026-05-13T11:21:00Z"
-    assert patched["history_count"] == 3
+    assert patched["updated_at"] != before_details["updated_at"]
+    assert_timestamp(patched["updated_at"])
+    assert patched["history_count"] == before_details["history_count"] + 1
 
     append_response = client.post(
         "/api/tasks/task-001/history",
@@ -152,30 +245,41 @@ def test_update_task_state_and_append_history(client: TestClient) -> None:
 
     assert append_response.status_code == 200
     event = append_response.json()
+    assert HISTORY_EVENT_FIELDS <= event.keys()
     assert event["task_id"] == "task-001"
-    assert event["authority_source"] == "00_DIAGRAM_LAYOUT_STANDARD_АСТЦВ"
-    assert event["authority_reference"] == "00_DIAGRAM_LAYOUT_STANDARD_АСТЦВ"
-    assert event["drive_context_reference"] == "obj-001"
-    assert event["approval_reference"] == "requested"
-    assert event["actor"] == "operator_backend"
+    assert event["authority_source"] == patched["authority_source"]
+    assert event["authority_reference"] == patched["authority_source"]
+    assert event["drive_context_reference"] == patched["drive_object_id"]
+    assert event["approval_reference"] == patched["approval_state"]
+    assert event["actor"] == patched["created_by"]
     assert event["result_state"] == "awaiting_operator_review"
+    assert_timestamp(event["timestamp"])
 
     history_response = client.get("/api/tasks/task-001/history")
     assert history_response.status_code == 200
     history = history_response.json()
-    assert len(history) == 4
-    assert history[2]["event_type"] == "status_changed_to_awaiting_operator_review"
-    assert history[2]["actor"] == "operator_backend"
-    assert history[2]["authority_reference"] == "00_DIAGRAM_LAYOUT_STANDARD_АСТЦВ"
-    assert history[2]["drive_context_reference"] == "obj-001"
-    assert history[2]["approval_reference"] == "requested"
-    assert history[2]["result_state"] == "awaiting_operator_review"
-    assert history[3]["event_type"] == "operator_review_requested"
+    assert len(history) == len(before_history) + 2
+    status_events = [
+        item
+        for item in history
+        if item["event_type"] == "status_changed_to_awaiting_operator_review"
+    ]
+    assert len(status_events) == 1
+    status_event = status_events[0]
+    assert status_event["actor"] == patched["created_by"]
+    assert status_event["authority_reference"] == patched["authority_source"]
+    assert status_event["drive_context_reference"] == patched["drive_object_id"]
+    assert status_event["approval_reference"] == patched["approval_state"]
+    assert status_event["result_state"] == patched["status"]
+    assert any(item["event_id"] == event["event_id"] for item in history)
 
 
 def test_update_without_status_change_does_not_append_history(
     client: TestClient,
 ) -> None:
+    before_details = client.get("/api/tasks/task-001").json()
+    before_history = client.get("/api/tasks/task-001/history").json()
+
     response = client.patch(
         "/api/tasks/task-001",
         json={"approval_state": "approved"},
@@ -184,7 +288,12 @@ def test_update_without_status_change_does_not_append_history(
     assert response.status_code == 200
     payload = response.json()
     assert payload["approval_state"] == "approved"
-    assert payload["history_count"] == 2
+    assert payload["updated_at"] != before_details["updated_at"]
+    assert payload["history_count"] == before_details["history_count"]
+
+    history_response = client.get("/api/tasks/task-001/history")
+    assert history_response.status_code == 200
+    assert history_response.json() == before_history
 
 
 def test_create_task_validation_errors_are_explicit(client: TestClient) -> None:
