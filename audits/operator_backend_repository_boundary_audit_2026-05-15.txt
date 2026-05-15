@@ -1,0 +1,213 @@
+Operator backend repository boundary audit
+Date: 2026-05-15
+Mode: audit-only
+
+Scope
+- Reviewed the current Phase 2 persistence readiness direction after
+  docs/BACKEND_PERSISTENCE_PLAN.md.
+- Target surface: operator_backend app/service/data boundary.
+- No runtime code, tests, backend schema, frontend, persistence implementation,
+  Google Drive, or Google Docs behavior is changed by this audit.
+
+Executive summary
+- The next safe step before SQLite or any other persistence implementation is to
+  isolate the current in-memory mock_store behind a repository boundary.
+- Current routes already depend on task_service rather than mock_store directly,
+  which is a useful separation.
+- task_service still imports app.data.mock_store directly, so persistence cannot
+  be swapped without changing service internals.
+- A TaskRepository protocol/interface should be introduced before SQLite work.
+- The first implementation PR should preserve current mock behavior and avoid
+  database code.
+
+Current boundary map
+
+Routes layer
+- File: operator_backend/app/routes/tasks.py
+- Current responsibility:
+  - defines HTTP routes;
+  - validates request payloads through Pydantic models;
+  - delegates business behavior to app.services.task_service.
+- Current risk:
+  - low. Routes do not depend directly on mock_store.
+- Boundary decision:
+  - keep routes thin;
+  - do not introduce database/session logic in routes.
+
+Service layer
+- File: operator_backend/app/services/task_service.py
+- Current responsibility:
+  - calls mock_store for task list, details, create, update, history list, and
+    history append;
+  - raises HTTPException for not-found cases;
+  - computes history_count;
+  - appends history for status changes.
+- Current risk:
+  - medium. Service imports mock_store directly, making persistence replacement
+    a service rewrite instead of a repository swap.
+- Boundary decision:
+  - task_service should depend on a repository abstraction;
+  - status-change history semantics should remain in service unless later moved
+    into a domain service;
+  - HTTPException handling can remain in service for now, but repository should
+    return None / data, not HTTP responses.
+
+Data layer
+- File: operator_backend/app/data/mock_store.py
+- Current responsibility:
+  - stores seed tasks and history in module-level dictionaries;
+  - creates tasks;
+  - updates task fields and updated_at;
+  - appends history events;
+  - returns deep copies to avoid external mutation.
+- Current risk:
+  - medium. Module-level globals are acceptable for mock-runtime but not for
+    durable local state.
+- Boundary decision:
+  - preserve this implementation as MockTaskRepository or repository backend;
+  - do not delete seed fixtures during first repository-boundary PR;
+  - retain deepcopy behavior to avoid accidental reference mutation.
+
+Models layer
+- File: operator_backend/app/models.py
+- Current responsibility:
+  - defines API request/response models and literal enums.
+- Current risk:
+  - medium only if repository code starts depending on API models as database
+    models.
+- Boundary decision:
+  - keep Pydantic API models separate from future persistence records;
+  - do not use TaskSummary / TaskDetails as ORM models.
+
+Recommended repository interface
+
+Name candidate
+- operator_backend/app/repositories/task_repository.py
+
+Core protocol candidate
+- list_tasks() -> list[dict]
+- get_task(task_id: str) -> dict | None
+- create_task(title: str, task_type: str) -> dict
+- update_task(task_id: str, patch: dict) -> dict | None
+- list_history(task_id: str) -> list[dict]
+- append_history(task_id: str, event_type: str, summary: str, result_state: str) -> dict | None
+
+Implementation candidates
+- MockTaskRepository:
+  - wraps existing mock_store behavior;
+  - preserves module-level seed behavior initially;
+  - can be dependency-injected into task_service.
+- SQLiteTaskRepository later:
+  - implements the same protocol;
+  - introduced behind explicit config after schema/migration plan.
+
+Dependency injection options
+
+Option A: module-level repository provider
+- Add a small provider such as get_task_repository() returning MockTaskRepository.
+- task_service calls the provider or receives a repository via helper.
+- Lowest complexity for local MVP.
+- Risk: can remain global-ish if not kept disciplined.
+
+Option B: service functions accept repository optional parameter
+- Service functions default to MockTaskRepository but tests can inject a fake.
+- Good for incremental testability.
+- Slightly noisier function signatures.
+
+Option C: FastAPI dependency injection
+- Routes inject repository and pass to service layer.
+- Better for production architecture.
+- More invasive and not needed for the first boundary PR.
+
+Recommendation
+- Use Option B or a very small provider first.
+- Do not introduce FastAPI dependency injection until the repository contract is
+  stable.
+
+Behavior-preservation requirements
+
+The first repository-boundary implementation must preserve:
+- health endpoint behavior;
+- task list response shape;
+- task detail response shape;
+- task create defaults;
+- missing-task 404 envelopes;
+- validation 422 envelopes;
+- status-change history creation;
+- non-status patch behavior: updated_at changes, history does not append;
+- history_count computation;
+- history append semantics;
+- deep-copy / no accidental external mutation behavior.
+
+Test expectations
+
+Existing backend API tests should continue to pass unchanged if the repository
+boundary is behavior-preserving.
+
+Possible additional tests for the repository-boundary PR:
+- service works with injected fake repository;
+- repository returns copies rather than mutable internal references;
+- status update still appends one history event;
+- non-status update still does not append history.
+
+Do not overfit new tests to exact seed timestamps or exact seed strings.
+
+Non-goals for first implementation PR
+- No SQLite.
+- No migrations.
+- No SQLAlchemy.
+- No database files.
+- No production persistence default.
+- No frontend changes.
+- No live Google integration.
+- No API field renames.
+- No change to Pydantic response models.
+- No auth/RBAC/CORS hardening in the same PR.
+
+Recommended next PR
+
+Production PR candidate:
+- Title: Introduce operator backend task repository boundary
+- Files likely changed:
+  - operator_backend/app/repositories/task_repository.py
+  - operator_backend/app/services/task_service.py
+  - operator_backend/tests/test_task_api.py only if needed
+  - possibly operator_backend/app/data/mock_store.py only if wrapping requires a
+    thin class adapter
+- Expected behavior change:
+  - none intended.
+- Validation:
+  - make test-backend
+  - make test-all
+  - make check
+  - git diff --check
+
+Acceptance criteria for next PR
+- No public API response shape changes.
+- All existing backend tests pass.
+- Mock runtime remains default.
+- No persistence package dependency is added.
+- No live Google behavior is touched.
+- Service layer no longer imports mock_store directly, or at minimum the direct
+  dependency is isolated behind a repository adapter.
+
+Risks to monitor
+- A repository class could accidentally return references to module-level dicts.
+- Service semantics could move too much into repository and blur domain logic.
+- Tests could pass while dependency boundaries remain effectively unchanged.
+- A future SQLite implementation could misuse Pydantic API models as database
+  models if the separation is not maintained.
+
+Rollback plan for future implementation PR
+- Revert the repository-boundary commit.
+- Because no database or schema migration should be included, rollback should be
+  a normal code revert.
+- If tests are added, revert them with the boundary change.
+
+Conclusion
+- Do not implement SQLite yet.
+- First introduce a small repository boundary around task/history persistence.
+- Keep mock runtime as default.
+- Preserve API behavior and tests.
+- Treat durable persistence as the following phase after the boundary is merged
+  and validated.
