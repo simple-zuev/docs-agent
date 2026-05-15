@@ -11,8 +11,14 @@ TASKS: dict[str, dict[str, Any]] = {
         "title": "Prepare diagram package for exchange overview",
         "task_type": "prepare_diagram_package",
         "status": "in_progress",
+        "created_at": "2026-05-13T11:12:00Z",
+        "updated_at": "2026-05-13T11:21:00Z",
+        "created_by": "operator_backend",
+        "authority_binding_id": "00_DIAGRAM_LAYOUT_STANDARD_АСТЦВ",
+        "drive_context_id": "obj-001",
         "output_state": "preview_ready",
         "approval_state": "required",
+        "notes": "Canonical diagram source is retained for review.",
         "authority_source": "00_DIAGRAM_LAYOUT_STANDARD_АСТЦВ",
         "authority_topic": "diagram source/export/layout rules",
         "relevant_section": "source-of-truth / export expectations",
@@ -28,8 +34,14 @@ TASKS: dict[str, dict[str, Any]] = {
         "title": "Read operating prompt document",
         "task_type": "read_document",
         "status": "completed",
+        "created_at": "2026-05-13T10:55:00Z",
+        "updated_at": "2026-05-13T10:55:00Z",
+        "created_by": "operator_backend",
+        "authority_binding_id": "00_AI_OPERATING_AND_DOCUMENT_WORKFLOW_STANDARD_АСТЦВ",
+        "drive_context_id": "obj-002",
         "output_state": "none",
         "approval_state": "not_required",
+        "notes": "Bounded read completed without mutation capability.",
         "authority_source": "00_AI_OPERATING_AND_DOCUMENT_WORKFLOW_STANDARD_АСТЦВ",
         "authority_topic": "document workflow / output discipline",
         "relevant_section": "bounded read / operator workflow",
@@ -104,13 +116,20 @@ def get_task(task_id: str) -> dict[str, Any] | None:
 
 def create_task(title: str, task_type: str) -> dict[str, Any]:
     task_id = f"task-{uuid4().hex[:8]}"
+    timestamp = now_iso()
     task = {
         "task_id": task_id,
         "title": title,
         "task_type": task_type,
         "status": "created",
+        "created_at": timestamp,
+        "updated_at": timestamp,
+        "created_by": "operator_backend",
+        "authority_binding_id": "UNBOUND",
+        "drive_context_id": "unbound",
         "output_state": "none",
         "approval_state": "not_required",
+        "notes": "",
         "authority_source": "UNBOUND",
         "authority_topic": "authority binding pending",
         "relevant_section": "to be resolved",
@@ -133,7 +152,7 @@ def create_task(title: str, task_type: str) -> dict[str, Any]:
             "authority_reference": "UNBOUND",
             "drive_context_reference": "unbound",
             "approval_reference": "not_required",
-            "timestamp": now_iso(),
+            "timestamp": timestamp,
             "result_state": "created",
         }
     ]
@@ -143,7 +162,10 @@ def create_task(title: str, task_type: str) -> dict[str, Any]:
 def update_task(task_id: str, patch: dict[str, Any]) -> dict[str, Any] | None:
     if task_id not in TASKS:
         return None
-    TASKS[task_id].update({k: v for k, v in patch.items() if v is not None})
+    changes = {k: v for k, v in patch.items() if v is not None}
+    if changes:
+        changes["updated_at"] = now_iso()
+    TASKS[task_id].update(changes)
     return deepcopy(TASKS[task_id])
 
 

@@ -49,8 +49,16 @@ def test_task_list_and_details_include_history_count(client: TestClient) -> None
     details_response = client.get("/api/tasks/task-001")
 
     assert list_response.status_code == 200
-    task_ids = {item["task_id"] for item in list_response.json()}
+    tasks = list_response.json()
+    task_ids = {item["task_id"] for item in tasks}
     assert {"task-001", "task-002"} <= task_ids
+    listed_task = next(item for item in tasks if item["task_id"] == "task-001")
+    assert listed_task["created_at"] == "2026-05-13T11:12:00Z"
+    assert listed_task["updated_at"] == "2026-05-13T11:21:00Z"
+    assert listed_task["created_by"] == "operator_backend"
+    assert listed_task["authority_binding_id"] == "00_DIAGRAM_LAYOUT_STANDARD_АСТЦВ"
+    assert listed_task["drive_context_id"] == "obj-001"
+    assert listed_task["notes"] == "Canonical diagram source is retained for review."
 
     assert details_response.status_code == 200
     details = details_response.json()
@@ -79,7 +87,13 @@ def test_create_task_defaults_to_unbound_non_mutating_state(
     assert payload["title"] == "Prepare operator packet"
     assert payload["task_type"] == "prepare_packet"
     assert payload["status"] == "created"
+    assert payload["created_at"].endswith("Z")
+    assert payload["updated_at"] == payload["created_at"]
+    assert payload["created_by"] == "operator_backend"
+    assert payload["authority_binding_id"] == "UNBOUND"
+    assert payload["drive_context_id"] == "unbound"
     assert payload["approval_state"] == "not_required"
+    assert payload["notes"] == ""
     assert payload["authority_source"] == "UNBOUND"
     assert payload["safe_for_mutation"] is False
     assert payload["history_count"] == 1
@@ -104,6 +118,7 @@ def test_update_task_state_and_append_history(client: TestClient) -> None:
     patched = patch_response.json()
     assert patched["status"] == "awaiting_operator_review"
     assert patched["approval_state"] == "requested"
+    assert patched["updated_at"] >= "2026-05-13T11:21:00Z"
     assert patched["history_count"] == 3
 
     append_response = client.post(
