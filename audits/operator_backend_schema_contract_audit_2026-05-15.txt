@@ -1,0 +1,226 @@
+Operator backend schema contract audit
+Date: 2026-05-15
+Mode: audit-only
+
+Scope
+- Reviewed AGENTS.md, docs/CODEX_HANDOFF.md, operator_backend/app/models.py,
+  operator_backend/app/data/mock_store.py, operator_backend/app/routes/tasks.py,
+  operator_backend/app/services/task_service.py, operator_backend/tests/test_task_api.py,
+  and recent backend audit notes from 2026-05-15.
+- No runtime code, tests, Makefile, README, docs/PROJECT_STATUS.md, PR state, or
+  Google Drive / Google Docs behavior was changed.
+
+Executive summary
+- The current operator_backend API is safe as a mock-runtime contract baseline,
+  but the task schema has grown faster than the canonical field model.
+- The main risk is not immediate runtime breakage. The main risk is locking
+  ambiguous mock fields into frontend or persistence contracts before choosing
+  canonical names and semantics.
+- Further backend/frontend expansion should pause until the authority, Drive
+  context, approval, and history field model is documented and pinned by tests.
+
+Current API surface
+- GET /api/tasks returns list[TaskSummary].
+- POST /api/tasks returns TaskDetails.
+- GET /api/tasks/{task_id} returns TaskDetails.
+- PATCH /api/tasks/{task_id} returns TaskDetails.
+- GET /api/tasks/{task_id}/history returns list[HistoryEvent].
+- POST /api/tasks/{task_id}/history returns HistoryEvent.
+
+TaskSummary vs TaskDetails
+- TaskSummary currently includes task identity, timestamps, creator, authority
+  binding id, Drive context id, output state, approval state, and notes.
+- TaskDetails extends TaskSummary with authority/source details, operator hint,
+  Drive object details, placement state, safe_for_mutation, and history_count.
+- Risk: TaskSummary is becoming too heavy for list endpoints. It now exposes
+  several fields that may be detail-only or mock-only once persistence and a UI
+  are added.
+- Recommendation: keep TaskSummary as a compact list item contract and move
+  richer authority/Drive/operator trace fields to TaskDetails unless a list view
+  explicitly needs them.
+
+HistoryEvent
+- HistoryEvent currently includes event identity, task id, event type, actor,
+  summary, authority_source, authority_reference, drive_context_reference,
+  approval_reference, timestamp, and result_state.
+- This is useful for auditability, but several fields mirror current task state
+  instead of preserving a separately versioned event-time reference.
+- Recommendation: treat HistoryEvent as an event-time trace. Each reference
+  field should either be a stable id/reference captured at event creation, or be
+  removed in favor of a documented event context object later.
+
+Duplicated or ambiguous fields
+
+authority_binding_id vs authority_source vs authority_reference
+- authority_binding_id is currently on TaskSummary and looks like the canonical
+  task-level authority id.
+- authority_source is currently on TaskDetails and HistoryEvent. In mock data it
+  often duplicates authority_binding_id.
+- authority_reference is currently on HistoryEvent and mirrors authority_source.
+- Risk: clients cannot tell which field is canonical.
+- Recommendation: make authority_binding_id the canonical task-level API field.
+  Keep authority_source only if it has a distinct human-readable meaning, such
+  as title/name. Make authority_reference an event-time copy of
+  authority_binding_id, or rename/remove it in a future production cleanup.
+
+drive_context_id vs drive_object_id vs drive_context_reference
+- drive_context_id is currently on TaskSummary.
+- drive_object_id is currently on TaskDetails.
+- drive_context_reference is currently on HistoryEvent and mirrors
+  drive_object_id in mock_store.append_history.
+- Risk: these three names describe nearly the same concept at different layers.
+- Recommendation: choose drive_context_id as the canonical task-level field for
+  the object/context the task is bound to. Keep drive_object_id only if details
+  need to expose a more specific Google Drive object id distinct from broader
+  context. Make drive_context_reference an event-time copy of the canonical id.
+
+approval_state vs approval_reference
+- approval_state is a task-level enum.
+- approval_reference is an event field but currently mirrors approval_state,
+  not a separate approval artifact or approval id.
+- Risk: approval_reference implies an external reference that does not exist.
+- Recommendation: keep approval_state as canonical now. Either rename
+  approval_reference to approval_state_at_event, or defer it until there is a
+  real approval request id / review artifact id.
+
+status vs result_state
+- status is the current task lifecycle state.
+- result_state is a HistoryEvent field and currently stores the outcome/state
+  after that event.
+- This split is reasonable if documented.
+- Recommendation: define result_state as event outcome, not task status. It may
+  equal a task status for status_changed events, but should not be required to
+  always match TaskStatus.
+
+history_count vs history endpoint
+- history_count appears only on TaskDetails and is computed by task_service from
+  mock_store.list_history.
+- GET /api/tasks/{task_id}/history is the authoritative detailed history source.
+- Recommendation: keep history_count as a convenience detail field, not as a
+  list endpoint field unless the UI has a concrete list-view need.
+
+updated_at semantics
+- mock_store.update_task updates updated_at for any non-empty patch, including
+  status, output_state, and approval_state.
+- task_service.update_task_state appends history only when status changes.
+- Risk: updated_at can advance without any history event, which is acceptable
+  only if documented as "last task record mutation", not "last history event".
+- Recommendation: document updated_at as last task-state write. If audit parity
+  is required later, add history events for approval/output transitions in a
+  separate production PR.
+
+Status-change history semantics
+- Status changes append bounded history events with event_type
+  status_changed_to_<status>, summary, and result_state=<status>.
+- Non-status patches do not append history.
+- This is simple and safe for mock-runtime, but it is not yet a full audit log.
+- Recommendation: preserve this behavior for now. Add explicit tests/docs that
+  only status changes append history until a broader audit-log model is chosen.
+
+Mock-only fields vs API contract fields
+- Likely API contract fields now:
+  task_id, title, task_type, status, created_at, updated_at, created_by,
+  authority_binding_id, drive_context_id, output_state, approval_state,
+  history_count on details, HistoryEvent identity/timestamp/event_type/summary.
+- Likely mock-only or candidate detail-only fields:
+  notes, authority_topic, relevant_section, operator_hint, drive_object_title,
+  object_role, placement_state, safe_for_mutation, seed-specific actor values,
+  seed-specific document titles, and exact seed timestamps.
+- Ambiguous fields needing canonical decision:
+  authority_source, authority_reference, drive_object_id,
+  drive_context_reference, approval_reference, result_state.
+
+Seed-data overfitting in tests
+- Current tests pin useful behavior, but also pin mock seed details:
+  exact timestamps, exact notes text, exact authority document names, obj-001,
+  history index positions, and actor="operator_backend".
+- Risk: future seed changes or persistence migration will break tests that are
+  not actually contract changes.
+- Recommendation: keep explicit tests for required field presence, enums,
+  missing-task envelopes, validation envelopes, status-history creation, and
+  non-mutating defaults. Reduce reliance on exact seed strings where the API
+  contract only needs "non-empty string" or "matches task-bound id".
+
+Is the list endpoint too heavy?
+- Yes, likely.
+- GET /api/tasks currently returns TaskSummary with trace fields and notes.
+  That is acceptable for the mock baseline, but it may become too heavy for an
+  operator list UI and too binding for persistence.
+- Recommendation: introduce a future TaskListItem or slim TaskSummary only
+  after documenting the canonical field model. Do not change it before tests
+  are adjusted.
+
+Recommended canonical field model
+
+Task list item / compact summary
+- task_id
+- title
+- task_type
+- status
+- output_state
+- approval_state
+- created_at
+- updated_at
+- created_by
+- authority_binding_id
+- drive_context_id
+
+Task details
+- all list item fields
+- notes
+- authority_source or authority_title, only if distinct from authority_binding_id
+- authority_topic
+- relevant_section
+- operator_hint
+- drive_object_title
+- object_role
+- placement_state
+- safe_for_mutation
+- history_count
+
+History event
+- event_id
+- task_id
+- event_type
+- actor
+- summary
+- timestamp
+- result_state
+- authority_binding_id_at_event or authority_reference
+- drive_context_id_at_event or drive_context_reference
+- approval_state_at_event, unless a real approval artifact id exists
+
+Recommended next PR split
+
+Docs-only PR
+- Add a short operator_backend schema note defining canonical task, detail, and
+  history fields.
+- State explicitly that backend remains mock-runtime only, with no production
+  persistence and no live Google-backed task execution.
+
+Test-only PR
+- Add contract tests for field presence and semantic relationships rather than
+  exact seed values.
+- Add tests documenting updated_at and status-history semantics:
+  status changes append history; approval/output-only patches update updated_at
+  but do not append history under the current contract.
+
+Production PR
+- After docs/test alignment, either:
+  1. keep current fields but rename/document ambiguous event references, or
+  2. split TaskSummary into a slimmer list model and keep richer data in
+     TaskDetails.
+- Do not combine this with frontend/operator_app work.
+
+Stop conditions
+- Do not merge PR #105 or other operator_app work before this schema decision is
+  accepted.
+- Do not add production persistence before choosing canonical field names.
+- Do not connect backend task execution to live Google Drive/Docs as part of
+  schema cleanup.
+- Do not remove fields from the API without a migration/compatibility decision.
+
+Validation
+- Audit-only file creation.
+- No tests required.
+- Recommended local check before commit: git diff --check.
