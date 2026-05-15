@@ -1,0 +1,23 @@
+Project status backend alignment audit
+Date: 2026-05-15
+
+Problem
+- docs/PROJECT_STATUS.md still described an older stage baseline and did not mention the operator backend contract work.
+- Recent small PRs added local test gates and pinned the mock backend task/history/error contracts.
+
+Decision
+- Update project status to identify the current baseline as main after backend contract alignment through PR #137.
+- Add confirmed operator backend capabilities and local Makefile test gates.
+- Keep live backend persistence and live Google-backed task execution listed as incomplete.
+
+Safety boundary
+- Docs-only change.
+- No runtime behavior is changed.
+- No Google Drive or Google Docs behavior is changed.
+
+Validation
+- make test-all: passed, 56 CLI tests and 10 backend tests. CLI suite still emits the existing Python 3.9 Google dependency warnings.
+- git diff --check: clean.
+
+Rollback
+- Revert docs/PROJECT_STATUS.md and this audit note.

@@ -2,7 +2,7 @@
 
 ## Текущий baseline
 
-- stage27-reconciled
+- main after mock operator backend contract baseline through PR #137
 
 ## Git status
 
@@ -10,6 +10,7 @@
 - GitHub remote подключен
 - ветка main синхронизирована
 - onboarding documentation package добавлен
+- local test gates доступны через `make test-cli`, `make test-backend`, `make test-all`
 
 ## Что подтверждено
 
@@ -39,6 +40,22 @@
 - curated commits выполнены
 - чувствительный config не попал в git
 
+### Operator backend
+Подтверждено:
+- FastAPI mock runtime exposes health, task list/details, task create, task update, history list, and history append routes
+- backend task responses include documented trace fields: created/updated metadata, authority binding, Drive context, approval state, notes, and history count
+- backend history responses include actor, authority, Drive context, approval, timestamp, and result-state trace fields
+- task status changes append history events
+- missing-task and validation error envelopes are pinned by API contract tests
+- backend tests run through `make test-backend`
+
+Ограничения:
+- backend readiness is mock-runtime only
+- production persistence is not complete
+- live Google-backed task execution is not complete
+- live Google Drive / Google Docs mutation behavior is not expanded by this baseline
+- read-doc, get-file, and read-doc-from-query remain degraded by default
+
 ## Что остается чувствительным
 
 ### Deep diagnostic path
@@ -61,10 +78,13 @@
 - controlled daily use
 - routine operations
 - controlled Git-based evolution
+- mock operator backend contract iteration
 
 Система пока не идеальна для:
 - частых серийных deep checks
 - безоглядочного масштабирования без cache/memoization
+- production backend persistence or live Google-backed task execution
+- live Google-backed operator task execution
 
 ## Следующий инженерный приоритет
 
@@ -104,6 +124,10 @@ Stable now:
 - onboarding and operations docs
 - routine path via doctor-lite
 - restored runtime baseline
+- local CLI and operator backend test gates
+- mock backend API contract coverage
 
 Not fully completed:
 - full-sheet stage30 runtime cache activation
+- live backend persistence
+- live authority / Drive resolution inside backend task handlers
