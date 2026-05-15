@@ -52,6 +52,7 @@ exports/
 reports/
 tmp_upload_test.txt
 auth_and_scan.py.bak-*
+var/
 
 # Sensitive local Google auth/config
 config/
